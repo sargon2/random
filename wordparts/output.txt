@@ -1,0 +1,7 @@
+Single letters: e s a r i t o n l d
+Two-letter combos: ed er in es ng le re te st ar
+Two-letter combos (beginning): re co ca st de ma pa ba sh sp
+Two-letter combos (end): ed es er ng ts rs ns le ly st
+Three-letter combos: ing ers ter est led ted ier ies les ate
+Three-letter combos (beginning): sta gra pro cha con car sha cra for par
+Three-letter combos (end): ing ers ted led ier ies est les ter ked
