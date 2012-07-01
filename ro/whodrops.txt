@@ -1,0 +1,231 @@
+Aloe: Mandragora, Metaller, Wormtail
+Amulet: Munak
+Anacondaq Card: Anacondaq
+Animal Blood: Condor
+Anti-painment: Cornutus, Snake, Poison Spore
+Apple: Lunatic, Poring, Willow
+Arc Wand: Sidewinder, Snake
+Arrow: Condor
+Azure Jewel: Roda Frog
+Banana: Yoyo
+Baphomet Doll: Baphomet
+Bear Paw: Bigfoot
+Bee's Sting: Hornet, Misstress
+Bigfoot Card: Bigfoot
+Bill of Birds: Condor, Pecopeco
+Black Ladle: Thief Bug Egg
+Blood Axe: Orc Hero
+Blue Gemstone: Cornutus, Golden Bug, Golem, Megalodon, Vadon
+Blue Herb: Golden Bug, Megalodon, Nightmare, Poison Spore, Spore
+Blue Jewel: Wol
+Blue Potion: Doppelganger
+Bluish Green Jewel: Mandragora, Poporing, Thief Bug (Big)
+Branch of Dead Tree: Elder Willow, Willow
+Broad Sword: Doppelganger, Isis
+Brooch: Obeaune
+Buckler: Thief Bug (Big)
+Carrot: Lunatic
+Castoff Skin: Pupa, Thief Bug, Thief Bug Egg
+Cat Hairband: Smokie
+Chain Mail: Hunter Fly
+Chonchon Card: Chonchon
+Chonchon Doll: Chonchon
+Circlet: Isis
+Claw of Birds: Condor, Pecopeco, Picky (with shell), Picky (without shell)
+Claw of Wolves: Wol
+Clover: Fabre, Mandragora
+Club: Fabre, Willow
+Composite Bow: Skeleton Archer
+Condor Card: Condor
+Cornutus Card: Cornutus
+Creamy Card: Creamy
+CrossBow: Skeleton Archer
+Crown: Osiris
+Cutter: Roda Frog
+Damascus: Misstress
+Dark-Red Jewel: Golem
+Decoration Flower: Creamy
+Demon's Horn: Baphomet
+Earring: Isis, Munak
+Elder Willow Card: Elder Willow
+Elunium Stone: Bigfoot, Golem, Marc, Obeaune, Orc Hero, Osiris, Scorpion, Steel Chonchon, Nightmare, Poporing
+Empty Bottle: Pecopeco Egg, Poring
+Fabre Card: Fabre
+Falchion: Pirate Skel, Thief Bug Egg, Creamy Egg
+Farmiliar Card: Farmiliar
+Feather: Fabre, Lunatic
+Feather of Birds: Condor, Pecopeco, Picky (with shell), Picky (without shell)
+Flame Arrow: Skeleton Archer
+Flower: Creamy
+Fluff: Fabre, Lunatic, Picky (with shell), Picky (without shell)
+Fortune Sword: Skeleton Soldier
+Four Leaf Clover: Mandragora
+Garlet: Farmiliar, Megalodon, Metaller, Poison Spore, Rocker, Steel Chonchon, Thief Bug (Big), Thief Bug (Green), Vadon, Wormtail, Hydra
+Ghoul Card: Ghoul
+Globe: Mummy
+Gold: Golden Bug
+Gold Ring: Golden Bug
+Gold Ring: Marc
+Gold Thief Bug Card: Golden Bug
+Golden Jewel: Golem
+Golem Card: Golem
+Grape: Farmiliar, Poporing
+Grasshopper Doll: Rocker
+Grasshopper's Leg: Metaller, Rocker
+Green Herb: Fabre, Hornet, Mandragora, Poison Spore, Snake
+Green Jewel: Fabre, Roda Frog, Wormtai
+Green Leaf: Scorpion
+Green Potion: Mummy
+Gungnir: Baphomet, Isis
+Hard Shell: Hunter Fly, Scorpion, Steel Chonchon, Vadon
+Hat: Spore
+Helm: Scorpion
+Hempen Hood: Pirate Skel
+Hinalle Flower: Rocker
+Holy Robe: Baphomet
+Honey: Creamy, Hornet, Misstress
+Hood: Pupa
+Horn of Bug: Creamy, Thief Bug (Big), Thief Bug (Green)
+Hornet Card: Hornet
+Horseshoe: Nightmare
+Hunter Fly Card: Hunter Fly
+Hwandotaedo: Pirate Skel
+Hydra Card: Hydra
+Immortal Heart: Vorit
+Isis Card: Isis
+Jellopy: Chonchon, Lunatic, Poporing, Poring, Roda Frog, Skeleton, Thief Bug, Willow
+Knife: Thief Bug
+Lance: Wormtail
+Leaf of Aloe: Metaller, Wormtail
+Leaf of Hinalle: Rocker
+Leather: Baphomet, Bigfoot, Smokie, Wolf, Yoyo
+Leather Jacket: Thief Bug
+Mace: Skeleton
+Mandragora Card: Mandragora
+Mantle: Wolf
+Meat: Condor, Hydra, Wolf
+Megalodon Card: Megalodon
+Memento of Dead: Ghoul, Mummy, Osiris, Skeleton Soldier, Vorit, Zombie
+Ment: Mandragora
+Metaller Card: Metaller
+Might Staff: Elder Willow
+Milk: Picky (with shell), Picky (without shell)
+Mink Coat: Yoyo
+Misstress Card: Misstress
+Monkey's Tail: Yoyo
+Monster's feed: Wolf
+Moth Dust: Creamy
+Mummy Card: Mummy
+Munak Card: Munak
+Mushroom Spore: Spore, Poison Spore
+Nail of Deceased: Ghoul, Zombie
+Necklace: Isis
+Ninja Suit: Munak
+Nipper: Vadon
+Obeaune Card: Obeaune
+Old Blue Box: Golden Bug, Orc Hero, Willow, Pirate Skel, Spore, Zombie
+Orc Cuspid: Orc Hero
+Orc Hero Card: Orc Hero
+Orc Hero Voucher: Orc Hero
+Orcish Axe: Orc Warrior
+Orcish Cuspid: Orc Warrior
+Orcish Sword: Orc Hero
+Orcish Voucher: Orc Warrior
+Oridecon Stone: Anacondaq, Baphomet, Golden Bug, Isis, Misstress, Munak, Nightmare, Orc Hero, Orc Warrior, Osiris, Skeleton Archer, Skeleton Soldier
+Padded Armor: Anacondaq, Steel Chonchon, Cornutus
+Pecopeco Card: Pecopeco
+Picky Card: Picky (with shell), Picky (without shell)
+Pigtail Ribbon: Munak
+Pirate Card: Pirate Skel
+Plate Mail: Doppelganger
+Poison Cuspid: Anacondaq, Sidewinder
+Poison Spore Card: Poison Spore
+Poporing Card: Poporing
+Poring Card: Poring
+Poring Doll: Poring
+Posion Cuspid: Snake
+Potato: Elder Willow
+Pupa Card: Pupa
+Raccoon Leaf: Smokie
+Raccoondog Doll: Smokie
+Red Gemstone: Bigfoot, Creamy Egg, Golem, Hornet, Thief Bug Egg, Thief Bug (Green)
+Red Herb: Fabre, Farmiliar, Pecopeco, Picky (with shell), Picky (without shell), Poring, Spore, Thief Bug, Willow, Lunatic, Skeleton
+Red Jewel: Zombie
+Red Potion: Pecopeco Egg
+Resin: Elder Willow, Willow
+Ribbon: Farmiliar
+Rocker Card: Rocker
+Rod: Pecopeco
+Roda Frog Card: Roda Frog
+Rosary: Nightmare
+Rotten Bandage: Mummy, Vorit
+Rotton Scale: Megalodon
+Royal Jelly: Misstress
+Safety Ring: Doppelganger
+Sandals: Condor, Pupa
+Scale: Steel Chonchon, Wormtai
+Scale of Snakes: Anacondaq, Isis, Sidewinder, Snake
+Scale Skin: Anacondaq, Isis, Sidewinder
+Scarlet Jewel: Misstress, Hornet
+Scell: Chonchon, Hornet, Roda Frog, Skeleton, Thief Bug
+Scorpion Card: Scorpion
+Scorpion's Tail: Scorpion
+Shell: Chonchon, Creamy Egg, Pecopeco Egg, Pupa, Steel Chonchon, Thief Bug (Big), Thief Bug Egg, Vadon
+Shield: Vadon
+Shining Scale: Isis, Sidewinder
+Shoes: Pecopeco
+Silver Ring: Isis, Mummy
+Singing Plant: Metaller, Thief Bug (Big)
+Skel Bone: Megalodon, Pirate Skel, Skeleton
+Skeleton Bone: Skeleton Archer, Skeleton Soldier
+Skeleton Card: Skeleton
+Skeleton Ring: Skeleton
+Skeleton Soldier Card: Skeleton Soldier
+Skull Ring: Ghoul, Skeleton Soldier
+Slayer: Thief Bug (Green)
+Smasher: Zombie
+Smokie Card: Smokie
+Snake Card: Snake
+Spawn: Roda Frog, Thara Frog
+Spear: Rocker
+Special Medicine: Pecopeco, Snake, Thief Bug
+Spore Card: Spore
+Spore Doll: Spore
+Steel Chonchon Card: Steel Chonchon
+Sticky Mucus: Poporing, Poring, Thief Bug Egg, Creamy Egg, Pupa
+Stiletto: Skeleton Soldier
+Stone Heart: Golem
+Stuffed Doll: Bigfoot
+Sweet Potato: Smokie, Willow
+Thara Frog Card: Thara Frog
+Thief Bug Card: Thief Bug
+Tiara: Misstress
+Tooth of Deceased: Ghoul, Zombie
+Tooth of the Bat: Farmiliar
+Tree Root: Elder Willow, Willow
+Trunk: Mandragora
+Tsurugi: Bigfoot
+Vador Card: Vadon
+Violet Jewel: Anacondaq, Snake
+Vorit Card: Vorit
+Wand: Pecopeco, Wolf
+War Hammer: Orc Warrior
+Web: Roda Frog
+White Herb: Ghoul, Hunter Fly, Marc
+White Platter: Pecopeco Egg
+White Potion: Doppelganger
+Willow Card: Willow
+Wing of Butterfly: Creamy
+Wing of Fly: Chonchon, Farmiliar, Hornet, Steel Chonchon
+Wolf Card: Wolf
+Wooden Mail: Willow
+Worm Shell: Thief Bug, Thief Bug (Green)
+Worm Tail Card: Wormtail
+Yellow Gemstone: Condor, Golem, Pecopeco Egg, Picky (with shell), Picky (without shell)
+Yellow Herb: Anacondaq, Pecopeco, Poison Spore, Thief Bug (Green), Wormtail
+Yellow Jewel: Metaller
+Yoyo Card: Yoy
+Yoyo Doll: Yoyo
+Zargon: Hunter Fly, Munak, Nightmare, Orc Hero, Orc Warrior
+Zombie Card: Zombie
+

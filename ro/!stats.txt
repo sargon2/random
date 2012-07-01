@@ -1,0 +1,65 @@
+Anacondaq:  HP: 820  Level: 35  XP: 62
+4Baphomet:  HP: ???  Level: ???  XP: ???
+Bigfoot:  HP: 1200-1400  Level: ???  XP: 66  J: 26
+Chonchon:  HP: 75  Level: 4 or 5  XP: 3
+Condor:  HP: 200  Level: 14 or 15  XP: 13
+Cornutus:  HP: 800  Level:  XP: 50
+Creamy:  HP: 600  Level: 22  XP: 30
+Creamy Egg:  HP: 450  Level: 1  XP: 5
+4Doppelganger:  HP: 5000-6000  Level: 65  XP: ???
+Elder Willow:  HP: 1300  Level: 28 or 29  XP: 42
+Fabre:  HP: 65  Level: 1  XP: 2
+4Farmiliar:  HP: 220  Level: 18 or 19  XP: 17
+4Ghoul:  HP: 2599-2700  Level: 50  XP: 124
+Golden Bug:  HP: 2500-3000  Level:  XP: 39(MVP)
+Golem:  HP: 1300-1400  Level: 40  XP: 55
+Hornet:  HP: 150  Level: 15 or 16  XP: 15
+4Hunter Fly:  HP: 3000  Level: 50  XP: 180
+Hydra:  HP: 550-600  Level:  XP: 34
+4Isis:  HP: 1700-1800  Level: 55  XP: 92
+Lunatic:  HP: 80  Level: 3  XP: 3
+Mandragora:  HP: 500  Level: 20  XP: 27
+4Marc:  HP: 1400-1700  Level: 60  XP: 196
+Megalodon:  HP: 950-960  Level:  XP: 60
+Metaller:  HP: 1400  Level: 25 or 26  XP: 65
+Misstress:  HP: ???  Level: ???  XP: 118(MVP)
+4Mummy:  HP: 2000  Level: 50  XP: 94
+4Munak:  HP: 1250  Level: 50  XP: 87
+4Nightmare:  HP: 4000  Level: 60  XP: 249
+4Obeaune:  HP: 1700-2200  Level: 60  XP: 189
+4Orc Hero:  HP:  Level:  XP: 119(MVP)
+4Orc Warrior:  HP: 1500  Level: 40  XP: 68
+4Osiris:  HP: ???  Level: ???  XP: ???
+Pecopeco:  HP: 420  Level: 16 or 17  XP: 27
+Pecopeco Egg:  HP: 350  Level: 1  XP: 6
+Picky (with shell):  HP: 90  Level: 3  XP: 3
+Picky (without shell):  HP: 90  Level: 2  XP: 2.5
+4Pirate Skel:  HP: 850-900  Level:  XP: 62
+4Poison Spore:  HP: 700-800  Level:  XP: 45
+Poporing:  HP: 1300  Level: 25 or 26  XP: 39 J: 18
+Poring:  HP: 45  Level: 1  XP: 1  J: 2
+Pupa:  HP: 300  Level: 1  XP: 4
+Rocker:  HP: 200  Level: 15 or 16  XP: 15
+Roda Frog:  HP: 180  Level: 10  XP: 11
+Scorpion:  HP: 950-960  Level: 40  XP: 74
+4Sidewinder:  HP: 2100  Level: 50  XP: 200
+4Skeleton:  HP: 300  Level:  XP: 16
+4Skeleton Archer:  HP: 800  Level: 40  XP: 79-85
+4Skeleton Soldier:  HP: 1000  Level: 40  XP: 96
+Smokie:  HP: 800  Level: 24 or 25  XP: 47
+Snake:  HP: 650  Level: 24 or 25  XP: 44
+Spore:  HP: 220  Level: 18 or 19  XP: 15
+Steel Chonchon:  HP: 600  Level: 28 or 29  XP: 49
+Thara Frog:  HP: 1200  Level: 40  XP: 80
+Thief Bug:  HP: 150  Level: 14 or 15  XP: 13
+Thief Bug (Big):  HP: 500  Level: 20  XP: 27
+4Thief Bug (Green):  HP: 500  Level: 25  XP: 32
+Thief Bug Egg:  HP:  Level:  XP: 5
+Vadon:  HP: 690  Level: 30  XP: 43  J: 18
+4Vorit:  HP: 2500  Level: 55  XP: 109
+Willow:  HP: 120  Level: 6 or 7  XP: 4
+Wolf:  HP: 300  Level: 16 or 17  XP: 17
+Wormtail:  HP: 500  Level: 22  XP: 30
+Yoyo:  HP: 1200  Level: 27 or 28  XP: 51
+4Zombie:  HP: 1000  Level: 27 or 28  XP: 44
+eof

@@ -1,0 +1,60 @@
+Baphomet  lv:58  hp:10350  atk:503  def:55  mdef:60  xp:306  mvp:153  size:l
+Osiris  lv:54  hp:14850  atk:463  def:15  mdef:45  xp:250  mvp:125  size:m
+Doppleganger  lv:50  hp:8220  atk:243  def:65  mdef:35  xp:216  mvp:108  size:m
+Misstress  lv:35  hp:5750  atk:152  def:55  mdef:65  xp:118  mvp:59  size:s
+Orc Hero  lv:50  hp:8500  atk:170  def:45  mdef:50  xp:238  mvp:119  size:l
+Golden Bug  lv:30  hp:4500  atk:70  def:85  mdef:80  xp:78  mvp:39  size:s
+Sidewinder  lv:40  hp:2400  atk:163  def:30  mdef:58  xp:199  mvp:58  size:s
+Hunter Fly  lv:38  hp:2500  atk:133  def:50  mdef:25  xp:180  job:55  size:s
+Nightmare  lv:42  hp:3150  atk:223  def:40  mdef:70  xp:249  job:62  size:l
+Bigfoot  lv:24  hp:1350  atk:62  def:20  mdef:10  xp:66  job:27  size:l
+Marc  lv:28  hp:1382  atk:82  def:35  mdef:15  xp:94  job:36  size:m
+Isis  lv:30  hp:1450  atk:83  def:5  mdef:60  xp:92  job:41  size:l
+Obeaune  lv:27  hp:1150  atk:75  def:5  mdef:40  xp:85  job:35  size:m
+Wormtail  lv:13  hp:430  atk:43  def:15  mdef:10  xp:27  job:13  size:m
+Cornutus  lv:21  hp:790  atk:47  def:60  mdef:45  xp:50  job:20  size:m
+Vorit  lv:31  hp:1540  atk:87  def:35  mdef:15  xp:95  job:40  size:m
+Pirate Skel  lv:23  hp:880  atk:67  def:45  mdef:30  xp:62  job:24  size:m
+Munak  lv:27  hp:1250  atk:81  def:23  mdef:30  xp:87  job:37  size:m
+Snake  lv:16  hp:560  atk:45  def:15  mdef:10  xp:26  job:13  size:s
+Willow  lv:5  hp:120  atk:28  def:5  mdef:15  xp:5  job:4  size:m
+Thara Frog  lv:25  hp:1200  atk:68  def:5  mdef:40  xp:75  job:30  size:m
+Scorpion  lv:24  hp:880  atk:73  def:35  mdef:25  xp:68  job:28  size:s
+Ghoul  lv:33  hp:1980  atk:109  def:10  mdef:15  xp:110  job:43  size:m
+Megalodon  lv:23  hp:960  atk:61  def:5  mdef:30  xp:60  job:25  size:m
+Mummy  lv:29  hp:1600  atk:88  def:5  mdef:15  xp:95  job:37  size:m
+Hydra  lv:15  hp:540  atk:25  def:0  mdef:70  xp:34  job:10  size:s
+Archer Skeleton  lv:28  hp:900  atk:79  def:20  mdef:20  xp:85  job:31  size:m
+Soldier Skeleton  lv:26  hp:1050  atk:76  def:20  mdef:20  xp:81  job:34  size:m
+Anacondaq  lv:23  hp:820  atk:69  def:20  mdef:20  xp:62  job:26  size:s
+Orc Warrior  lv:22  hp:930  atk:63  def:20  mdef:10  xp:56  job:25  size:m
+Golem  lv:22  hp:950  atk:70  def:45  mdef:15  xp:55  job:26  size:l
+Metaller  lv:21  hp:820  atk:47  def:20  mdef:30  xp:51  job:21  size:m
+Vadon  lv:18  hp:690  atk:49  def:45  mdef:10  xp:43  job:18  size:m
+Creamy  lv:13  hp:410  atk:39  def:5  mdef:30  xp:26  job:13  size:s
+Pupa  lv:3  hp:300  atk:0  def:40  mdef:0  xp:4  job:4  size:s
+Elder Willow  lv:20  hp:750  atk:55  def:20  mdef:45  xp:48  job:20  size:m
+Yoyo  lv:19  hp:790  atk:55  def:20  mdef:15  xp:46  job:19  size:s
+Poison Spore  lv:18  hp:755  atk:47  def:10  mdef:20  xp:45  job:16  size:s
+Steel Chonchon  lv:18  hp:600  atk:46  def:30  mdef:10  xp:43  job:18  size:s
+Smokie  lv:17  hp:680  atk:47  def:15  mdef:25  xp:42  job:17  size:s
+Zombie  lv:16  hp:800  atk:46  def:5  mdef:5  xp:38  job:16  size:m
+Mandragora  lv:12  hp:380  atk:35  def:15  mdef:5  xp:23  job:12  size:m
+Poporing  lv:18  hp:730  atk:44  def:10  mdef:20  xp:34  job:18  size:s
+Pecopeco  lv:12  hp:410  atk:36  def:12  mdef:5  xp:23  job:12  size:m
+Wolf  lv:10  hp:260  atk:30  def:12  mdef:5  xp:17  job:10  size:m
+Skeleton  lv:10  hp:305  atk:31  def:5  mdef:5  xp:16  job:11  size:s
+Farmiliar  lv:10  hp:200  atk:27  def:5  mdef:15  xp:17  job:10  size:s
+Hornet  lv:9  hp:170  atk:30  def:10  mdef:5  xp:15  job:9  size:s
+Rocker  lv:9  hp:220  atk:27  def:10  mdef:20  xp:15  job:9  size:m
+Spore  lv:9  hp:200  atk:26  def:7  mdef:10  xp:15  job:9  size:m
+Condor  lv:8  hp:180  atk:25  def:10  mdef:5  xp:13  job:8  size:s
+Roda frog  lv:7  hp:180  atk:20  def:10  mdef:10  xp:11  job:7  size:s
+Thief bug  lv:8  hp:135  atk:24  def:20  mdef:5  xp:13  job:8  size:s
+Picky  lv:6  hp:90  atk:12  def:3  mdef:5  xp:2  job:3  size:s
+Chonchon  lv:3  hp:75  atk:19  def:15  mdef:0  xp:3  job:3  size:s
+Fabre  lv:2  hp:68  atk:11  def:5  mdef:0  xp:2  job:2  size:s
+Poring  lv:1  hp:45  atk:10  def:3  mdef:0  xp:1  job:2  size:s
+Thief Bug (Big):  HP: 500  Level: 20  XP: 27
+Thief Bug (Green):  HP: 500  Level: 25  XP: 32
+

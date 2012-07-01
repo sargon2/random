@@ -1,0 +1,7 @@
+/msg thumper fortune
+/msg thumper <phrase> to spellcheck
+!quote <string> in the channel
+!seen <nick> in the channel
+!say HH:MM:SS <phrase>
+/msg thumper next <nick> saying
+/msg thumper check to check your messages
