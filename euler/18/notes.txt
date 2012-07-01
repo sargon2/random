@@ -1,0 +1,10 @@
+Start at the bottom and work up.
+At each number, take the max of each child and add it to self.
+
+Data locations:
+row 0:    0
+row 1:   0 1
+row 2:  0 1 2
+row 3: 0 1 2 3
+
+Children are data[row+1][me] and data[row+1][me+1].
