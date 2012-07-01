@@ -1,0 +1,12 @@
+laskfjasdf
+
+<!--##repeat namespace="*NUMBERS*" -->
+	asdfjkl _value_<br>
+<!--##repeat namespace="*NUMBERS*" -->
+
+<!--##repeat namespace="*NUMBERS2*" -->
+<!--##repeat namespace="value" -->
+	asdf _value_
+<!--##repeat namespace="value" --><br>
+<!--##repeat namespace="*NUMBERS2*" -->
+
