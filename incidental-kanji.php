@@ -20,7 +20,7 @@ $contents = file_get_contents($full_url);
 ?><a href="<?=$full_url?>"><?=$full_url?></a><?
 
 $dom = new DOMDocument;
-$dom->loadHTML($contents);
+@$dom->loadHTML($contents);
 $content = $dom->getElementById("result_content");
 print "<br />";
 print "<pre>";
