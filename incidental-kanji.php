@@ -16,8 +16,9 @@ $uncommon_url = "http://jisho.org/words?jap=*%s*&eng=&dict=edict&common=off";
 if(!isset($kanji)) exit();
 
 print "<pre>";
-doit($common_url);
-doit($uncommon_url);
+$count = doit($common_url);
+if($count < 10)
+        doit($uncommon_url);
 print "</pre>";
 
 function doit($url) {
@@ -54,6 +55,7 @@ function doit($url) {
                 print "$k: $meaning<br />";
         }
         print "<br /><br /><br />";
+        return count($meanings);
 }
 
 ?>
