@@ -2,9 +2,15 @@
 header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
 header("Expires: Sat, 26 Jul 1997 05:00:00 GMT"); // Date in the past
 ?>
+<!DOCTYPE html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <title>kanji</title>
+<script>
+function selectId(id) {
+        document.getElementById(id).select();
+}
+</script>
 </head>
 <body>
 <?
@@ -16,12 +22,12 @@ $uncommon_url = "http://jisho.org/words?jap=*%s*&eng=&dict=edict&common=off";
 if(!isset($kanji)) exit();
 
 print "<pre>";
-$count = doit($common_url);
+$count = doit($common_url, 1);
 if($count < 10)
-        doit($uncommon_url);
+        doit($uncommon_url, 2);
 print "</pre>";
 
-function doit($url) {
+function doit($url, $id) {
         global $kanji;
         $full_url = sprintf($url, urlencode($kanji));
         $contents = file_get_contents($full_url);
@@ -31,6 +37,7 @@ function doit($url) {
         @$dom->loadHTML($contents);
         $content = $dom->getElementById("result_content");
         print "<br /><br />";
+        print "<form>";
         print "Kanji: " . $kanji . "<br /><br />";
         $meanings = array();
         $context = "";
@@ -51,7 +58,9 @@ function doit($url) {
         }
 
         $context = trim($context);
-        print $context;
+        print "<button type=\"button\" onclick=\"selectId('context" . $id . "')\">select</button>";
+        print "<input type=\"text\" style=\"width: 50%\" id=\"context" . $id . "\" value=\"" . $context . "\"/>";
+        print "</form>";
 
         print "<br /><br /><br />Meanings:<br />";
 
