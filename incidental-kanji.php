@@ -33,6 +33,7 @@ function doit($url) {
         print "<br /><br />";
         print "Kanji: " . $kanji . "<br /><br />";
         $meanings = array();
+        $context = "";
         foreach($content->getElementsByTagName("tr") as $tr) {
                 $tds = $tr->getElementsByTagName("td");
                 $data = array();
@@ -45,9 +46,12 @@ function doit($url) {
                         $named_data['meanings'] = $data[2];
                         $meanings[$named_data['kanji']] = $named_data['meanings'];
                         $named_data['kanji'] = str_replace($kanji, "＿", $named_data['kanji']);
-                        print $named_data['kanji'] . '[' . $named_data['kana'] . ']   ';
+                        $context = $context . $named_data['kanji'] . '[' . $named_data['kana'] . ']   ';
                 }
         }
+
+        $context = trim($context);
+        print $context;
 
         print "<br /><br /><br />Meanings:<br />";
 
