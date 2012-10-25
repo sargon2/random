@@ -41,6 +41,7 @@ function doit($url, $id) {
         print "Kanji: " . $kanji . "<br /><br />";
         $meanings = array();
         $context = "";
+        if(!$content) return 0;
         foreach($content->getElementsByTagName("tr") as $tr) {
                 $tds = $tr->getElementsByTagName("td");
                 $data = array();
