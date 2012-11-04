@@ -60,7 +60,7 @@ function doit($url, $id) {
 
         $context = trim($context);
         print "<button type=\"button\" onclick=\"selectId('context" . $id . "')\">select</button>";
-        print "<input type=\"text\" style=\"width: 50%\" id=\"context" . $id . "\" value=\"" . $context . "\"/>";
+        print "<input type=\"text\" style=\"width: 90%\" id=\"context" . $id . "\" value=\"" . $context . "\"/>";
         print "</form>";
 
         print "<br /><br /><br />Meanings:<br />";
