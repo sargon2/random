@@ -3,6 +3,7 @@
 from __future__ import division
 
 import math
+import sys
 
 numerator = 1
 denominator = 1
@@ -14,9 +15,9 @@ while(True):
     if error < best_error:
         best_error = error
         print str(numerator) + " / " + str(denominator) + " = " + str(result) + ", error = " + str(error)
+    if str(result) == str(math.pi):
+        sys.exit(0)
     if result < math.pi :
         numerator = numerator + 1
     elif result > math.pi :
         denominator = denominator + 1
-    elif result == math.pi:
-        system.exit(0)
