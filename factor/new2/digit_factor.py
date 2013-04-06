@@ -6,7 +6,7 @@ import sys
 
 
 def get_digits(number, digits):
-    return str(number)[-digits:]
+    return (("0"*digits) + str(number))[-digits:]
 
 def strlen(number):
     return len(str(number))

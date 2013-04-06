@@ -23,3 +23,7 @@ class TestDigitFactor(unittest.TestCase):
         self.assertResult(2851, 2851)
     def test_5051_5059(self):
         self.assertResult(5051, 5059)
+    def test_55619_55621(self):
+        self.assertResult(55619, 55621)
+    def test_10007_10009(self):
+        self.assertResult(10007, 10009)
