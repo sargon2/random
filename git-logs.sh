@@ -1,3 +1,4 @@
 #!/bin/bash
+
 COLUMNS=$(tput cols)
-git log --stat=$COLUMNS,$(($COLUMNS-32))
+git log --stat=$COLUMNS,$(($COLUMNS-32)) "$@"
