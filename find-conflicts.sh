@@ -1,3 +1,3 @@
 #!/bin/bash
 
-! fgrep -I -r --exclude-dir=.git "<<<<" . 
+! grep -I -r --exclude-dir=.git "^<<<<<<< " .
