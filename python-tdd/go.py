@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# I started with defining success as 'success' and failure as 'failure, and made succeed() and fail() methods
+# I started with defining success as 'success' and failure as 'failure', and made succeed() and fail() methods
 # and TDD'd from there.  I removed lots of duplication, etc.
 # What did I discover?  If we use return code to indicate test success or failure,
 # we eliminate try/catch blocks, and we actually obviate the need for assertEquals().
@@ -11,6 +11,7 @@
 def equals(a, b):
     return a == b
 
+# todo: this shouldn't be so exposed
 tests = []
 
 def Test(fn):
