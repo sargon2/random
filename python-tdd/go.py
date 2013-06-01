@@ -28,9 +28,8 @@ def testAssertEqualsFail():
 
 # todo: this should be a console runner etc.
 for test in tests:
-    result = test()
-    print test.__name__,
-    if result:
+    print test.__name__ + ":",
+    if test():
         print "pass"
     else:
         print "fail"
