@@ -54,6 +54,7 @@ function doit($url, $id) {
                         $named_data['meanings'] = $data[2];
                         $meanings[$named_data['kanji']] = $named_data['meanings'];
                         $named_data['kanji'] = str_replace($kanji, "＿", $named_data['kanji']);
+                        # TODO: show furigana only for the kanji, not for the okurigana
                         $context = $context . $named_data['kanji'] . '[' . $named_data['kana'] . ']   ';
                 }
         }
