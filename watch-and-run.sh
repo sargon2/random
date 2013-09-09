@@ -13,6 +13,6 @@ if [ ! -e "$1" ]; then
     usage
 fi
 
-while inotifywait -r -e modify -e attrib -e move -e create -e delete "$1"; do
+while inotifywait -r -e modify -e attrib -e move -e create -e delete --exclude '\.git' "$1"; do
     $2
 done
