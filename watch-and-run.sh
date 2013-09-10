@@ -13,6 +13,10 @@ if [ ! -e "$1" ]; then
     usage
 fi
 
-while inotifywait -r -e modify -e attrib -e move -e create -e delete --exclude '\.git' "$1"; do
-    $2
+TO_WATCH=$1
+shift 1
+
+"$@"
+while inotifywait -r -e modify -e attrib -e move -e create -e delete --exclude '\.git' "$TO_WATCH"; do
+    "$@"
 done
