@@ -14,6 +14,9 @@ class IndividualRange(object):
             self.begin = int(begin)
             self.end = int(end)
 
+        if self.end < self.begin:
+            self.end, self.begin = self.begin, self.end
+
     def __str__(self):
         if self.begin == self.end:
             return str(self.begin)
