@@ -38,7 +38,8 @@ class Ranges(object):
         if input is None:
             return
 
-        ranges = [IndividualRange(item) for item in sorted(input)]
+        ranges = [IndividualRange(item) for item in input]
+        ranges.sort(key=lambda s:s.begin)
 
         last_range = None
         for range in ranges:
