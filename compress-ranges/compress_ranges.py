@@ -7,12 +7,12 @@ class IndividualRange(object):
         if end is None:
             end = begin
         if "-" in str(begin):
-            parts = begin.split("-")
-            self.begin = int(parts[0])
-            self.end = int(parts[1])
+            self.begin, self.end = begin.split("-")
         else:
-            self.begin = int(begin)
-            self.end = int(end)
+            self.begin, self.end = begin, end
+
+        self.begin = int(self.begin)
+        self.end = int(self.end)
 
         if self.end < self.begin:
             self.end, self.begin = self.begin, self.end
@@ -22,13 +22,11 @@ class IndividualRange(object):
             return str(self.begin)
         return "%s-%s" % (self.begin, self.end)
 
+    def is_within(self, num):
+        return self.begin-1 <= num <= self.end+1
+
     def is_overlapping(self, range):
-        begin_minus_one = self.begin-1
-        end_plus_one = self.end+1
-        if range.begin >= begin_minus_one and range.begin <= end_plus_one:
-            return True
-        if range.end >= begin_minus_one and range.end <= end_plus_one:
-            return True
+        return any(map(self.is_within, (range.begin, range.end)))
 
     def merge(self, range):
         self.begin = min(self.begin, range.begin)
