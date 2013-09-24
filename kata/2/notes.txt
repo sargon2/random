@@ -1,0 +1,7 @@
+http://codekata.pragprog.com/2007/01/kata_two_karate.html
+
+I kind of want to use the same test framework for all five implementations.
+
+Should I use different languages?
+
+

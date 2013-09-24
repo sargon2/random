@@ -1,0 +1,25 @@
+http://codekata.pragprog.com/2007/01/code_kata_one_s.html
+
+Say the price is $1 per item, or $1.50 for two.
+The customer has options:
+1. Don't buy anything
+2. Buy one item for $1
+3. Buy two items for $1.50
+4. Buy two items for $2 in two different transactions
+5. Buy three items for $2.50
+6. Buy three items for $2 (can he do this?)
+7. Buy three items for $3 in 3 different transactions
+
+It seems like a price is a set of options the customer has.  Each transaction is a pass through state machine with decisions at each step.
+ - The set can have infinite options in it, and even multiple infinities (buy inf items in inf transactions, or inf items in one transaction)
+   - But it's never really infinite, since the store has limited stock
+
+Buy two, get one free: does the third item have a price?
+- This is a false dichotomy.  Really it's just an option in a sales state machine.
+
+What is the value of the inventory?
+- Interesting that this depends on which option the customer takes.  So a shelf has a min and a max value, and perhaps an expected value based on the options we think the customer(s) will choose.
+
+Rounding should happen at the last possible moment.
+
+How do you keep an audit trail?  That's the event thing.  We keep a log of events that occurred (transactions that happened along with decisions in the state machine the customer made).
