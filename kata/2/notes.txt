@@ -4,4 +4,6 @@ I kind of want to use the same test framework for all five implementations.
 
 Should I use different languages?
 
-
+1: Non-TDD; write the tests first, then implement the whole algorithm
+2: Try to TDD up the actual algorithm itself
+3: Use an object to represent the current range we're examining
