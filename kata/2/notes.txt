@@ -6,4 +6,6 @@ Should I use different languages?
 
 1: Non-TDD; write the tests first, then implement the whole algorithm
 2: Use an object to represent the current range we're examining
-3: Try to TDD up the actual algorithm itself
+3: Binary search that works for data that we don't know the length of
+
+Try to TDD up the actual algorithm itself?
