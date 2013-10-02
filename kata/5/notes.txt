@@ -1,0 +1,29 @@
+I don't like the idea of a bloom filter, because it's not perfect.
+
+I do like the idea of writing a memory-efficient spell-checker that doesn't make suggestions for corrections.
+
+We can store data as a DAG.
+
+For example, the list:
+abc
+abd
+abcd
+
+can be stored as:
+
+                    +--------------+
+                    |              v
+(start) -> (ab) -> (c) -> (d) -> (end)
+             |             ^
+             +-------------+
+
+This doesn't remove all duplication.  Consider:
+
+abcabc
+abcdef
+
+(start) -> (abc) -> (def) -> (end)
+             |                 ^
+           (abc) --------------+
+
+We could have one set of structures to store the actual data, and another set to describe their relationships.
