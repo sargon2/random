@@ -1,2 +1,3 @@
 *.pyc
 tatoeba/*.csv
+.venv
