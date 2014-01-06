@@ -67,9 +67,9 @@ He says if the codebreaker knows T, P, and X, they still can't deduce Q.  Why is
 
 Making a pair of keys:
 
-We choose R to be the product of two primes, U * V.  Why can't R be prime?  So phi(r) isn't just R-1.  The attacker knows R but not phi(R).
+We choose R to be the product of two primes, U * V.  Why can't R be prime?  So phi(R) isn't just R-1.  The attacker knows R but not phi(R).
 
-We want R to be hard to factor.  Why is that?
+We want R to be hard to factor.  Why is that?  To make it hard to find phi(R).
 
 phi(R) = (U-1) * (V-1).  We can discard U and V after calculating R.
 
@@ -94,5 +94,11 @@ He says let Q = 23.  We just brute-force search for that I guess?
 7 * 23 = 161 = 4 * 40 + 1.
 
 So, P=7 and Q=23.
+
+T = 31.  31^7 (mod 55) = 27512614111 (mod 55) = 26.
+
+T = 31, P = 7, Q = 23, X = 26, R = 55.
+
+Back to the not knowing Q thing.  26^Q % 55 = 31.  There are lots of valid values for Q.
 
 
