@@ -1,0 +1,10 @@
+
+It seems to me like one way to break RSA would be to find phi(R) without actually factoring R.
+
+Could we choose random numbers 1<n<R, calculate gcd(n,R), and get a feel for the ratio of divisors?
+
+Could we even find a single number such that gcd(n,R) != 1 for a large R?  If we do find one, does that give us R?
+
+If R=55, say we haphazardly find 22.  We know both 55 and 22 are multiples of P.  gcd(55,22) = P.  GCD is polynomial, so that does give us R.
+
+Empirically, it's hard to find such a number (I tried millions with a smallish R).  The feel for the ratio of divisors is very, very low.
