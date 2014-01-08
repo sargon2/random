@@ -1,0 +1,14 @@
+A primorial is like a factorial, but for primes.
+
+e.g. 2*3*5*7*11*...
+
+You could factor the large non-square semiprime n by:
+1. Calculate some giant primorial to be used for all your factoring needs.  Call this p.
+2. x=p/n # It will be divisible because n is a non-squre semiprime.
+3. Factor x.  It will be easy because it has lots of small factors.
+4. The list of factors of x will be missing two primes.  Those are the divisors of n.
+
+Problems:
+1. The giant primorial will be too giant to store in our universe.
+2. Is factoring x actually easy?  I kind of think so.
+3. Detecting which primes are missing from the list of factors of x may not be easy.
