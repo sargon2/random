@@ -60,3 +60,13 @@ class TestSieve(unittest2.TestCase):
         end = time.clock()
         elapsed = end - start
         self.assertLess(elapsed, .1)
+
+    def test_sum(self):
+        i=0
+        sum=0
+        for p in sieve():
+            i += 1
+            sum += p
+            if i == 10000:
+                break
+        self.assertEquals(sum, 496165411) # from wolfram alpha
