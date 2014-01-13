@@ -6,6 +6,8 @@
 # The idea was to find a Japanese word I don't know, and be able to look up a trustworthy example sentence that contains it
 # for addition to Anki.  But, unless it's one of those 30, well...
 
+# 1/13/2014 it's up to 221
+
 set -e
 
 rm -f sentences.csv
