@@ -1,3 +1,4 @@
 *.pyc
 tatoeba/*.csv
 .venv
+aozora/textfiles
