@@ -1,0 +1,2 @@
+
+Now that I'm ignoring other known characters for the book section, it's mostly weird text files that aren't books.  How do I filter those out?
