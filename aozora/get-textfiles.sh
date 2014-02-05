@@ -10,7 +10,7 @@ mkdir $TARGET_DIR
 
 cd ~/github/aozorabunko
 
-for i in `ls **/*.zip`; do
+for i in `ls **/*ruby*.zip`; do
     mkdir -p $TARGET_DIR/$i
     unzip $i '*.txt' -d $TARGET_DIR/$i || :
 done
