@@ -25,6 +25,12 @@ class Board(object):
         self.pieces = {}
 
     def move(self, x, y, symbol):
+        if (x, y) in self.pieces:
+            raise ValueError("Position already taken")
+        if x < 0 or x >= self.size[0]:
+            raise ValueError("Move outside board")
+        if y < 0 or y >= self.size[1]:
+            raise ValueError("Move outside board")
         self.pieces[(x, y)] = symbol
 
     def get(self, x, y):
@@ -45,6 +51,23 @@ class TestBoard(unittest2.TestCase):
         b = Board(3, 3)
         b.move(0, 1, 'o')
         self.assertEquals('o', b.get(0, 1))
+
+    def test_move_same_place(self):
+        b = Board(3, 3)
+        b.move(0, 0, 'x')
+        with self.assertRaises(ValueError):
+            b.move(0, 0, 'o')
+
+    def test_move_outside_board(self):
+        b = Board(3, 4)
+        with self.assertRaises(ValueError):
+            b.move(3, 5, 'x')
+        with self.assertRaises(ValueError):
+            b.move(4, 4, 'x')
+        with self.assertRaises(ValueError):
+            b.move(-1, 0, 'x')
+        with self.assertRaises(ValueError):
+            b.move(0, -1, 'x')
 
 
 class TestTurnManager(unittest2.TestCase):
