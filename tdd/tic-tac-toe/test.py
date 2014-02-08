@@ -18,7 +18,36 @@ class TurnManager(object):
         self.current_player = self.current_player.next_player
         return self.current_player
 
-class Test(unittest2.TestCase):
+
+class Board(object):
+    def __init__(self, width, height):
+        self.size = (width, height)
+        self.pieces = {}
+
+    def move(self, x, y, symbol):
+        self.pieces[(x, y)] = symbol
+
+    def get(self, x, y):
+        return self.pieces[(x, y)]
+
+
+class TestBoard(unittest2.TestCase):
+    def test_board_construct(self):
+        self.assertEquals((2, 2), Board(2, 2).size)
+        self.assertEquals((2, 3), Board(2, 3).size)
+
+    def test_make_move(self):
+        b = Board(3, 3)
+        b.move(0, 0, 'x')
+        self.assertEquals('x', b.get(0, 0))
+
+    def test_make_move_different(self):
+        b = Board(3, 3)
+        b.move(0, 1, 'o')
+        self.assertEquals('o', b.get(0, 1))
+
+
+class TestTurnManager(unittest2.TestCase):
     def test_single_player_turn(self):
         p = Player()
         t = TurnManager(p)
