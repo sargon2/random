@@ -1,4 +1,6 @@
+#!/usr/bin/python
 import unittest2
+import subprocess
 
 # The idea here is we list the N largest items in the given folder.
 # e.g.:
@@ -16,10 +18,21 @@ import unittest2
 # Maybe I should have a split() function that takes in a folder, finds the largest unsplit item, and splits it.
 # Then I could just call it N times.
 
-def du_provider(self):
-    pass
+class real_du_provider(object):
+    ''' Untested. '''
+    def get_du(self, path):
+        command = ["du", "-sk", path]
+        print "running %s" % command
+        return int(subprocess.call(command))
+    def get_du_for_children(self, path):
+        command = ["du", "-sk", path + '/*']
+        print "running %s" % command
+        # TODO: the return should be a dictionary
+        return subprocess.call(command)
 
-def du(num_items, du_provider=du_provider):
+def du(num_items, du_provider=None):
+    if not du_provider:
+        du_provider = real_du_provider()
     items = DuResult(du_provider, '.')
     while(len(items) < num_items):
         items = items.split()
@@ -138,3 +151,9 @@ class TestDu(unittest2.TestCase):
                             "./<etc>": 48
                           }
         self.assert_result(expected_result, 2, mock_fs)
+
+
+# Untested.
+if __name__ == "__main__":
+    result = du(10)
+    print result
