@@ -18,17 +18,22 @@ import subprocess
 # Maybe I should have a split() function that takes in a folder, finds the largest unsplit item, and splits it.
 # Then I could just call it N times.
 
+def run_command(command):
+    ''' Why is this so hard? '''
+    return subprocess.Popen(command, stdout=subprocess.PIPE, shell=True).communicate()[0]
+
 class real_du_provider(object):
     ''' Untested. '''
     def get_du(self, path):
-        command = ["du", "-sk", path]
-        print "running %s" % command
-        return int(subprocess.call(command))
+        command = [ "du", "-sk", path ]
+        return int(run_command(command).split()[0])
     def get_du_for_children(self, path):
-        command = ["du", "-sk", path + '/*']
+        command = [ "du", "-sk", path + '/*' ]
         print "running %s" % command
         # TODO: the return should be a dictionary
-        return subprocess.call(command)
+        r = run_command(command)
+        print "r is %s" % r
+        return r
 
 def du(num_items, du_provider=None):
     if not du_provider:
