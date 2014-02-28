@@ -119,6 +119,16 @@ class TestDu(unittest2.TestCase):
                           }
         self.assert_result(expected_result, 2, mock_fs)
 
+    def test_two_files_two_returns_other_order(self):
+        mock_fs = { ".": 44,
+                    "./file1": 20,
+                    "./file2": 20
+                  }
+        expected_result = { "./<etc>": 24,
+                            "./file1": 20
+                          }
+        self.assert_result(expected_result, 2, mock_fs)
+
     def test_two_files_two_returns_different(self):
         mock_fs = { ".": 88,
                     "./file3": 40,
