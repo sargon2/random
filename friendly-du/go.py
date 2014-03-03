@@ -14,35 +14,36 @@ import subprocess
 def run_command(command):
     return subprocess.Popen(command, stdout=subprocess.PIPE, shell=True).communicate()[0]
 
-class TestDu(unittest2.TestCase):
-    def make_tabs(self, output):
-        ret = ""
-        for item in output:
-            ret += "\t".join([str(x) for x in item]) + "\n"
-        return ret
+def make_tabs(output):
+    ret = ""
+    for item in output:
+        ret += "\t".join([str(x) for x in item]) + "\n"
+    return ret
 
-    def doit(self, num_items, du_output):
-        biggest = None
-        rest = 0
-        for line in du_output.splitlines():
-            (size, item) = line.split()
-            size = int(size)
-            if item == '.':
-                dotsize = size
-            elif not biggest or size > biggest[1]:
-                biggest = (item, size)
-            else:
-                rest += size
-        if num_items == 1:
-            output = [('.', dotsize)]
-            return self.make_tabs(output)
-        if num_items == 2:
-            etc_size = dotsize - biggest[1]
-            output = [biggest, ('./<etc>', etc_size)]
-            return self.make_tabs(output)
+def doit(num_items, du_output):
+    biggest = None
+    rest = 0
+    for line in du_output.splitlines():
+        (size, item) = line.split()
+        size = int(size)
+        if item == '.':
+            dotsize = size
+        elif not biggest or size > biggest[1]:
+            biggest = (item, size)
+        else:
+            rest += size
+    if num_items == 1:
+        output = [('.', dotsize)]
+        return make_tabs(output)
+    if num_items == 2:
+        etc_size = dotsize - biggest[1]
+        output = [biggest, ('./<etc>', etc_size)]
+        return make_tabs(output)
+
+class TestDu(unittest2.TestCase):
 
     def assert_result(self, expected_output, num_items, mock_du_result):
-        result = self.doit(num_items, mock_du_result)
+        result = doit(num_items, mock_du_result)
         self.assertEquals(expected_output, result)
 
     def test_one_file_total(self):
@@ -94,4 +95,4 @@ class TestDu(unittest2.TestCase):
 
 # Untested.
 if __name__ == "__main__":
-    pass
+    print doit(2, run_command("du -a"))
