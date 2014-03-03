@@ -106,6 +106,48 @@ class TestDu(unittest2.TestCase):
         expected_output = "34\t./folder2\n28\t./<etc>\n"
         self.assert_result(expected_output, 2, mock_du_result)
 
+    def test_two_folders_four_files(self):
+        mock_du_result = "50\t./folder1/file1\n" + \
+                         "10\t./folder1/file2\n" + \
+                         "60\t./folder2/file1\n" + \
+                         "15\t./folder2/file2\n" + \
+                         "68\t./folder1\n" + \
+                         "83\t./folder2\n" + \
+                         "155\t.\n"
+
+        expected_output = "155\t.\n"
+        self.assert_result(expected_output, 1, mock_du_result)
+
+        expected_output = "83\t./folder2\n72\t./<etc>\n"
+        self.assert_result(expected_output, 2, mock_du_result)
+
+        expected_output = "??"
+        self.assert_result(expected_output, 3, mock_du_result)
+
+        expected_output = "??"
+        self.assert_result(expected_output, 4, mock_du_result)
+
+    def test_two_folders_four_files_second_folder_small(self):
+        mock_du_result = "50\t./folder1/file1\n" + \
+                         "60\t./folder1/file2\n" + \
+                         "10\t./folder2/file1\n" + \
+                         "15\t./folder2/file2\n" + \
+                         "114\t./folder1\n" + \
+                         "29\t./folder2\n" + \
+                         "147\t.\n"
+
+        expected_output = "147\t.\n"
+        self.assert_result(expected_output, 1, mock_du_result)
+
+        expected_output = "114\t./folder1\n33\t./<etc>\n"
+        self.assert_result(expected_output, 2, mock_du_result)
+
+        expected_output = "60\t./folder1/file2\n54\t./folder1/<etc>\n33\t./<etc>\n"
+        self.assert_result(expected_output, 3, mock_du_result)
+
+        expected_output = "??"
+        self.assert_result(expected_output, 4, mock_du_result)
+
     def xtest_three_returns_two_etc(self):
         self.fail("Not written yet")
 
