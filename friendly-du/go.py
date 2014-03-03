@@ -20,23 +20,28 @@ def make_tabs(output):
         ret += "\t".join([str(x) for x in item]) + "\n"
     return ret
 
-def doit(num_items, du_output):
-    biggest = None
-    rest = 0
+def parse(du_output):
+    # converts sizes to ints, sorts
+    ret = []
     for line in du_output.splitlines():
         (size, item) = line.split()
-        size = int(size)
-        if item == '.':
-            dotsize = size
-        elif not biggest or size > biggest[0]:
-            biggest = (size, item)
-        else:
-            rest += size
+        ret.append((int(size), item))
+    return sorted(ret, key=lambda tup: tup[0], reverse=True)
+
+
+def doit(num_items, du_output):
+    du_output = parse(du_output)
     if num_items == 1:
-        output = [(dotsize, '.')]
+        output = [du_output[0]]
     if num_items == 2:
-        etc_size = dotsize - biggest[0]
+        biggest = du_output[1]
+        etc_size = du_output[0][0] - biggest[0]
         output = [biggest, (etc_size, './<etc>')]
+    if num_items == 3:
+        biggest = du_output[1]
+        second_biggest = du_output[2]
+        etc_size = du_output[0][0] - biggest[0] - second_biggest[0]
+        output = [biggest, second_biggest, (etc_size, './<etc>')]
     return make_tabs(output)
 
 class TestDu(unittest2.TestCase):
@@ -90,6 +95,19 @@ class TestDu(unittest2.TestCase):
         mock_du_result = "54\t.\n20\t./file1\n20\t./file2\n10\t./file3\n"
         expected_output = "20\t./file1\n34\t./<etc>\n"
         self.assert_result(expected_output, 2, mock_du_result)
+
+    def test_three_returns_three_items(self):
+        mock_du_result = "54\t.\n20\t./file1\n20\t./file2\n10\t./file3\n"
+        expected_output = "20\t./file1\n20\t./file2\n14\t./<etc>\n"
+        self.assert_result(expected_output, 3, mock_du_result)
+
+    def test_two_returns_deep_folders(self):
+        mock_du_result = "24\t./folder1\n34\t./folder2\n20\t./folder1/file1\n30\t./folder2/file2\n62\t.\n"
+        expected_output = "34\t./folder2\n28\t./<etc>\n"
+        self.assert_result(expected_output, 2, mock_du_result)
+
+    def xtest_three_returns_two_etc(self):
+        self.fail("Not written yet")
 
 
 # Untested.
