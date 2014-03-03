@@ -28,17 +28,16 @@ def doit(num_items, du_output):
         size = int(size)
         if item == '.':
             dotsize = size
-        elif not biggest or size > biggest[1]:
-            biggest = (item, size)
+        elif not biggest or size > biggest[0]:
+            biggest = (size, item)
         else:
             rest += size
     if num_items == 1:
-        output = [('.', dotsize)]
-        return make_tabs(output)
+        output = [(dotsize, '.')]
     if num_items == 2:
-        etc_size = dotsize - biggest[1]
-        output = [biggest, ('./<etc>', etc_size)]
-        return make_tabs(output)
+        etc_size = dotsize - biggest[0]
+        output = [biggest, (etc_size, './<etc>')]
+    return make_tabs(output)
 
 class TestDu(unittest2.TestCase):
 
@@ -48,7 +47,7 @@ class TestDu(unittest2.TestCase):
 
     def test_one_file_total(self):
         mock_du_result = "26\t./file1\n30\t.\n"
-        expected_output = ".\t30\n"
+        expected_output = "30\t.\n"
         self.assert_result(expected_output, 1, mock_du_result)
 
     def test_one_file_total_fail(self):
@@ -59,37 +58,37 @@ class TestDu(unittest2.TestCase):
 
     def test_one_file_total_different(self):
         mock_du_result = "36\t./file1\n40\t.\n"
-        expected_output = ".\t40\n"
+        expected_output = "40\t.\n"
         self.assert_result(expected_output, 1, mock_du_result)
 
     def test_two_files(self):
         mock_du_result = "20\t./file1\n20\t./file2\n44\t.\n"
-        expected_output = ".\t44\n"
+        expected_output = "44\t.\n"
         self.assert_result(expected_output, 1, mock_du_result)
 
     def test_two_files_two_returns(self):
         mock_du_result = "20\t./file1\n20\t./file2\n44\t.\n"
-        expected_output = "./file1\t20\n./<etc>\t24\n"
+        expected_output = "20\t./file1\n24\t./<etc>\n"
         self.assert_result(expected_output, 2, mock_du_result)
 
     def test_two_files_two_returns_other_order(self):
         mock_du_result = "44\t.\n20\t./file1\n20\t./file2\n"
-        expected_output = "./file1\t20\n./<etc>\t24\n"
+        expected_output = "20\t./file1\n24\t./<etc>\n"
         self.assert_result(expected_output, 2, mock_du_result)
 
     def test_two_files_two_returns_different(self):
         mock_du_result = "40\t./file3\n30\t./file4\n88\t.\n"
-        expected_output = "./file3\t40\n./<etc>\t48\n"
+        expected_output = "40\t./file3\n48\t./<etc>\n"
         self.assert_result(expected_output, 2, mock_du_result)
 
     def test_two_returns_first_not_biggest(self):
         mock_du_result = "30\t./file3\n40\t./file4\n88\t.\n"
-        expected_output = "./file4\t40\n./<etc>\t48\n"
+        expected_output = "40\t./file4\n48\t./<etc>\n"
         self.assert_result(expected_output, 2, mock_du_result)
 
     def test_two_returns_three_items(self):
         mock_du_result = "54\t.\n20\t./file1\n20\t./file2\n10\t./file3\n"
-        expected_output = "./file1\t20\n./<etc>\t34\n"
+        expected_output = "20\t./file1\n34\t./<etc>\n"
         self.assert_result(expected_output, 2, mock_du_result)
 
 
