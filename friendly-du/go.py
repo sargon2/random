@@ -18,6 +18,9 @@ import subprocess
 # Maybe I should have a split() function that takes in a folder, finds the largest unsplit item, and splits it.
 # Then I could just call it N times.
 
+# split_item = find_largest_item_that_can_be_split() # if it's a file it can't be split
+# split(split_item)
+
 def run_command(command):
     ''' Why is this so hard? '''
     return subprocess.Popen(command, stdout=subprocess.PIPE, shell=True).communicate()[0]
@@ -72,7 +75,7 @@ class DuResult(object):
         return sum(dict.values())
 
     def split(self):
-        largest = self.get_largest()
+        largest = self.get_largest() # TODO: this is returning <etc>
         inner_result = self.provider.get_du_for_children(largest)
         inner_largest = self.get_largest(inner_result)
         new_dict = {}
