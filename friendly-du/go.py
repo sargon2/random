@@ -22,23 +22,23 @@ class TestDu(unittest2.TestCase):
         return ret
 
     def doit(self, num_items, du_output):
-        first = None
+        biggest = None
         rest = 0
         for line in du_output.splitlines():
             (size, item) = line.split()
             size = int(size)
             if item == '.':
                 dotsize = size
-            elif not first:
-                first = (item, size)
+            elif not biggest or size > biggest[1]:
+                biggest = (item, size)
             else:
                 rest += size
         if num_items == 1:
             output = [('.', dotsize)]
             return self.make_tabs(output)
         if num_items == 2:
-            etc_size = dotsize - first[1]
-            output = [first, ('./<etc>', etc_size)]
+            etc_size = dotsize - biggest[1]
+            output = [biggest, ('./<etc>', etc_size)]
             return self.make_tabs(output)
 
     def assert_result(self, expected_output, num_items, mock_du_result):
@@ -81,7 +81,7 @@ class TestDu(unittest2.TestCase):
         expected_output = "./file3\t40\n./<etc>\t48\n"
         self.assert_result(expected_output, 2, mock_du_result)
 
-    def xtest_two_returns_first_not_biggest(self):
+    def test_two_returns_first_not_biggest(self):
         mock_du_result = "30\t./file3\n40\t./file4\n88\t.\n"
         expected_output = "./file4\t40\n./<etc>\t48\n"
         self.assert_result(expected_output, 2, mock_du_result)
