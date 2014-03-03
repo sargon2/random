@@ -25,15 +25,16 @@ def run_command(command):
 class real_du_provider(object):
     ''' Untested. '''
     def get_du(self, path):
-        command = [ "du", "-sk", path ]
+        command = "du -sk %s" % (path)
         return int(run_command(command).split()[0])
     def get_du_for_children(self, path):
-        command = [ "du", "-sk", path + '/*' ]
-        print "running %s" % command
-        # TODO: the return should be a dictionary
+        command = "du -sk %s/*" % (path)
         r = run_command(command)
-        print "r is %s" % r
-        return r
+        ret = {}
+        for item in r.splitlines():
+            (size, item) = item.split()
+            ret[item] = int(size)
+        return ret
 
 def du(num_items, du_provider=None):
     if not du_provider:
@@ -64,6 +65,7 @@ class DuResult(object):
         for key, value in dict.iteritems():
             if max is None or max < value:
                 ret = key
+                max = value
         return ret
 
     def sum(self, dict):
