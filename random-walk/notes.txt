@@ -1,0 +1,16 @@
+Render a line across the screen.  Use /, \, and _ only.
+   _
+\_/ \
+     \_   _ etc
+       \_/
+
+Perlin's problem is it's so expensive.  It does so many passes.  It requires interpolation.
+
+What if we tweaked the likelihood of each outcome and just did a random walk?
+
+But what do we tweak the likelihoods with?
+
+As we're going, generate a random number, if it's less than some amount, regenerate likelihoods.
+  - That will make startling changes.  What if we want gradual changes too?
+
+We want some combination of gradual and startling changes.
