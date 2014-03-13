@@ -1,6 +1,8 @@
+#!/usr/bin/python
 import unittest2
 from collections import defaultdict
 import re
+import random
 
 def align(str):
     # I'm pretty sure the fastest we can do this is O(n^2).  Think of the case of all \ - we're rendering n^2/2 characters.
@@ -55,3 +57,13 @@ class TestAlign(unittest2.TestCase):
 
     def test_up_and_down(self):
         self.assertAlign(" _   _   _   _\n/ \\_/ \\_/ \\_/ \\", "/_\\_/_\\_/_\\_/_\\")
+
+def generate():
+    chars = ['/', '_', '\\']
+    ret = ""
+    for i in xrange(1, 80):
+        ret += random.sample(chars, 1)[0]
+    return ret
+
+if __name__ == "__main__":
+    print align(generate())
