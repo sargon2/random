@@ -14,3 +14,7 @@ As we're going, generate a random number, if it's less than some amount, regener
   - That will make startling changes.  What if we want gradual changes too?
 
 We want some combination of gradual and startling changes.
+
+--
+
+The problem with this method is it's O(n) to generate a single point -- the point furthest to the right.  The beauty of perlin is you don't have to add up every point since the origin to get a single point.
