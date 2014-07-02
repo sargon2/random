@@ -1,12 +1,17 @@
 #!/bin/bash
-echo -n "VFINX: $";
-curl -s 'http://download.finance.yahoo.com/d/quotes.csv?s=VFINX&f=l1'
 
-echo -n "NASDAQ:EDS: $";
-curl -s 'http://download.finance.yahoo.com/d/quotes.csv?s=eds&f=l1'
+function display {
+    # http://www.jarloo.com/yahoo_finance/
+    echo -n "$1: $";
+    curl -s "http://download.finance.yahoo.com/d/quotes.csv?s=$1&f=l1b3b2" | dos2unix | sed 's/,/ (/' | sed 's/,/ - /' | sed 's/$/)/g'
+}
 
-echo -n "HPQ: $";
-curl -s 'http://download.finance.yahoo.com/d/quotes.csv?s=hpq&f=l1'
+
+echo "stock: last price (bid - ask)"
+display "VFINX"
+display "EDS"
+display "HPQ"
+display "CAMP"
 
 #echo -n "Bitcoin: ";
 #curl -s 'https://mtgox.com/api/0/data/ticker.php'
