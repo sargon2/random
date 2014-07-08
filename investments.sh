@@ -10,8 +10,7 @@ function display {
 echo "stock: last price (bid - ask)"
 display "VFINX"
 display "EDS"
-display "HPQ"
-display "CAMP"
+display "VBK"
 
 #echo -n "Bitcoin: ";
 #curl -s 'https://mtgox.com/api/0/data/ticker.php'
