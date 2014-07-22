@@ -9,7 +9,6 @@ function display {
 
 echo "stock: last price (bid - ask)"
 display "VFINX"
-display "EDS"
 display "VBK"
 
 #echo -n "Bitcoin: ";
