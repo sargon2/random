@@ -55,12 +55,6 @@ function addword(sentenceIndex) {
     addinput(wordDiv, "Meaning");
     wordDiv.innerHTML += "<br />";
 
-    addinput(wordDiv, "Context");
-    wordDiv.innerHTML += "<br />";
-
-    addinput(wordDiv, "Reading");
-    wordDiv.innerHTML += "<br />";
-
     removeWordButton = document.createElement('button');
     removeWordButton.setAttribute('onclick', 'removeword(' + wordIndex + ')');
     removeWordButton.setAttribute('type', 'button');
@@ -102,7 +96,6 @@ function onFormChange() {
 }
 
 function addSentence(sentenceDiv) {
-    // for each input
     inputs = sentenceDiv.getElementsByTagName('input');
     expression = inputs[0].value;
     meaning = inputs[1].value;
@@ -119,7 +112,41 @@ function addSentence(sentenceDiv) {
     output.innerHTML += "\n";
 
     // for each word div
-    // get inputs
-    // make word card
-    // make kanji cards, if not kana
+    wordDivs = sentenceDiv.getElementsByTagName('div');
+    for(var i=0;i<wordDivs.length;i++) {
+        inputs = wordDivs[i].getElementsByTagName('input');
+        // get inputs
+        word = inputs[0].value;
+        wordMeaning = inputs[1].value;
+        wordContext = getContext(word, reading);
+        wordReading = getReading(word, reading);
+
+        // make word card
+        output.innerHTML += "a one piece of info::b writing and meaning -> reading (words)"
+        output.innerHTML += "\t";
+        output.innerHTML += "Japanese writing and meaning -> reading (words)"
+        output.innerHTML += "\t";
+        output.innerHTML += "0"
+        output.innerHTML += "\t";
+        output.innerHTML += word;
+        output.innerHTML += "\t";
+        output.innerHTML += wordMeaning;
+        output.innerHTML += "\t";
+        output.innerHTML += wordContext;
+        output.innerHTML += "\t";
+        output.innerHTML += wordReading;
+        output.innerHTML += "\n";
+
+        // make kanji cards
+    }
+}
+
+function getContext(word, sentenceReading) {
+    // TODO
+    return "context for " + word + " in " + sentenceReading;
+}
+
+function getReading(word, sentenceReading) {
+    // TODO
+    return "reading for " + word + " in " + sentenceReading;
 }
