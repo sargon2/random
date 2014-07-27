@@ -1,0 +1,16 @@
+MultiImport https://ankiweb.net/shared/info/182238015
+
+Input fields:
+Sentence
+  Expression
+  Meaning
+  Reading
+  Audio
+Word1
+  Word
+  Meaning
+  Context
+  Reading
+Word2
+...
+

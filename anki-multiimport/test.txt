@@ -1,0 +1,3 @@
+a one piece of info::a meaning and reading -> writing (kanji)	Japanese meaning and reading -> stroke order (kanji)	0	word	kanji	kanji-meaning	kanji-context
+a one piece of info::b writing and meaning -> reading (words)	Japanese writing and meaning -> reading (words)	0	word-expression	word-meaning	word-context	word-reading
+a one piece of info::c writing and reading -> meaning (sentences)	Japanese stroke order and reading -> meaning (sentences)	0	sentence-expression	sentence-meaning	sentence-reading	audio
