@@ -9,6 +9,7 @@ rm -f ~/bin/dropbox
 rm -rf ~/.dropbox/ ~/.dropbox-dist/ ~/.dropbox-master/
 
 cd ~ && wget -O - "https://www.dropbox.com/download?plat=lnx.x86_64" | tar xzf -
+# cd ~ && wget -O - "https://www.dropbox.com/download?plat=lnx.x86" | tar xzf -
 
 wget -O ~/bin/dropbox "https://www.dropbox.com/download?dl=packages/dropbox.py" && chmod +x ~/bin/dropbox
 
