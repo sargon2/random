@@ -5,7 +5,11 @@
 </head>
 <body>
     <button onclick="addsentence()">Add Sentence</button><br />
-    <form id="myForm">
+    <form id="myForm" onchange="onFormChange()">
     </form>
+    <br />
+    Output:
+    <button>copy to clipboard (not implemented yet)</button>
+    <textarea id="output" rows=25 style="width: 100%" disabled="true"></textarea>
 </body>
 </html>
