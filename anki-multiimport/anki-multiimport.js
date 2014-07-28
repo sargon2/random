@@ -138,8 +138,8 @@ function addSentence(sentenceDiv) {
 
         // make kanji cards
         kanjis = split(word);
-        for(var i=0;i<kanjis.length;i++) {
-            kanji = kanjis[i];
+        for(var j=0;j<kanjis.length;j++) {
+            kanji = kanjis[j];
             if(is_kana_or_english(kanji)) continue;
             output.innerHTML += "a one piece of info::a meaning and reading -> writing (kanji)";
             output.innerHTML += "\t";
