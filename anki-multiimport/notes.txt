@@ -15,3 +15,6 @@ Word2
 ...
 
 http://stackoverflow.com/questions/609530/download-textarea-contents-as-a-file-using-only-javascript-no-server-side
+
+It overwrites cards that already exist.  Is that a problem?
+Do I need a way to make word cards that aren't a substring of the sentence card?  i.e. de-conjugated
