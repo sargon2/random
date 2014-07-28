@@ -172,7 +172,11 @@ function is_kana_or_english(ch) {
 
 function getContext(word, sentence_reading) {
     // return the sentence reading with the word's reading removed
-    return sentence_reading.replace(getReading(word, sentence_reading), word);
+    search = getReading(word, sentence_reading);
+    if(sentence_reading.indexOf(" " + search) > -1) {
+        return sentence_reading.replace(" " + search, word);
+    }
+    return sentence_reading.replace(search, word);
 }
 
 function getReading(word, sentence_reading) {
