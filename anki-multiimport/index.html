@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="utf-8">
     <script type="text/javascript" src="anki-multiimport.js" ></script>
 </head>
 <body>
+    <button onclick="document.getElementById('helper').select()">select</button>
+    <input id="helper" style="width: 80%" disabled="true" value='"deck:b 日本語::z ONSLAUGHT" -tag:fully_added -tag:leech -is:suspended prop:reps=0'></input><br />
     <button onclick="addsentence()">Add Sentence</button><br />
     <form id="myForm" onchange="onFormChange()">
     </form>
