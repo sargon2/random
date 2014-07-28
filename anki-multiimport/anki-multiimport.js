@@ -118,7 +118,6 @@ function addSentence(sentenceDiv) {
         // get inputs
         word = inputs[0].value;
         wordMeaning = inputs[1].value;
-        wordContext = getContext(word, reading);
         wordReading = getReading(word, reading);
 
         // make word card
@@ -132,21 +131,56 @@ function addSentence(sentenceDiv) {
         output.innerHTML += "\t";
         output.innerHTML += wordMeaning;
         output.innerHTML += "\t";
-        output.innerHTML += wordContext;
+        output.innerHTML += getContext(word, reading);
         output.innerHTML += "\t";
         output.innerHTML += wordReading;
         output.innerHTML += "\n";
 
         // make kanji cards
+        kanjis = split(word);
+        for(var i=0;i<kanjis.length;i++) {
+            kanji = kanjis[i];
+            if(is_kana(kanji)) continue;
+            output.innerHTML += "a one piece of info::a meaning and reading -> writing (kanji)";
+            output.innerHTML += "\t";
+            output.innerHTML += "Japanese meaning and reading -> stroke order (kanji)";
+            output.innerHTML += "\t";
+            output.innerHTML += "0";
+            output.innerHTML += "\t";
+            output.innerHTML += cloze(kanji, wordReading);
+            output.innerHTML += "\t";
+            output.innerHTML += kanji;
+            output.innerHTML += "\t";
+            output.innerHTML += wordMeaning;
+            output.innerHTML += "\t";
+            output.innerHTML += cloze(kanji, reading);
+            output.innerHTML += "\n";
+        }
     }
 }
 
-function getContext(word, sentenceReading) {
-    // TODO
-    return "context for " + word + " in " + sentenceReading;
+function split(word) {
+    return word.split("");
 }
 
-function getReading(word, sentenceReading) {
+function is_kana(word) {
+    // http://stackoverflow.com/questions/15033196/using-javascript-to-check-whether-a-string-contains-japanese-characters-includi
+    return word.match(/[\u3040-\u309f\u30a0-\u30ff]/);
+}
+
+function getContext(word, sentence_reading) {
+    // return the sentence reading with the word's reading removed
     // TODO
-    return "reading for " + word + " in " + sentenceReading;
+    return sentence_reading;
+}
+
+function getReading(word, sentence_reading) {
+    // return the word with reading attached
+    // TODO
+    return word + "[reading]"
+}
+
+function cloze(kanji, string) {
+    // replace kanji with full-width _ in string
+    return string.replace(kanji, "\uFF3F");
 }
