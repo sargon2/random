@@ -184,6 +184,7 @@ function getReading(word, sentence_reading) {
     regex = "";
     kanjis = split(word);
     for(var i=0;i<kanjis.length;i++) {
+        if(i>0) regex += '\\s*';
         regex += kanjis[i] + '(?:\\[[^\\]]+\\])?';
     }
     regex = new RegExp(regex);
