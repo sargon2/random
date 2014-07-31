@@ -1,0 +1,5 @@
+#!/bin/bash
+cd /home/sargon/tads3/mine
+rm -f obj/*
+rm -f gameinfo.txt
+rm -f game.t3

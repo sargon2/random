@@ -1,0 +1,11 @@
+#
+
+-o game.t3
+-D LANGUAGE=en_us
+-D MESSAGESTYLE=neu
+-Fy obj
+-Fo obj
+-lib system
+-lib adv3/adv3
+src/main.t
+src/startfield.t
