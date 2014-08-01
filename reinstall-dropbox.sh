@@ -18,7 +18,7 @@ chmod a+x ~/bin/dropbox
 dropbox start -i # to install it
 
 echo "Manual steps follow; exiting until they're automated"
-exit 0
+exit 1
 
 # MANUAL: wait for it to install
 
