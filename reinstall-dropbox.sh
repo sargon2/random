@@ -28,7 +28,7 @@ exit 1
 # MANUAL: kill it
 ~/bin/dropbox start
 
-~/bin/dropbox status
-# MANUAL: wait until done syncing
+# wait until done syncing
+while ! ~/bin/dropbox status 2>&1 | grep -q "Up to date"; do sleep 1; done
 
 ~/bin/dropbox lansync n # apparently makes it use less network bandwidth
