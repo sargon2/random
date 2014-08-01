@@ -15,7 +15,7 @@ rm -rf ~/.dropbox/ ~/.dropbox-dist/ ~/.dropbox-master/ || :
 wget -O ~/bin/dropbox "https://www.dropbox.com/download?dl=packages/dropbox.py"
 chmod a+x ~/bin/dropbox
 
-dropbox start -i # to install it
+~/bin/dropbox start -i # to install it
 
 echo "Manual steps follow; exiting until they're automated"
 exit 1
@@ -33,4 +33,4 @@ exit 1
 ~/bin/dropbox status
 # MANUAL: wait until done syncing
 
-dropbox lansync n # apparently makes it use less network bandwidth
+~/bin/dropbox lansync n # apparently makes it use less network bandwidth
