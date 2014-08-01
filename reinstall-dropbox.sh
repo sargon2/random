@@ -4,20 +4,31 @@ set -ex
 
 cd ~
 
-rm -f ~/bin/dropbox
+mkdir ~/bin/ || :
 
-rm -rf ~/.dropbox/ ~/.dropbox-dist/ ~/.dropbox-master/
+rm -f ~/bin/dropbox || :
 
-cd ~ && wget -O - "https://www.dropbox.com/download?plat=lnx.x86_64" | tar xzf -
-# cd ~ && wget -O - "https://www.dropbox.com/download?plat=lnx.x86" | tar xzf -
+rm -rf ~/.dropbox/ ~/.dropbox-dist/ ~/.dropbox-master/ || :
 
-wget -O ~/bin/dropbox "https://www.dropbox.com/download?dl=packages/dropbox.py" && chmod +x ~/bin/dropbox
+wget -O ~/bin/dropbox "https://www.dropbox.com/download?dl=packages/dropbox.py"
+chmod a+x ~/bin/dropbox
 
-# dropbox start -i
+dropbox start -i # to install it
 
-echo "Be sure to run dropbox lansync n after it's up and running"
+echo "Manual steps follow; exiting until they're automated"
+exit 0
 
+# MANUAL: wait for it to install
 
-~/.dropbox-dist/dropboxd # will ask for authentication
+~/bin/dropbox stop
 
-# dropbox lansync n # apparently makes it use less network bandwidth
+~/.dropbox-dist/dropboxd
+# MANUAL: <visit link>
+
+# MANUAL: kill it
+~/bin/dropbox start
+
+~/bin/dropbox status
+# MANUAL: wait until done syncing
+
+dropbox lansync n # apparently makes it use less network bandwidth
