@@ -2,6 +2,8 @@
 
 set -ex
 
+unset DISPLAY # otherwise dropbox tries to use X
+
 cd ~
 
 mkdir ~/bin/ || :
