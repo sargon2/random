@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -ex
+set -e
 
 unset DISPLAY # otherwise dropbox tries to use X
 
@@ -15,20 +15,22 @@ rm -rf ~/.dropbox/ ~/.dropbox-dist/ ~/.dropbox-master/ || :
 wget -O ~/bin/dropbox "https://www.dropbox.com/download?dl=packages/dropbox.py"
 chmod a+x ~/bin/dropbox
 
-yes | ~/bin/dropbox start -i # to install it
+echo "No need to type anything"
+echo y | ~/bin/dropbox start -i # to install it
 
-echo "Manual steps follow; exiting until they're automated"
-exit 1
+~/bin/dropbox stop
 
-# MANUAL: wait for it to install, kill it when finished
+~/.dropbox-dist/dropboxd &
 
-~/.dropbox-dist/dropboxd
+echo "Manually visit the link!!"
 # MANUAL: <visit link, authenticate>
 
-# MANUAL: kill it
-~/bin/dropbox start
-
 # wait until done syncing
-while ! ~/bin/dropbox status 2>&1 | grep -q "Up to date"; do sleep 1; done
+# TODO: we're doing extra status calls here...
+while ! ~/bin/dropbox status 2>&1 | grep -q "Up to date"; do sleep 5; ~/bin/dropbox status; sleep 5; done
+
+# Restart it so it's running via the python script instead of in this shell
+~/bin/dropbox stop
+~/bin/dropbox start
 
 ~/bin/dropbox lansync n # apparently makes it use less network bandwidth
