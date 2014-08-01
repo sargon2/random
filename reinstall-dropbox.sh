@@ -15,17 +15,15 @@ rm -rf ~/.dropbox/ ~/.dropbox-dist/ ~/.dropbox-master/ || :
 wget -O ~/bin/dropbox "https://www.dropbox.com/download?dl=packages/dropbox.py"
 chmod a+x ~/bin/dropbox
 
-~/bin/dropbox start -i # to install it
+yes | ~/bin/dropbox start -i # to install it
 
 echo "Manual steps follow; exiting until they're automated"
 exit 1
 
-# MANUAL: wait for it to install
-
-~/bin/dropbox stop
+# MANUAL: wait for it to install, kill it when finished
 
 ~/.dropbox-dist/dropboxd
-# MANUAL: <visit link>
+# MANUAL: <visit link, authenticate>
 
 # MANUAL: kill it
 ~/bin/dropbox start
