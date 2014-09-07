@@ -1,38 +1,33 @@
 var sentenceIndex = 0;
 var wordIndex = 0;
 
-function addinput(div, title) {
+function addinput(div, title, contents) {
     div.innerHTML += title + ": ";
     input = document.createElement('input');
     input.setAttribute('type', 'text');
-    // TODO: better layout
     input.setAttribute('style', 'width: 80%');
+    if(contents !== undefined)
+        input.setAttribute('value', contents);
     div.appendChild(input);
 }
 
-function addsentence() {
+function addsentence(expression, meaning, reading, audio) {
     sentenceDiv = document.createElement('div');
     sentenceDiv.setAttribute('id', "sentence" + sentenceIndex);
     sentenceDiv.innerHTML += "<hr/>";
 
-    removeSentenceButton = document.createElement('button');
-    removeSentenceButton.setAttribute('onclick', 'removesentence(' + sentenceIndex + ')');
-    removeSentenceButton.setAttribute('type', 'button');
-    removeSentenceButton.innerHTML = "remove sentence";
-    sentenceDiv.appendChild(removeSentenceButton);
-
     sentenceDiv.innerHTML += "<br />";
 
-    addinput(sentenceDiv, "Expression");
+    addinput(sentenceDiv, "Expression", expression);
     sentenceDiv.innerHTML += "<br />";
 
-    addinput(sentenceDiv, "Meaning");
+    addinput(sentenceDiv, "Meaning", meaning);
     sentenceDiv.innerHTML += "<br />";
 
-    addinput(sentenceDiv, "Reading");
+    addinput(sentenceDiv, "Reading", reading);
     sentenceDiv.innerHTML += "<br />";
 
-    addinput(sentenceDiv, "Audio");
+    addinput(sentenceDiv, "Audio", audio);
     sentenceDiv.innerHTML += "<br />";
 
     addWordButton = document.createElement('button');
@@ -72,14 +67,27 @@ function removeItem(id) {
 }
 
 function removeword(wordIndex) {
-    // TODO: "are you sure?"
     removeItem('word' + wordIndex);
     onFormChange();
 }
 
-function removesentence(sentenceIndex) {
-    // TODO: "are you sure?"
-    removeItem('sentence' + sentenceIndex);
+function removeAllSentences() {
+    for(var i=0;i<sentenceIndex;i++) {
+        removeItem('sentence' + i)
+    }
+    sentenceIndex = 0;
+    onFormChange();
+}
+
+function onInputChange() {
+    blockInput = document.getElementById('blockInput');
+    removeAllSentences();
+    items = blockInput.value.split("\n");
+    for(var i=0;i<items.length;i++) {
+        parts = items[i].split("\t");
+        if(parts.length >= 4)
+            addsentence(parts[1], parts[0], parts[2], parts[3]);
+    }
     onFormChange();
 }
 

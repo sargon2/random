@@ -7,7 +7,9 @@
 <body>
     <button onclick="document.getElementById('helper').select()">select</button>
     <input id="helper" style="width: 80%" disabled="true" value='"deck:b 日本語::z ONSLAUGHT" -tag:fully_added -tag:leech -is:suspended prop:reps=0'></input><br />
-    <button onclick="addsentence()">Add Sentence</button><br />
+    Paste from <a href="http://stuff.xem.us/besen/onslaught-export/filtered.txt">here</a>:<br />
+    <textarea id="blockInput" onchange="onInputChange()" rows=25 style="width: 100%"></textarea>
+    <b>Caution</b>: Changing text box will reset words.
     <form id="myForm" onchange="onFormChange()">
     </form>
     <br />
