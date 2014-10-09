@@ -118,6 +118,7 @@ class TestDots(unittest2.TestCase):
         self.assertEquals(False, self.sut.wins([2, 1]))
         self.assertEquals(True, self.sut.wins([2, 2]))
         self.assertEquals(True, self.sut.wins([3, 3, 3]))
+        self.assertEquals(True, self.sut.wins([4, 4, 2, 0]))
 
 if __name__ == "__main__":
     d = Dots()
