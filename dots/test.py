@@ -24,11 +24,10 @@ class Dots(object):
         # Get the memoized result
         result = self.memo[rb]
 
-        if level <= 1:
-            if result:
-                print board, "wins"
-            else:
+        if level <= 1 and not result:
                 print board, "loses"
+        if level == 0 and result:
+                print board, "wins"
         return result
 
     def minimize(self, board):
@@ -140,5 +139,3 @@ if __name__ == "__main__":
         #    print board, "wins"
         #else:
         #    print board, "loses"
-
-    # TODO: given an initial board layout, print the whole game of perfect play
