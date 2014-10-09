@@ -2,20 +2,34 @@ import unittest2
 
 class Dots(object):
     memo = {}
-    def wins(self, board):
-        if repr(board) in self.memo:
-            return self.memo[repr(board)]
-        if board == [1]:
-            self.memo[repr(board)] = False
-            return False
-        for move in self.generateMoves(board):
-            # If any one of our children is a loss, we're a win.
-            # If all of our children are a win, we're a loss.
-            if not self.wins(move):
-                self.memo[repr(board)] = True
-                return True
-        self.memo[repr(board)] = False
-        return False
+
+    def calculate(self, board, level=0):
+        wins = False
+        if board != [1]:
+            for move in self.generateMoves(board):
+                # If any one of our children is a loss, we're a win.
+                # If all of our children are a win, we're a loss.
+                if not self.wins(move, level+1):
+                    # we can't just return here because we want to calculate all winning moves
+                    wins = True
+        return wins
+
+    def wins(self, board, level=0):
+        # Memoize the result
+        rb = repr(board)
+        if not rb in self.memo:
+            result = self.calculate(board, level)
+            self.memo[rb] = result
+
+        # Get the memoized result
+        result = self.memo[rb]
+
+        if level <= 1:
+            if result:
+                print board, "wins"
+            else:
+                print board, "loses"
+        return result
 
     def minimize(self, board):
         return board[0:board[0]]
@@ -108,8 +122,17 @@ class TestDots(unittest2.TestCase):
 
 if __name__ == "__main__":
     d = Dots()
-    for board in d.generateBoards():
-        if d.wins(board):
-            print board, "wins"
-        else:
-            print board, "loses"
+    # We can't do two of these at once because of the memoization.
+    # TODO: auto-pad
+    d.wins([7, 7, 7, 7, 7, 7, 0])
+    # d.wins([6, 6, 6, 6, 6, 0])
+    # d.wins([5, 5, 5, 5, 5])
+
+    # for calculating everything (also remove prints above)
+    # TODO: switches instead of comments?
+    #for board in d.generateBoards():
+    #    d.wins(board)
+        #if d.wins(board):
+        #    print board, "wins"
+        #else:
+        #    print board, "loses"
