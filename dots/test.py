@@ -122,11 +122,15 @@ class TestDots(unittest2.TestCase):
 
 if __name__ == "__main__":
     d = Dots()
-    # We can't do two of these at once because of the memoization.
+    # We have to do these small-to-large because of the memoization.
     # TODO: auto-pad
+    d.wins([3, 3, 0])
+    d.wins([4, 4, 4, 0])
+    d.wins([5, 5, 5, 5, 0])
+    d.wins([6, 6, 6, 6, 6, 0])
     d.wins([7, 7, 7, 7, 7, 7, 0])
-    # d.wins([6, 6, 6, 6, 6, 0])
-    # d.wins([5, 5, 5, 5, 5])
+    d.wins([8, 8, 8, 8, 8, 8, 8, 0])
+    d.wins([9, 9, 9, 9, 9, 9, 9, 9, 0])
 
     # for calculating everything (also remove prints above)
     # TODO: switches instead of comments?
@@ -136,3 +140,5 @@ if __name__ == "__main__":
         #    print board, "wins"
         #else:
         #    print board, "loses"
+
+    # TODO: given an initial board layout, print the whole game of perfect play
