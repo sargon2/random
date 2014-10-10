@@ -1,5 +1,8 @@
 import unittest2
 
+# I got this game from the online Yale course on game theory.
+# Turns out it's called "Chomp".
+
 class Dots(object):
     memo = {}
 
