@@ -31,7 +31,7 @@ class Dots(object):
         return result
 
     def minimize(self, board):
-        return board[0:board[0]]
+        return [x for x in board if x != 0]
 
     def generateMoves(self, board):
         for i in range(len(board)):
@@ -43,16 +43,15 @@ class Dots(object):
                     for x in range(i, len(r)):
                         if r[x] > j:
                             r[x] = j
-                    if len(r) <= r[0] or r[r[0]] == 0:
-                        m = self.minimize(r)
-                        if len(m) > 0:
-                            yield m
+                    m = self.minimize(r)
+                    if len(m) > 0:
+                        yield m
 
     def generateBoards(self):
         ret = [1]
         length = 1
         while True:
-            yield ret
+            yield self.minimize(ret)
             ret = list(ret) # copy
             ret[length-1] += 1
             for i in range(length-1, 0, -1):
@@ -75,22 +74,22 @@ class TestDots(unittest2.TestCase):
 
     def testGenerateBoards(self):
         expected = [[1],
-                    [2, 0],
+                    [2],
                     [2, 1],
                     [2, 2],
-                    [3, 0, 0],
-                    [3, 1, 0],
+                    [3],
+                    [3, 1],
                     [3, 1, 1],
-                    [3, 2, 0],
+                    [3, 2],
                     [3, 2, 1],
                     [3, 2, 2],
-                    [3, 3, 0],
+                    [3, 3],
                     [3, 3, 1],
                     [3, 3, 2],
                     [3, 3, 3],
-                    [4, 0, 0, 0],
-                    [4, 1, 0, 0],
-                    [4, 1, 1, 0],
+                    [4],
+                    [4, 1],
+                    [4, 1, 1],
                    ]
         result = []
         generator = self.sut.generateBoards()
@@ -101,36 +100,36 @@ class TestDots(unittest2.TestCase):
 
     def testMinimize(self):
         self.assertEquals([1], self.sut.minimize([1, 0]))
-        self.assertEquals([2, 0], self.sut.minimize([2, 0]))
-        self.assertEquals([2, 0], self.sut.minimize([2, 0, 0]))
+        self.assertEquals([2], self.sut.minimize([2, 0]))
+        self.assertEquals([2], self.sut.minimize([2, 0, 0]))
 
     def testGenerateMoves(self):
         # TODO: the order of these is really undefined...
-        self.assertEquals([[1]], list(self.sut.generateMoves([2, 0])))
-        self.assertEquals([[2, 0]], list(self.sut.generateMoves([2, 1])))
-        self.assertEquals([[2, 1], [2, 0]], list(self.sut.generateMoves([2, 2])))
-        self.assertEquals([[3, 2, 2], [3, 1, 1], [3, 0, 0], [3, 3, 2], [3, 3, 1], [3, 3, 0]], list(self.sut.generateMoves([3, 3, 3])))
-        self.assertEquals([[2, 0], [1]], list(self.sut.generateMoves([3, 0, 0])))
+        self.assertEquals([[1]], list(self.sut.generateMoves([2])))
+        self.assertEquals([[1, 1], [2]], list(self.sut.generateMoves([2, 1])))
+        self.assertEquals([[1, 1], [2, 1], [2]], list(self.sut.generateMoves([2, 2])))
+        self.assertEquals([[2, 2, 2], [1, 1, 1], [3, 2, 2], [3, 1, 1], [3], [3, 3, 2], [3, 3, 1], [3, 3]], list(self.sut.generateMoves([3, 3, 3])))
+        self.assertEquals([[2], [1]], list(self.sut.generateMoves([3])))
 
     def testWinLoss(self):
         self.assertEquals(False, self.sut.wins([1]))
-        self.assertEquals(True, self.sut.wins([2, 0]))
+        self.assertEquals(True, self.sut.wins([2]))
         self.assertEquals(False, self.sut.wins([2, 1]))
         self.assertEquals(True, self.sut.wins([2, 2]))
         self.assertEquals(True, self.sut.wins([3, 3, 3]))
-        self.assertEquals(True, self.sut.wins([4, 4, 2, 0]))
+        self.assertEquals(True, self.sut.wins([4, 4, 2]))
 
 if __name__ == "__main__":
     d = Dots()
     # We have to do these small-to-large because of the memoization.
-    # TODO: auto-pad
-    d.wins([3, 3, 0])
-    d.wins([4, 4, 4, 0])
-    d.wins([5, 5, 5, 5, 0])
-    d.wins([6, 6, 6, 6, 6, 0])
-    d.wins([7, 7, 7, 7, 7, 7, 0])
-    d.wins([8, 8, 8, 8, 8, 8, 8, 0])
-    d.wins([9, 9, 9, 9, 9, 9, 9, 9, 0])
+    #d.wins([3, 3])
+    # for i in range(1, 41):
+    #     d.wins([i] * 3)
+    #d.wins([5, 5, 5, 5, 5])
+    d.wins([6, 6, 6, 6, 6])
+    #d.wins([7, 7, 7, 7, 7, 7])
+    #d.wins([8, 8, 8, 8, 8, 8, 8])
+    #d.wins([9, 9, 9, 9, 9, 9, 9, 9])
 
     # for calculating everything (also remove prints above)
     # TODO: switches instead of comments?
