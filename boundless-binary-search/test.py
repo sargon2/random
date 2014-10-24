@@ -17,6 +17,7 @@ def searchFor(method, output):
     if method(min) == output:
         return min
     while(method(max) < output):
+        min = max
         max *= 2
     if method(max) == output:
         return max
