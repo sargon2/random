@@ -4,19 +4,20 @@ from __future__ import division
 import sys
 from collections import defaultdict
 
-def get_counts(str):
+def get_max(str):
     letters = defaultdict(lambda: 0)
+    max = 0
     for letter in str:
-        letters[letter] += 1
-    return letters
+        v = letters[letter]
+        v += 1
+        letters[letter] = v
+        if v > max:
+            max = v
+    return max
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print "return the alliterative index of a string"
-        print "usage:", sys.argv[0], "<str>"
-        sys.exit()
-    str = sys.argv[1]
-    counts = get_counts(str)
-    s = sorted(counts, key=counts.get, reverse=True)
-    m = counts[s[0]]
-    print m / len(str), str
+    with open("/usr/share/dict/words") as f:
+        for line in f:
+            str = line.strip()
+            m = get_max(str)
+            print m / len(str), m, len(str), str
