@@ -161,15 +161,15 @@ class Maze(object):
             p2 = position
             for i in range(2):
                 p2 = self.move(p2, direction)
-            if self.is_in_range(p2):
+            if self.isInRange(p2):
                 if self.get(p2):
                     ret.append(direction)
         return ret
 
-    def has_nearby_uncarved(self, position):
+    def hasNearbyUncarved(self, position):
         return len(self.getMovableDirections(position)) > 0
 
-    def is_in_range(self, position):
+    def isInRange(self, position):
         (x, y) = position
         return y > 0 and x > 0 and y < self.height-1 and x < self.width-1
 
@@ -182,7 +182,7 @@ class Maze(object):
                     ret.append(position)
                 else:
                     if not self.get(position): # We can only start on an existing path.
-                        if self.has_nearby_uncarved(position):
+                        if self.hasNearbyUncarved(position):
                             ret.append(position)
         return ret
 
