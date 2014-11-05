@@ -9,6 +9,12 @@ import unittest2
 # get_movable_directions(position)
 # get_startable_positions()
 
+class Directions:
+    right = (1, 0)
+    left = (-1, 0)
+    up = (0, -1)
+    down = (0, 1)
+
 class InvalidArgumentException(Exception):
     pass
 
@@ -80,29 +86,56 @@ class MazeTest(unittest2.TestCase):
         self.assertEquals((1, 1), s[0])
         self.assertEquals((3, 1), s[1])
 
-    def test_get_startable_positions_one_empty(self):
-        self.fail("Not written yet")
-
     def test_clear_and_move(self):
         m = Maze(5, 3)
-        m.clearAndMove((3, 3), "right")
+        m.clearAndMove((1, 1), Directions.right)
         self.assertEquals([[True, True, True, True, True],
                            [True, True, False, False, True],
                            [True, True, True, True, True]], m.getMaze())
 
+    def test_clear_and_move_left(self):
+        m = Maze(5, 3)
+        m.clearAndMove((3, 1), Directions.left)
+        self.assertEquals([[True, True, True, True, True],
+                           [True, False, False, True, True],
+                           [True, True, True, True, True]], m.getMaze())
+
+    def test_clear_and_move_down(self):
+        m = Maze(3, 5)
+        m.clearAndMove((1, 1), Directions.down)
+        self.assertEquals([[True, True, True],
+                           [True, True, True],
+                           [True, False, True],
+                           [True, False, True],
+                           [True, True, True]], m.getMaze())
+
+    def test_clear_and_move_up(self):
+        m = Maze(3, 5)
+        m.clearAndMove((1, 3), Directions.up)
+        self.assertEquals([[True, True, True],
+                           [True, False, True],
+                           [True, False, True],
+                           [True, True, True],
+                           [True, True, True]], m.getMaze())
+
     def test_get_maze(self):
+        # Note that these duplicate pointers.
         self.assertEquals([[True] * 3] * 3, Maze(3, 3).getMaze())
         self.assertEquals([[True] * 5] * 3, Maze(5, 3).getMaze())
+
+    def test_get_startable_positions_one_empty(self):
+        self.fail("Not written yet")
+
 
 
 class Maze(object):
 
     def __init__(self, width, height):
-        if width < 3 or height < 3 or width % 2 == 0 or height % 2 == 0:
+        if width < 3 or height < 3 or (height*width) % 2 == 0:
             raise InvalidArgumentException()
         self.width = width
         self.height = height
-        self.maze = [[True] * width] * height
+        self.maze = [[True for i in range(width)] for i in range(height)]
 
     def getMaze(self):
         return self.maze
@@ -115,4 +148,14 @@ class Maze(object):
         return ret
 
     def clearAndMove(self, position, direction):
-        pass
+        for i in range(2):
+            position = self.clearAndMoveOne(position, direction)
+        return position
+
+    def clearAndMoveOne(self, position, direction):
+        position = self.move(position, direction)
+        self.maze[position[1]][position[0]] = False
+        return position
+
+    def move(self, position, direction):
+        return (position[0] + direction[0], position[1] + direction[1])
