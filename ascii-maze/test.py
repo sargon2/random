@@ -146,32 +146,32 @@ class Maze(object):
     def getMaze(self):
         return self.maze
 
+    def get(self, position):
+        return self.maze[position[1]][position[0]] # note swapped
+
+    def has_nearby_uncarved(self, position):
+        (x, y) = position
+        if y > 1 and self.get((x, y-2)):
+            return True
+        if x > 1 and self.get((x-2, y)):
+            return True
+        if y < self.height-2 and self.get((x, y+2)):
+            return True
+        if x < self.width-2 and self.get((x+2, y)):
+            return True
+        return False
+
     def getStartablePositions(self):
-        if self.isEmpty:
-            ret = []
-            for i in range(1, self.width-1, 2):
-                for j in range(1, self.height-1, 2):
-                    ret.append((i, j))
-        else:
-            ret = []
-            for i in range(1, self.width-1, 2):
-                for j in range(1, self.height-1, 2):
-                    if not self.maze[j][i]: # We can only start on an existing path.
-                        # Do we have a nearby uncarved spot?
-                        have_uncarved = False
-
-                        # TODO: this is ugly
-                        if j > 1 and self.maze[j-2][i]:
-                            have_uncarved = True
-                        if i > 1 and self.maze[j][i-2]:
-                            have_uncarved = True
-                        if j < self.height-2 and self.maze[j+2][i]:
-                            have_uncarved = True
-                        if i < self.width-2 and self.maze[j][i+2]:
-                            have_uncarved = True
-
-                        if have_uncarved:
-                            ret.append((i, j))
+        ret = []
+        for i in range(1, self.width-1, 2):
+            for j in range(1, self.height-1, 2):
+                position = (i, j)
+                if self.isEmpty:
+                    ret.append(position)
+                else:
+                    if not self.get(position): # We can only start on an existing path.
+                        if self.has_nearby_uncarved(position):
+                            ret.append(position)
         return ret
 
     def carve(self, position):
