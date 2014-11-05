@@ -1,4 +1,5 @@
 import unittest2
+import operator
 
 # Pick a random spot that's not on an edge
 # Continue to move in random directions, avoiding connecting to empty spots or edges, until trapped
@@ -90,21 +91,21 @@ class MazeTest(unittest2.TestCase):
         m = Maze(5, 3)
         m.clearAndMove((1, 1), Directions.right)
         self.assertEquals([[True, True, True, True, True],
-                           [True, True, False, False, True],
+                           [True, False, False, False, True],
                            [True, True, True, True, True]], m.getMaze())
 
     def test_clear_and_move_left(self):
         m = Maze(5, 3)
         m.clearAndMove((3, 1), Directions.left)
         self.assertEquals([[True, True, True, True, True],
-                           [True, False, False, True, True],
+                           [True, False, False, False, True],
                            [True, True, True, True, True]], m.getMaze())
 
     def test_clear_and_move_down(self):
         m = Maze(3, 5)
         m.clearAndMove((1, 1), Directions.down)
         self.assertEquals([[True, True, True],
-                           [True, True, True],
+                           [True, False, True],
                            [True, False, True],
                            [True, False, True],
                            [True, True, True]], m.getMaze())
@@ -115,7 +116,7 @@ class MazeTest(unittest2.TestCase):
         self.assertEquals([[True, True, True],
                            [True, False, True],
                            [True, False, True],
-                           [True, True, True],
+                           [True, False, True],
                            [True, True, True]], m.getMaze())
 
     def test_get_maze(self):
@@ -124,7 +125,11 @@ class MazeTest(unittest2.TestCase):
         self.assertEquals([[True] * 5] * 3, Maze(5, 3).getMaze())
 
     def test_get_startable_positions_one_empty(self):
-        self.fail("Not written yet")
+        m = Maze(7, 3)
+        m.clearAndMove((1, 1), Directions.right)
+        s = m.getStartablePositions()
+        self.assertEquals(1, len(s))
+        self.assertEquals((3, 1), s[0])
 
 
 
@@ -136,26 +141,53 @@ class Maze(object):
         self.width = width
         self.height = height
         self.maze = [[True for i in range(width)] for i in range(height)]
+        self.isEmpty = True
 
     def getMaze(self):
         return self.maze
 
     def getStartablePositions(self):
-        ret = []
-        for i in range(1, self.width-1, 2):
-            for j in range(1, self.height-1, 2):
-                ret.append((i, j))
+        if self.isEmpty:
+            ret = []
+            for i in range(1, self.width-1, 2):
+                for j in range(1, self.height-1, 2):
+                    ret.append((i, j))
+        else:
+            ret = []
+            for i in range(1, self.width-1, 2):
+                for j in range(1, self.height-1, 2):
+                    if not self.maze[j][i]: # We can only start on an existing path.
+                        # Do we have a nearby uncarved spot?
+                        have_uncarved = False
+
+                        # TODO: this is ugly
+                        if j > 1 and self.maze[j-2][i]:
+                            have_uncarved = True
+                        if i > 1 and self.maze[j][i-2]:
+                            have_uncarved = True
+                        if j < self.height-2 and self.maze[j+2][i]:
+                            have_uncarved = True
+                        if i < self.width-2 and self.maze[j][i+2]:
+                            have_uncarved = True
+
+                        if have_uncarved:
+                            ret.append((i, j))
         return ret
 
+    def carve(self, position):
+        self.isEmpty = False
+        self.maze[position[1]][position[0]] = False
+
     def clearAndMove(self, position, direction):
+        self.carve(position)
         for i in range(2):
             position = self.clearAndMoveOne(position, direction)
         return position
 
     def clearAndMoveOne(self, position, direction):
         position = self.move(position, direction)
-        self.maze[position[1]][position[0]] = False
+        self.carve(position)
         return position
 
     def move(self, position, direction):
-        return (position[0] + direction[0], position[1] + direction[1])
+        return tuple(map(operator.add, position, direction))
