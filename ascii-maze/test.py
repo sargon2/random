@@ -158,7 +158,6 @@ class Maze(object):
         return self.maze[position[1]][position[0]] # note swapped
 
     def getMovableDirections(self, position):
-        # TODO: is this slow? is there any way to speed it up?
         ret = []
         for direction in Directions.all:
             p2 = position
@@ -177,7 +176,7 @@ class Maze(object):
         return y > 0 and x > 0 and y < self.height-1 and x < self.width-1
 
     def getStartablePositions(self):
-        # TODO: for speed, we should keep a list of startable positions, and remove from it on carve.
+        # TODO: This method is 98% of the runtime of the program.  How to speed it up?
         ret = []
         for i in range(1, self.width-1, 2):
             for j in range(1, self.height-1, 2):
