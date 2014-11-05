@@ -1,5 +1,7 @@
 import unittest2
 import operator
+import random
+import sys
 
 # Pick a random spot that's not on an edge
 # Continue to move in random directions, avoiding connecting to empty spots or edges, until trapped
@@ -156,6 +158,7 @@ class Maze(object):
         return self.maze[position[1]][position[0]] # note swapped
 
     def getMovableDirections(self, position):
+        # TODO: is this slow? is there any way to speed it up?
         ret = []
         for direction in Directions.all:
             p2 = position
@@ -174,6 +177,7 @@ class Maze(object):
         return y > 0 and x > 0 and y < self.height-1 and x < self.width-1
 
     def getStartablePositions(self):
+        # TODO: for speed, we should keep a list of startable positions, and remove from it on carve.
         ret = []
         for i in range(1, self.width-1, 2):
             for j in range(1, self.height-1, 2):
@@ -203,3 +207,30 @@ class Maze(object):
 
     def move(self, position, direction):
         return tuple(map(operator.add, position, direction))
+
+    def generate(self): # TODO: untested
+        while(True):
+            positions = m.getStartablePositions()
+            if len(positions) == 0:
+                break
+            position = random.choice(positions)
+            while(True):
+                directions = m.getMovableDirections(position)
+                if len(directions) == 0:
+                    break
+                direction = random.choice(directions)
+                position = m.clearAndMove(position, direction)
+
+def printmaze(data): # TODO: untested, and where should it live?
+    for row in data:
+        for column in row:
+            if column:
+                sys.stdout.write("#")
+            else:
+                sys.stdout.write(" ")
+        sys.stdout.write("\n")
+
+if __name__ == "__main__":
+    m = Maze(51, 31)
+    m.generate()
+    printmaze(m.getMaze())
