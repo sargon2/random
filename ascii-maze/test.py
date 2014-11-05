@@ -132,6 +132,11 @@ class MazeTest(unittest2.TestCase):
         self.assertEquals(1, len(s))
         self.assertEquals((3, 1), s[0])
 
+    def test_get_movable_directions(self):
+        m = Maze(5, 3)
+        dirs = m.getMovableDirections((1, 1))
+        self.assertEquals(1, len(dirs))
+        self.assertEquals((1, 0), dirs[0])
 
 
 class Maze(object):
@@ -150,15 +155,19 @@ class Maze(object):
     def get(self, position):
         return self.maze[position[1]][position[0]] # note swapped
 
-    def has_nearby_uncarved(self, position):
+    def getMovableDirections(self, position):
+        ret = []
         for direction in Directions.all:
             p2 = position
             for i in range(2):
                 p2 = self.move(p2, direction)
             if self.is_in_range(p2):
                 if self.get(p2):
-                    return True
-        return False
+                    ret.append(direction)
+        return ret
+
+    def has_nearby_uncarved(self, position):
+        return len(self.getMovableDirections(position)) > 0
 
     def is_in_range(self, position):
         (x, y) = position
