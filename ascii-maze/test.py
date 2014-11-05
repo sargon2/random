@@ -84,7 +84,15 @@ class MazeTest(unittest2.TestCase):
         self.fail("Not written yet")
 
     def test_clear_and_move(self):
-        self.fail("Not written yet")
+        m = Maze(5, 3)
+        m.clearAndMove((3, 3), "right")
+        self.assertEquals([[True, True, True, True, True],
+                           [True, True, False, False, True],
+                           [True, True, True, True, True]], m.getMaze())
+
+    def test_get_maze(self):
+        self.assertEquals([[True] * 3] * 3, Maze(3, 3).getMaze())
+        self.assertEquals([[True] * 5] * 3, Maze(5, 3).getMaze())
 
 
 class Maze(object):
@@ -94,6 +102,10 @@ class Maze(object):
             raise InvalidArgumentException()
         self.width = width
         self.height = height
+        self.maze = [[True] * width] * height
+
+    def getMaze(self):
+        return self.maze
 
     def getStartablePositions(self):
         ret = []
@@ -101,3 +113,6 @@ class Maze(object):
             for j in range(1, self.height-1, 2):
                 ret.append((i, j))
         return ret
+
+    def clearAndMove(self, position, direction):
+        pass
