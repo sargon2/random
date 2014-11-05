@@ -225,12 +225,12 @@ def printmaze(data): # TODO: untested, and where should it live?
     for row in data:
         for column in row:
             if column:
-                sys.stdout.write("#")
+                sys.stdout.write("##")
             else:
-                sys.stdout.write(" ")
+                sys.stdout.write("  ")
         sys.stdout.write("\n")
 
 if __name__ == "__main__":
-    m = Maze(51, 31)
+    m = Maze(31, 31)
     m.generate()
     printmaze(m.getMaze())
