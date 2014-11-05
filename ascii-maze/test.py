@@ -225,11 +225,13 @@ def printmaze(data): # TODO: untested, and where should it live?
         for column in row:
             if column:
                 sys.stdout.write("##")
+                #sys.stdout.write(unicode(u'\u2588').encode('utf8') * 2) # full block
             else:
                 sys.stdout.write("  ")
         sys.stdout.write("\n")
 
 if __name__ == "__main__":
+    # m = Maze(239, 73) # size of my terminal
     m = Maze(31, 31)
     m.generate()
     printmaze(m.getMaze())
