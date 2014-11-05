@@ -15,6 +15,7 @@ class Directions:
     left = (-1, 0)
     up = (0, -1)
     down = (0, 1)
+    all = [left, right, up, down]
 
 class InvalidArgumentException(Exception):
     pass
@@ -150,16 +151,18 @@ class Maze(object):
         return self.maze[position[1]][position[0]] # note swapped
 
     def has_nearby_uncarved(self, position):
-        (x, y) = position
-        if y > 1 and self.get((x, y-2)):
-            return True
-        if x > 1 and self.get((x-2, y)):
-            return True
-        if y < self.height-2 and self.get((x, y+2)):
-            return True
-        if x < self.width-2 and self.get((x+2, y)):
-            return True
+        for direction in Directions.all:
+            p2 = position
+            for i in range(2):
+                p2 = self.move(p2, direction)
+            if self.is_in_range(p2):
+                if self.get(p2):
+                    return True
         return False
+
+    def is_in_range(self, position):
+        (x, y) = position
+        return y > 0 and x > 0 and y < self.height-1 and x < self.width-1
 
     def getStartablePositions(self):
         ret = []
