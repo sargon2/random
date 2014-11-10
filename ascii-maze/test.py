@@ -150,6 +150,10 @@ class Maze(object):
         self.height = height
         self.maze = [[True for i in range(width)] for i in range(height)]
         self.isEmpty = True
+        self.empty_positions_memoize = []
+        for i in range(1, self.width-1, 2):
+            for j in range(1, self.height-1, 2):
+                self.empty_positions_memoize.append((i, j))
 
     def getMaze(self):
         return self.maze
@@ -176,17 +180,16 @@ class Maze(object):
         return y > 0 and x > 0 and y < self.height-1 and x < self.width-1
 
     def getStartablePositions(self):
-        # TODO: This method is 98% of the runtime of the program.  How to speed it up?
         ret = []
-        for i in range(1, self.width-1, 2):
-            for j in range(1, self.height-1, 2):
-                position = (i, j)
-                if self.isEmpty:
-                    ret.append(position)
-                else:
-                    if not self.get(position): # We can only start on an existing path.
-                        if self.hasNearbyUncarved(position):
-                            ret.append(position)
+        for position in list(self.empty_positions_memoize):
+            if self.isEmpty:
+                ret.append(position)
+            else:
+                if not self.get(position): # We can only start on an existing path.
+                    if self.hasNearbyUncarved(position):
+                        ret.append(position)
+                    else:
+                        self.empty_positions_memoize.remove(position)
         return ret
 
     def carve(self, position):
@@ -231,7 +234,7 @@ def printmaze(data): # TODO: untested, and where should it live?
         sys.stdout.write("\n")
 
 if __name__ == "__main__":
-    # m = Maze(239, 73) # size of my terminal
+    # m = Maze(119, 73) # size of my terminal
     m = Maze(31, 31)
     m.generate()
     printmaze(m.getMaze())
