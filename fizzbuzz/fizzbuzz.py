@@ -13,19 +13,32 @@ import sys
 # Printing "fizz" and printing "fizzbuzz" both duplicate printing "fizz".
 # Checking for i%3 and i%15 duplicates the check for i%3.
 
+# Solution, courtesy of http://c2.com/cgi/wiki?FizzBuzz
+for i in range(1, 100):
+    line = ""
+    if i % 3 == 0:
+        line += "fizz"
+    if i % 5 == 0:
+        line += "buzz"
+
+    if line:
+        print line
+    else:
+        print i
+
 # This is the least duplication I can come up with:
 
-for i in range(1, 100):
-    printed = False
-    if i % 3 == 0:
-        sys.stdout.write("fizz")
-        printed = True
-    if i % 5 == 0:
-        sys.stdout.write("buzz")
-        printed =  True
-    if not printed:
-        sys.stdout.write(str(i))
-    sys.stdout.write("\n")
+#for i in range(1, 100):
+#    printed = False
+#    if i % 3 == 0:
+#        sys.stdout.write("fizz")
+#        printed = True
+#    if i % 5 == 0:
+#        sys.stdout.write("buzz")
+#        printed =  True
+#    if not printed:
+#        sys.stdout.write(str(i))
+#    sys.stdout.write("\n")
 
 # Full duplication looks like this:
 
