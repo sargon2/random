@@ -13,14 +13,13 @@ import sys
 # Printing "fizz" and printing "fizzbuzz" both duplicate printing "fizz".
 # Checking for i%3 and i%15 duplicates the check for i%3.
 
-# Solution, courtesy of http://c2.com/cgi/wiki?FizzBuzz
+# Modified solution from http://c2.com/cgi/wiki?FizzBuzz
 for i in range(1, 100):
+    data = [(3, "fizz"), (5, "buzz")]
     line = ""
-    if i % 3 == 0:
-        line += "fizz"
-    if i % 5 == 0:
-        line += "buzz"
-
+    for num, word in data:
+        if i % num == 0:
+            line += word
     if line:
         print line
     else:
