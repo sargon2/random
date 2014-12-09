@@ -87,34 +87,36 @@ class TestThings(unittest.TestCase):
         self.assertEquals(5, sut.getNeighborCount(20, 31))
         self.assertEquals(5, sut.getNeighborCount(22, 31))
 
+    def assertDies(self, sut, x, y):
+        self.assertTrue(sut.getCell(x, y))
+        sut.tick()
+        self.assertFalse(sut.getCell(x, y))
+
+    def assertAnimates(self, sut, x, y):
+        self.assertFalse(sut.getCell(x, y))
+        sut.tick()
+        self.assertTrue(sut.getCell(x, y))
+
     def test_advance_state(self):
         sut = GameOfLife()
         sut.turnOnCell(10, 10)
-        self.assertTrue(sut.getCell(10, 10))
-        sut.tick()
-        self.assertFalse(sut.getCell(10, 10))
+        self.assertDies(sut, 10, 10)
 
     def test_advance_state_different(self):
         sut = GameOfLife()
         sut.turnOnCell(11, 11)
-        self.assertTrue(sut.getCell(11, 11))
-        sut.tick()
-        self.assertFalse(sut.getCell(11, 11))
+        self.assertDies(sut, 11, 11)
 
     def test_advance_state_on(self):
         sut = GameOfLife()
         sut.turnOnCell(9, 9)
         sut.turnOnCell(10, 9)
         sut.turnOnCell(11, 9)
-        self.assertFalse(sut.getCell(10, 10))
-        sut.tick()
-        self.assertTrue(sut.getCell(10, 10))
+        self.assertAnimates(sut, 10, 10)
 
     def test_advance_state_on_different(self):
         sut = GameOfLife()
         sut.turnOnCell(10, 10)
         sut.turnOnCell(11, 10)
         sut.turnOnCell(12, 10)
-        self.assertFalse(sut.getCell(11, 11))
-        sut.tick()
-        self.assertTrue(sut.getCell(11, 11))
+        self.assertAnimates(sut, 11, 11)
