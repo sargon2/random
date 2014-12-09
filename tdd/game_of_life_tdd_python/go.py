@@ -37,7 +37,6 @@ class GameOfLife(object):
         newboard = self.make_board()
         for (rowkey, row) in self.board.items():
             for (cellkey, cell) in row.items():
-                print "processing", rowkey, cellkey
                 newboard[rowkey][cellkey] = process(self.getNeighborCount(rowkey, cellkey), cell)
         self.board = newboard
 
