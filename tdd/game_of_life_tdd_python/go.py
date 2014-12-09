@@ -1,20 +1,53 @@
 import unittest
+from collections import defaultdict
 
 # https://sites.google.com/site/tddproblems/all-problems-1/game-of-life
-DEAD = False
-ALIVE = True
+DEAD = 0
+ALIVE = 1
+
+def process(num_neighbors, is_alive):
+    if num_neighbors == 3:
+        return ALIVE
+    if num_neighbors == 2 and is_alive == ALIVE:
+        return ALIVE
+    return DEAD
+
+class GameOfLife(object):
+    def make_board(self):
+        return defaultdict(lambda: defaultdict(lambda: 0))
+
+    def __init__(self):
+        self.board = self.make_board()
+
+    def turnOnCell(self, x, y):
+        self.board[x][y] = ALIVE
+
+    def getNeighborCount(self, x, y):
+        # I tried this with loops, but it's faster to unroll them.
+        return self.board[x+1][y] \
+             + self.board[x-1][y] \
+             + self.board[x][y+1] \
+             + self.board[x][y-1] \
+             + self.board[x+1][y+1] \
+             + self.board[x+1][y-1] \
+             + self.board[x-1][y+1] \
+             + self.board[x-1][y-1]
+
+    def tick(self):
+        newboard = self.make_board()
+        for (rowkey, row) in self.board.items():
+            for (cellkey, cell) in row.items():
+                print "processing", rowkey, cellkey
+                newboard[rowkey][cellkey] = process(self.getNeighborCount(rowkey, cellkey), cell)
+        self.board = newboard
+
+    def getCell(self, x, y):
+        return self.board[x][y] == ALIVE
 
 class TestThings(unittest.TestCase):
 
-    def process(self, num_neighbors, is_alive):
-        if num_neighbors == 3:
-            return ALIVE
-        if num_neighbors == 2 and is_alive == ALIVE:
-            return ALIVE
-        return DEAD
-
     def assert_state(self, is_alive, num_neighbors, expected_result):
-        result = self.process(num_neighbors, is_alive)
+        result = process(num_neighbors, is_alive)
         self.assertEquals(result, expected_result)
 
     def assert_neighbor_state_change(self, num_neighbors, if_was_alive, if_was_dead):
@@ -31,3 +64,57 @@ class TestThings(unittest.TestCase):
         self.assert_neighbor_state_change(6, DEAD, DEAD)
         self.assert_neighbor_state_change(7, DEAD, DEAD)
         self.assert_neighbor_state_change(8, DEAD, DEAD)
+
+    def test_cell_neighbors(self):
+        sut = GameOfLife()
+        sut.turnOnCell(10, 10)
+        sut.turnOnCell(11, 10)
+        self.assertEquals(1, sut.getNeighborCount(10, 10))
+        self.assertEquals(1, sut.getNeighborCount(11, 10))
+        self.assertEquals(2, sut.getNeighborCount(10, 11))
+
+    def test_11_1(self): # to be different from test_cell_neighbors
+        sut = GameOfLife()
+        sut.turnOnCell(10, 10)
+        self.assertEquals(1, sut.getNeighborCount(10, 11))
+
+    def test_all_neighbors(self):
+        sut = GameOfLife()
+        for x in range(20, 23):
+            for y in range(30, 33):
+                sut.turnOnCell(x, y)
+        self.assertEquals(8, sut.getNeighborCount(21, 31))
+        self.assertEquals(5, sut.getNeighborCount(20, 31))
+        self.assertEquals(5, sut.getNeighborCount(22, 31))
+
+    def test_advance_state(self):
+        sut = GameOfLife()
+        sut.turnOnCell(10, 10)
+        self.assertTrue(sut.getCell(10, 10))
+        sut.tick()
+        self.assertFalse(sut.getCell(10, 10))
+
+    def test_advance_state_different(self):
+        sut = GameOfLife()
+        sut.turnOnCell(11, 11)
+        self.assertTrue(sut.getCell(11, 11))
+        sut.tick()
+        self.assertFalse(sut.getCell(11, 11))
+
+    def test_advance_state_on(self):
+        sut = GameOfLife()
+        sut.turnOnCell(9, 9)
+        sut.turnOnCell(10, 9)
+        sut.turnOnCell(11, 9)
+        self.assertFalse(sut.getCell(10, 10))
+        sut.tick()
+        self.assertTrue(sut.getCell(10, 10))
+
+    def test_advance_state_on_different(self):
+        sut = GameOfLife()
+        sut.turnOnCell(10, 10)
+        sut.turnOnCell(11, 10)
+        sut.turnOnCell(12, 10)
+        self.assertFalse(sut.getCell(11, 11))
+        sut.tick()
+        self.assertTrue(sut.getCell(11, 11))
