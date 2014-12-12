@@ -12,7 +12,7 @@ def process(num_neighbors, is_alive):
         return ALIVE
     return DEAD
 
-class GameOfLife(object):
+class GameOfLifeBoard(object):
     def __init__(self):
         self.board = defaultdict(lambda: 0)
 
@@ -32,16 +32,31 @@ class GameOfLife(object):
              + self.board[(x-1, y+1)] \
              + self.board[(x-1, y-1)]
 
-    def tick(self):
-        newgame = GameOfLife() # TODO: create only a new board, not a whole new game
-        for cell in self.board.keys():
-            # We don't want to set dead cells because we don't want to calculate them unnecessarily.
-            if process(self.getNeighborCount(cell), self.board[cell]) == ALIVE:
-                newgame.turnOnCell(cell)  # We have to call turnOnCell here so the cells around the new cell get calculated
-        self.board = newgame.board
+    def shouldProcessCells(self):
+        return self.board.keys()
 
     def getCell(self, cell):
         return self.board[cell] == ALIVE
+
+    def calculate_next_generation(self, cell):
+        return process(self.getNeighborCount(cell), self.getCell(cell))
+
+class GameOfLife(object):
+    def __init__(self):
+        self.board = GameOfLifeBoard()
+
+    def turnOnCell(self, cell):
+        self.board.turnOnCell(cell)
+
+    def getCell(self, cell):
+        return self.board.getCell(cell)
+
+    def tick(self):
+        newboard = GameOfLifeBoard()
+        for cell in self.board.shouldProcessCells():
+            if self.board.calculate_next_generation(cell) == ALIVE:
+                newboard.turnOnCell(cell)
+        self.board = newboard
 
     def runAndRender(self): # TODO: untested
         import time
@@ -78,7 +93,7 @@ class TestGameOfLife(unittest.TestCase):
         self.assert_neighbor_state_change(8, DEAD, DEAD)
 
     def test_cell_neighbors(self):
-        sut = GameOfLife()
+        sut = GameOfLifeBoard()
         sut.turnOnCell((10, 10))
         sut.turnOnCell((11, 10))
         self.assertEquals(1, sut.getNeighborCount((10, 10)))
@@ -86,12 +101,12 @@ class TestGameOfLife(unittest.TestCase):
         self.assertEquals(2, sut.getNeighborCount((10, 11)))
 
     def test_11_1(self): # to be different from test_cell_neighbors
-        sut = GameOfLife()
+        sut = GameOfLifeBoard()
         sut.turnOnCell((10, 10))
         self.assertEquals(1, sut.getNeighborCount((10, 11)))
 
     def test_all_neighbors(self):
-        sut = GameOfLife()
+        sut = GameOfLifeBoard()
         for x in range(20, 23):
             for y in range(30, 33):
                 sut.turnOnCell((x, y))
