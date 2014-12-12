@@ -36,9 +36,7 @@ class GameOfLife(object):
 
     def touchNearbyCells(self):
         # Touch cells near cells that are turned on so they get calculated later.
-        i = 0
         for cell in self.board.keys():
-            i += 1
             self.getNeighborCount(cell)
 
     def tick(self):
