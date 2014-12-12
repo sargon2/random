@@ -119,3 +119,10 @@ class TestThings(unittest.TestCase):
         sut.turnOnCell(11, 10)
         sut.turnOnCell(12, 10)
         self.assertAnimates(sut, 11, 11)
+
+    def test_advance_state_on_different2(self):
+        sut = GameOfLife()
+        sut.turnOnCell(10, 10)
+        sut.turnOnCell(11, 10)
+        sut.turnOnCell(12, 10)
+        self.assertAnimates(sut, 11, 9)
