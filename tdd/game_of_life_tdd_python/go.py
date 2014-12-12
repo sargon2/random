@@ -13,14 +13,12 @@ def process(num_neighbors, is_alive):
     return DEAD
 
 class GameOfLife(object):
-    def make_board(self):
-        return defaultdict(lambda: 0)
-
     def __init__(self):
-        self.board = self.make_board()
+        self.board = defaultdict(lambda: 0)
 
     def turnOnCell(self, cell):
         self.board[cell] = ALIVE
+        self.getNeighborCount(cell)  # Touch cells around it so they get calculated later
 
     def getNeighborCount(self, cell):
         x, y = cell
@@ -34,19 +32,13 @@ class GameOfLife(object):
              + self.board[(x-1, y+1)] \
              + self.board[(x-1, y-1)]
 
-    def touchNearbyCells(self):
-        # Touch cells near cells that are turned on so they get calculated later.
-        for cell in self.board.keys():
-            self.getNeighborCount(cell)
-
     def tick(self):
-        self.touchNearbyCells()
-        newboard = self.make_board()
+        newgame = GameOfLife() # TODO: create only a new board, not a whole new game
         for cell in self.board.keys():
             # We don't want to set dead cells because we don't want to calculate them unnecessarily.
             if process(self.getNeighborCount(cell), self.board[cell]) == ALIVE:
-                newboard[cell] = ALIVE
-        self.board = newboard
+                newgame.turnOnCell(cell)  # We have to call turnOnCell here so the cells around the new cell get calculated
+        self.board = newgame.board
 
     def getCell(self, cell):
         return self.board[cell] == ALIVE
@@ -64,7 +56,7 @@ class GameOfLife(object):
             self.tick()
             time.sleep(0.5)
 
-class TestThings(unittest.TestCase):
+class TestGameOfLife(unittest.TestCase):
 
     def assert_state(self, is_alive, num_neighbors, expected_result):
         result = process(num_neighbors, is_alive)
