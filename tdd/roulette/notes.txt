@@ -1,0 +1,16 @@
+http://gojko.net/2010/04/19/effective-exercises-for-teaching-tdd/
+
+"The wheel will spin for 20 seconds and the ball will land on a random number."
+
+This is supposed to be a hard problem for tdd that you need mocks to solve.
+
+Spinning for 20 seconds:
+ - get the time, call the code, get the time, assert that the time that elapsed is within a bound
+ - mock time.sleep
+
+Land on a random number:
+ - Call the random number generator a bunch and assert the distribution is pretty even
+ - mock the code that actually generates the random number
+
+I'm worried about edge cases with the random number.  mt_rand(0, 20) vs. mt_rand(0, 21).
+
