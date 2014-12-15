@@ -52,3 +52,21 @@ for i in range(1, 100):
 #            print "buzz"
 #        else:
 #            print i
+
+# Another interesting solution 12/15/2014:
+#def none(*args):
+#    for arg in args:
+#        if arg: return False
+#    return True
+#
+#for i in range(1, 100):
+#    fizz = i % 3 == 0
+#    buzz = i % 5 == 0
+#    if fizz:
+#        sys.stdout.write("fizz")
+#    if buzz:
+#        sys.stdout.write("buzz")
+#    if none(fizz, buzz):
+#        sys.stdout.write(str(i))
+#    sys.stdout.write("\n")
+
