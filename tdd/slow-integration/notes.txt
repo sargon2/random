@@ -1,0 +1,96 @@
+
+# At work, I was told it's possible to TDD integration with a slow, legacy system.
+#
+# This is my attempt to understand that.  Is it possible?  Is it impossible?  My gut feeling is that it is impossible.
+
+import unittest2
+from slow_component import api
+
+class SlowApiInvoker(object):
+    pass
+
+class TestThings(unittest2.TestCase):
+    def xtest_something(self): # too slow
+        s = api.SlowApi()
+        result = s.invoke_api()
+
+    def test_something_else(self):
+        # Our code calls the slow api and adds one to the result.
+        # So, we could mock the slow api... but that couples our tests to their implementation.
+
+        # What's the assert I wish I had?
+        # assertCallsSlowApiAndAddsOneToResult
+        # assertIfSlowApiReturnsOurResultIs(3, 4)
+        # assertFinalResult(4) # magically speeds up the api -- couples our tests to their implementation
+
+        # We want our tests to fail if they change their api in such a way that it breaks us.
+        # (actually, we want *their* tests to fail, but good luck with that)
+        # This failure should be at test time, not at run time.  But if none of our tests invoke the api, how do we know it's broken at test time?
+        # We break our suite into "fast" tests and "slow" tests?  Then we TDD only with the fast tests, and the slow tests are manual?
+
+        # This is pointing at two types of test: one that mocks the slow api, and one that invokes it and isn't run very often.
+        pass
+
+    def test_third_thing(self):
+        # What if it was their tests that failed when their api changed and broke us?
+        # Then how would we tdd around/with it?
+
+        # They have an assert: assertInvokerResult(4, 3) # the 3 is our mocked result
+
+        # The only difference is that then the mocks live next to the code they're mocking.
+
+        # When you produce a slow API, you should also produce fast mocks for it.
+        pass
+
+    # When we test with time.sleep(), we mock it.  When we test with slowapi(), we mock it.
+
+    # Writing mocks for a slow api SUCKS.  That's not a short feedback loop.  It's not product code.
+
+    # How about an automatic record/playback for the slow api?  We could run it slowly once, and record the output, then replay it to our code quickly.
+
+    # The user specifies what API to call and what the arguments are.  The code invokes it and records all results.  Then we have a replay() method.
+
+    # The slow API can't be so slow that we can never invoke it even once.  With this method, we invoke it exactly once for each thing we want to learn from it.
+
+    # So, we want:
+    # def doRecording():
+    #     apiReplayer = ApiReplayer(actualSlowSystem)
+    #     ...
+    # def testSomething():
+    #     sut = RealSystem(apiReplayer)
+
+    # This is like dynamic programming, but on a longer scale.
+    # We have to ensure the replayer doesn't make it into production code.
+    # The real code does s = RealSystem(actualSlowSystem).  This is not tested.
+    # The test code does s = RealSystem(ApiReplayer(actualSlowSystem)).
+    # Then when the tests are run for the first time, the result is invoked and recorded.
+    # The results are checked in to git! (!)
+    # Then subsequent invocations use the recorded results.  If you want new results, just delete the cache data.
+    # (And set up the real system so it can be invoked first).
+
+    # Note that this will work for unreliable apis as well.  We can force the same result each time.
+
+    # What about testing for different results from the same api call?  Like what if the api call fails sometimes and we want to test for that?
+    # It can't be super transparent.  We have to have a manual way to tell it to record a new result set.
+    # So we have result sets.  The tests are run with each result set in turn.  Making new result sets and deleting result sets are manual actions the programmer takes.
+
+    # python ./make_new_result_set.py # invokes the actual live slow system
+
+    # The api replayer instance should have a name, so you can have more than one in use at a time.
+
+    # invocation_results/slowsystem1/resultset1/...
+    # invocation_results/slowsystem1/resultset2/...
+    # invocation_results/slowsystem2/resultset1/...
+
+    # It's important that the tests don't say "loadResultSet(1)".  The product code should handle the result set without knowing which it is.
+
+    # Result sets are "things the slow system can return".
+
+
+    # We're adding a lot of state here.  That's dangerous.
+
+    # This is not a mock.  It's a cache.  If it's possible to get this cache to work perfectly for tests, then it would also work perfectly for the actual system.
+
+    # I'm back to slow systems are broken and need to be fixed.
+
+    # Actually, the tests have some control the real system doesn't have.  So maybe it's not quite the same thing.
