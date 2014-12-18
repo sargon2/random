@@ -2,11 +2,13 @@ import unittest2
 from collections import defaultdict
 
 # The idea here is we keep old logs, and progressively delete them as they get older.
-# We always keep the oldest log.
+# We always keep the newest and oldest log.
 # The older a log is, the more likely it is to be deleted.
 # This makes the space the logs take up about log(num of logs). No pun intended.
 
 def calculate(booldict):
+    if len(booldict) == 0:
+        return booldict
     m = max(booldict.keys())
     i = 0
     r = 1
@@ -37,6 +39,8 @@ def convert_str_to_defaultdict(instr):
 
 def convert_defaultdict_to_str(indict):
     ret = ""
+    if len(indict) == 0:
+        return ret
     m = max(indict.keys())
     for i in range(0, m+1):
         if indict[i]:
@@ -65,6 +69,9 @@ class TestLogRotate(unittest2.TestCase):
         # We divide the history of logs into groups.
         # There's a group of size 1, then 2, then 4, then 8, etc.
         # We only keep one log in each group (the oldest we've seen).
+
+        # X represents logs we keep, and space is logs we delete.
+        # Left is newer, right is older.
         expected_progression = [
            # |..||||........||||||||||||||||.
             "X",
@@ -93,12 +100,13 @@ class TestLogRotate(unittest2.TestCase):
             prev_item = item
 
     def test_non_progression(self):
+        self.assert_str("", "")
         self.assert_str("XXXXXXXXXXXXXXX", "X X   X       X")
         self.assert_str("XXXXXXXXXXXXXX",  "X X   X      X")
 
 # TODO: actually rotate logs (parse their filenames or timestamps, etc)
 if __name__ == "__main__":
-    s = "X"
+    s = ""
     for i in range(1, 100):
         result = calculate_str(s)
         print result
