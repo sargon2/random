@@ -1,0 +1,11 @@
+first, we want to test end-to-end, because if we don't then we can overlook something.
+
+the rocket analogy --
+How do we tdd control software for an Apollo rocket that's taking astronauts to the moon?
+We only get one attempt at the actual launch.  If that fails, it's far too expensive to do again.
+So, we run simulations.  We make a holographic world that we test our rocket launch software in.
+The more realistic the holographic world is, the better.  We have to be able to tweak parameters in it -- what if it's cloudy? raining? etc.
+So the old argument of "if the mock is as good as the real system, it should replace it" is wrong!  You can't replace the real world.  The mock simulates things the real world can actually do.
+
+How do we make the holographic world?  We tdd it!  It's simulated so we know we can do that.  Some of the tests we develop there may even double as functional tests for the actual product (not for the rocket case, of course -- there are no functional tests there).
+
