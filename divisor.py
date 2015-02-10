@@ -3,6 +3,9 @@
 # The one minute game challenge.  Make a game in 1 minute.
 
 # (after) I didn't measure it, but this took about 2 minutes.  It's a game.
+# Things that embarass me about it:
+# - It requires a console to run.  It's not graphical.
+# - It feels like edutainment.
 
 import sys
 import random
