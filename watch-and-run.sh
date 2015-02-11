@@ -19,7 +19,7 @@ shift 1
 # TODO: make the clears optional
 clear
 "$@"
-while inotifywait -r -e modify -e attrib -e move -e create -e delete --exclude '\.git' --exclude '\.ropeproject' "$TO_WATCH"; do
+while inotifywait -r -e modify -e attrib -e move -e create -e delete --exclude '\.git|\.ropeproject' "$TO_WATCH"; do
     clear
     "$@"
 done
