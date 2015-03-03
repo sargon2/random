@@ -1,0 +1,35 @@
+games db (arbitrary db)
+
+items have:
+ - item id
+ - images (really just a tag with a uri in it)
+ - arbitrary file attachments (tag w/ uri)
+ - arbitrary text fields
+ - arbitrary numeric fields? price? metascore
+ - tags
+ - a game can have a link to a set of game characters?
+
+so there are things, and relationships between things, and tags, and tags with values (text, numeric, ...?)
+maybe relationships have tags too?
+
+nodes, edges, tags, tags with values?  are tags with values just nodes? no, they can be irrational numbers. game_disc_circumference
+
+
+(super mario world) ---- character is in ---- (yoshi)
+
+(super mario world) ---- (metascore critic: 123)
+(super mario world) ---- (metascore user: 89)
+(super mario world) --123-- (metascore critic score)
+(super mario world) --89-- (metascore user score)
+
+making tags a node overcomplicates things.
+
+super mario world has tag: metascore critic 123
+
+super mario world has tag: characters, which contains links to nodes: mario yoshi
+
+ - a tag can have a list of nodes in it
+
+nodes have types? game, game character, etc.
+
+So, nodes exist.  Nodes have types.  Nodes have tags.  Tags can have values.  Tag values can be strings, numbers, or a list of nodes of any type.
