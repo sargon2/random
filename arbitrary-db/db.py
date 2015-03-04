@@ -3,6 +3,7 @@ import pickle
 import os
 import types
 
+
 class Node(object):
     def __init__(self, nodeType=None):
         self.nodeType = nodeType
@@ -21,6 +22,7 @@ class Node(object):
     def getTags(self):
         return self.tags
 
+
 class Tag(object):
     def __init__(self, name, value = None):
         self.name = name
@@ -38,11 +40,13 @@ class DB(object):
         self.file_location = file_location
         self.db = {}
         if os.path.isfile(self.file_location):
-            self.db = pickle.load(open(self.file_location, "rb"))
+            with open(self.file_location, "rb") as f:
+                self.db = pickle.load(f)
 
     def addNode(self, node, nid):
         self.db[nid] = node
-        pickle.dump(self.db, open(self.file_location, "wb"))
+        with open(self.file_location, "wb") as f:
+            pickle.dump(self.db, f)
 
     def getNodeById(self, nid):
         return self.db[nid]
