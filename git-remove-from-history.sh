@@ -13,7 +13,7 @@ then
 fi
 
 
-git filter-branch --index-filter "git rm -r --cached --ignore-unmatch $*" --prune-empty --tag-name-filter cat -- --all
+git filter-branch --index-filter "git rm -r --cached --ignore-unmatch $*" --tag-name-filter cat -- --all
 rm -rf .git/refs/original/
 git reflog expire --expire=now --all
 git gc --prune=now
