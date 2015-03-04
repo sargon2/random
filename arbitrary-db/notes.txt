@@ -33,3 +33,5 @@ super mario world has tag: characters, which contains links to nodes: mario yosh
 nodes have types? game, game character, etc.
 
 So, nodes exist.  Nodes have types.  Nodes have tags.  Tags can have values.  Tag values can be strings, numbers, or a list of nodes of any type.
+
+bottle vs. django vs. flask vs. pyramid: testing looks easiest in flask, so use that.
