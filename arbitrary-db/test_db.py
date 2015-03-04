@@ -38,35 +38,26 @@ class TestDB(unittest2.TestCase):
         t = db.Tag(tagname, val)
         n.setTags(t)
         tags = n.getTags()
-        self.assertEquals(val, tags[0].getValue())
         self.assertEquals(tagname, tags[0].getName())
+        self.assertEquals(val, tags[0].getValue())
 
     def test_tags_can_have_values(self):
         self.verifyTag("tagname", "value!")
+        self.verifyTag("tagname2", "value!")
         self.verifyTag("tagname", 3)
         self.verifyTag("tagname", 3.2)
         self.verifyTag("tagname", [db.Node(), db.Node()])
-
-    def test_tag_name_and_value(self):
-        n = db.Node()
-        t = db.Tag("tagname", "tagvalue")
-        n.setTags(t)
-        tag = n.getTags()[0]
-        self.assertEqual("tagname", tag.getName())
-        self.assertEqual("tagvalue", tag.getValue())
 
     def test_persistence_with_reload(self):
         n = db.Node("nodetype")
         t = db.Tag("tagname", "value")
         n.setTags(t)
-        ndb = db.DB("testdb.p")
         nid = 1
-        ndb.addNode(n, nid)
+        db.DB("testdb.p").addNode(n, nid)
 
         reload(db)
 
-        ndb = db.DB("testdb.p")
-        result = ndb.getNodeById(nid)
+        result = db.DB("testdb.p").getNodeById(nid)
         self.assertEqual("nodetype", result.getType())
         tag = result.getTags()[0]
         self.assertEqual("tagname", tag.getName())
