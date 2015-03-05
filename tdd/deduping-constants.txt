@@ -1,0 +1,17 @@
+
+code: render "hello world"
+tests: does it render "hello world"?
+
+extract variable
+code: render var
+tests: does it render var?
+config: var = "hello world"
+
+but then config is untested!
+config: var = "hello world"
+test config: var should = "hello world"
+
+config should be untested.  config is both tests and code, deduped.
+
+is what I'm writing config?
+ - are the code and the tests for it identical except for replacing = with assertEqual?

@@ -78,3 +78,15 @@ class TestDB(unittest2.TestCase):
         size_after = os.stat(ndb.get_storage_location()).st_size
 
         self.assertEqual(size_before, size_after)
+
+    def test_generate_nid(self):
+        ndb = db.DB("testdb.p")
+        ndb.addNode(db.Node())
+        ndb.addNode(db.Node())
+        result = db.DB("testdb.p").getAllNodes()
+        self.assertEquals(2, len(result))
+
+    def test_get_tag_value(self):
+        n = db.Node()
+        n.setTags(db.Tag("tag", "value"))
+        self.assertEquals("value", n.getTagValue("tag"))

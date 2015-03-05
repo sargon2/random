@@ -1,10 +1,14 @@
 
 import unittest2
 import flask
+import db
+import os
 
 # TODO:
-# The default page should tell you if there are no nodes.
+# (done) The default page should tell you if there are no nodes.
 # The default page should have a way to add a node.
+#   How do I assert that we have a clickable add button?
+#   (done) post some data
 # If there's at least one node, the default page should provide you a way to get to at least one node.
 # If there are 10 trillion nodes, the default page should not show all 10 trillion.
 # If you click a link on the default page to a node, you should get the node page.
@@ -13,18 +17,48 @@ import flask
 # The default page should give you a way to (filter?) by node type.
 # If a node page shows a tag that contains a list of nodes, you should be able to click those nodes to get to their node pages.
 
+class Serve(object):
+    def __init__(self):
+        self.items = []
+        self.db = db.DB("delme.p")
+
+    def index(self):
+        nodes = self.db.getAllNodes()
+        ret = ""
+        for node in nodes:
+            ret += node.getTagValue("name")
+        return ret
+
+    def add(self):
+        name = flask.request.form["nodeName"]
+        n = db.Node()
+        n.setTags(db.Tag("name", name))
+        self.db.addNode(n)
+        return "added" # TODO: redirect to make f5 cleaner
+
+    def get_app(self):
+        app = flask.Flask(__name__)
+        app.add_url_rule('/', view_func=self.index)
+        app.add_url_rule('/items', view_func=self.add, methods=["POST"])
+        return app
+
+    def add_items(self, items):
+        self.items.extend(items)
+
 class TestServe(unittest2.TestCase):
 
-    def assertNotNone(self, item):
-        self.assertNotEqual(item, None)
+    def test_add_node(self):
+        s = Serve()
+        tc = s.get_app().test_client()
+        tc.post('/items', data={"nodeName": "asdf"})
+        self.assertIn("asdf", tc.get('/').data)
+        os.unlink("delme.p")
 
-    def test_something(self):
-        indexstr="asdf"
-        app = flask.Flask(__name__)
-        def index():
-            return indexstr
-        app.add_url_rule('/', view_func=index)
-
-        tc = app.test_client()
-        result = tc.get('/')
-        self.assertIn(indexstr, result.data)
+    def test_add_two_nodes(self):
+        s = Serve()
+        tc = s.get_app().test_client()
+        tc.post('/items', data={"nodeName": "asdf"})
+        tc.post('/items', data={"nodeName": "node2"})
+        self.assertIn("asdf", tc.get('/').data)
+        self.assertIn("node2", tc.get('/').data)
+        os.unlink("delme.p")
