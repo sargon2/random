@@ -18,9 +18,9 @@ import os
 # If a node page shows a tag that contains a list of nodes, you should be able to click those nodes to get to their node pages.
 
 class Serve(object):
-    def __init__(self):
+    def __init__(self, db_name):
         self.items = []
-        self.db = db.DB("delme.p")
+        self.db = db.DB(db_name)
 
     def index(self):
         nodes = self.db.getAllNodes()
@@ -47,18 +47,23 @@ class Serve(object):
 
 class TestServe(unittest2.TestCase):
 
+    def setUp(self):
+        self.filename = "delme.p"
+        self.serve = Serve(self.filename)
+        self.tc = self.serve.get_app().test_client()
+
+    def tearDown(self):
+        try:
+            os.unlink(self.filename)
+        except:
+            pass
+
     def test_add_node(self):
-        s = Serve()
-        tc = s.get_app().test_client()
-        tc.post('/items', data={"nodeName": "asdf"})
-        self.assertIn("asdf", tc.get('/').data)
-        os.unlink("delme.p")
+        self.tc.post('/items', data={"nodeName": "asdf"})
+        self.assertIn("asdf", self.tc.get('/').data)
 
     def test_add_two_nodes(self):
-        s = Serve()
-        tc = s.get_app().test_client()
-        tc.post('/items', data={"nodeName": "asdf"})
-        tc.post('/items', data={"nodeName": "node2"})
-        self.assertIn("asdf", tc.get('/').data)
-        self.assertIn("node2", tc.get('/').data)
-        os.unlink("delme.p")
+        self.tc.post('/items', data={"nodeName": "asdf"})
+        self.tc.post('/items', data={"nodeName": "node2"})
+        self.assertIn("asdf", self.tc.get('/').data)
+        self.assertIn("node2", self.tc.get('/').data)
