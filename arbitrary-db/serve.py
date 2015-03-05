@@ -23,7 +23,7 @@ class Serve(object):
     def index(self):
         nodes = self.db.getAllNodes()
         ret = ""
-        ret += """ <a href="/add">Add node</a> """
+        ret += """<a href="/add">Add node</a>"""
         for node in nodes:
             ret += node.getTagValue("name")
         return ret
@@ -36,7 +36,7 @@ class Serve(object):
         return flask.redirect("/")
 
     def addNodePage(self):
-        return "<form action=\"/items\" method=\"POST\"><input type=\"text\" name=\"nodeName\"/></form>"
+        return """<form action="/items" method="POST"><input type="text" name="nodeName"/></form>"""
 
     def get_app(self):
         app = flask.Flask(__name__)
