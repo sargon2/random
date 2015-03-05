@@ -2,6 +2,7 @@
 import unittest2
 import os
 import serve
+import webtest
 
 # TODO:
 # (done) The default page should tell you if there are no nodes.
@@ -21,7 +22,7 @@ class TestServe(unittest2.TestCase):
     def setUp(self):
         self.filename = "delme.p"
         self.serve = serve.Serve(self.filename)
-        self.tc = self.serve.get_app().test_client()
+        self.tc = webtest.TestApp(self.serve.get_app())
 
     def tearDown(self):
         try:
@@ -30,11 +31,15 @@ class TestServe(unittest2.TestCase):
             pass
 
     def test_add_node(self):
-        self.tc.post('/items', data={"nodeName": "asdf"})
-        self.assertIn("asdf", self.tc.get('/').data)
+        self.tc.post('/items', {"nodeName": "asdf"})
+        self.assertIn("asdf", self.tc.get('/'))
 
     def test_add_two_nodes(self):
-        self.tc.post('/items', data={"nodeName": "asdf"})
-        self.tc.post('/items', data={"nodeName": "node2"})
-        self.assertIn("asdf", self.tc.get('/').data)
-        self.assertIn("node2", self.tc.get('/').data)
+        self.tc.post('/items', {"nodeName": "asdf"})
+        self.tc.post('/items', {"nodeName": "node2"})
+        self.assertIn("asdf", self.tc.get('/'))
+        self.assertIn("node2", self.tc.get('/'))
+
+    def xtest_clicking(self):
+        r = self.tc.get('/')
+        r.click("link")
