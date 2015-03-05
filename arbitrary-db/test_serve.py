@@ -40,6 +40,19 @@ class TestServe(unittest2.TestCase):
         self.assertIn("asdf", self.tc.get('/'))
         self.assertIn("node2", self.tc.get('/'))
 
-    def xtest_clicking(self):
+    def test_add_node_clickable(self):
         r = self.tc.get('/')
-        r.click("link")
+        r.click("Add node", href="/add")
+
+    def test_add_node(self):
+        r = self.tc.get('/add')
+        r.form["nodeName"] = "node name"
+        redirect = r.form.submit()
+        mainPage = redirect.follow()
+        self.assertIn("node name", mainPage)
+
+    def xtest_add_page_has_add_button_that_submits_form(self):
+        self.fail("don't know how to do this")
+
+    def xtest_add_plus(self):
+        self.fail("add+ button should add and redirect back to add page")

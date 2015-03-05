@@ -23,21 +23,26 @@ class Serve(object):
     def index(self):
         nodes = self.db.getAllNodes()
         ret = ""
+        ret += """ <a href="/add">Add node</a> """
         for node in nodes:
             ret += node.getTagValue("name")
         return ret
 
-    def add(self):
+    def addNodeToDB(self):
         name = flask.request.form["nodeName"]
         n = db.Node()
         n.setTags(db.Tag("name", name))
         self.db.addNode(n)
-        return "added" # TODO: redirect to make f5 cleaner
+        return flask.redirect("/")
+
+    def addNodePage(self):
+        return "<form action=\"/items\" method=\"POST\"><input type=\"text\" name=\"nodeName\"/></form>"
 
     def get_app(self):
         app = flask.Flask(__name__)
         app.add_url_rule('/', view_func=self.index)
-        app.add_url_rule('/items', view_func=self.add, methods=["POST"])
+        app.add_url_rule('/items', view_func=self.addNodeToDB, methods=["POST"])
+        app.add_url_rule('/add', view_func=self.addNodePage)
         return app
 
     def add_items(self, items):
