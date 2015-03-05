@@ -52,6 +52,7 @@ class TestServe(unittest2.TestCase):
         self.assertIn("node name", mainPage)
 
     def xtest_add_page_has_add_button_that_submits_form(self):
+        # Filed against webtest as https://github.com/Pylons/webtest/issues/134
         self.fail("don't know how to do this")
 
     def xtest_add_plus(self):
