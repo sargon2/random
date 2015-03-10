@@ -16,6 +16,7 @@ import webtest
 # The node page should contain the node type.
 # The default page should give you a way to (filter?) by node type.
 # If a node page shows a tag that contains a list of nodes, you should be able to click those nodes to get to their node pages.
+# xtests
 
 class TestServe(unittest2.TestCase):
 
@@ -57,3 +58,11 @@ class TestServe(unittest2.TestCase):
 
     def xtest_add_plus(self):
         self.fail("add+ button should add and redirect back to add page")
+
+    def xtest_node_link(self):
+        r = self.tc.get('/add')
+        r.form["nodeName"] = "node name"
+        redirect = r.form.submit()
+        mainPage = redirect.follow()
+        self.assertIn("node name", mainPage)
+        mainPage.click("node name", href="/nodes/1")
