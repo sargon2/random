@@ -1,0 +1,1 @@
+make-quine -- a program that takes in a python program and makes it a quine
