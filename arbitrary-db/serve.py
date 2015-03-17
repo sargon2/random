@@ -11,8 +11,10 @@ class Serve(object):
         nodes = self.db.getAllNodes()
         ret = ""
         ret += """<a href="/add">Add node</a><br />\n"""
-        for node in nodes:
+        for nodeid, node in nodes:
+            ret += """<a href="/nodes/{0}">""".format(nodeid)
             ret += node.getTagValue("name")
+            ret += "</a>"
             ret += "<br />\n"
         return ret
 
@@ -31,7 +33,12 @@ class Serve(object):
         app.add_url_rule('/', view_func=self.index)
         app.add_url_rule('/items', view_func=self.addNodeToDB, methods=["POST"])
         app.add_url_rule('/add', view_func=self.addNodePage)
+        app.add_url_rule('/nodes/<int:nodeid>', view_func=self.node)
         return app
+
+    def node(self, nodeid):
+        node = self.db.getNodeById(nodeid)
+        return node.getTagValue("name")
 
     def add_items(self, items):
         self.items.extend(items)

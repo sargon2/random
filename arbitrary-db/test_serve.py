@@ -46,10 +46,25 @@ class TestServe(unittest2.TestCase):
     def xtest_add_plus(self):
         self.fail("add+ button should add and redirect back to add page")
 
-    def xtest_node_link(self):
+    def addNode(self, nodeName):
         r = self.tc.get('/add')
-        r.form["nodeName"] = "node name"
+        r.form["nodeName"] = nodeName
         redirect = r.form.submit()
-        mainPage = redirect.follow()
+        return redirect.follow()
+
+    def test_node_link(self):
+        mainPage = self.addNode("node name")
         self.assertIn("node name", mainPage)
-        mainPage.click("node name", href="/nodes/1")
+        mainPage.click("node name", href="/nodes/0")
+
+    def test_two_node_links(self):
+        self.addNode("node name 1")
+        mainPage = self.addNode("node name 2")
+
+        mainPage.click("node name 1", href="/nodes/0")
+        mainPage.click("node name 2", href="/nodes/1")
+
+    def test_something(self):
+        mainPage = self.addNode("node name")
+        nodePage = mainPage.click("node name", href="/nodes/0")
+        self.assertIn("node name", nodePage)

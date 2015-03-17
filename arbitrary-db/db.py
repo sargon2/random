@@ -59,7 +59,7 @@ class DB(object):
         return self.db[nid]
 
     def getAllNodes(self):
-        return self.db.values()
+        return self.db.items()
 
     def get_storage_location(self):
         return self.file_location
