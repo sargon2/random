@@ -1,0 +1,15 @@
+
+* reprioritize this list
+
+(done) The default page should tell you if there are no nodes.
+The default page should have a way to add a node.
+  How do I assert that we have a clickable add button?
+  (done) post some data
+If there's at least one node, the default page should provide you a way to get to at least one node.
+If there are 10 trillion nodes, the default page should not show all 10 trillion.
+If you click a link on the default page to a node, you should get the node page.
+The node page should contain a list of tags.
+The node page should contain the node type.
+The default page should give you a way to (filter?) by node type.
+If a node page shows a tag that contains a list of nodes, you should be able to click those nodes to get to their node pages.
+xtests
