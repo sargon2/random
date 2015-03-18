@@ -14,3 +14,4 @@ The default page should have a way to add a node.
   (blocked; worked around) How do I assert that we have a clickable add button?
   (done) post some data
 xtests
+It should be possible to display an image on the node page using an image url in a tag.
