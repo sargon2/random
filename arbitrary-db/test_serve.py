@@ -39,6 +39,25 @@ class TestServe(unittest2.TestCase):
         mainPage = redirect.follow()
         self.assertIn("node name", mainPage)
 
+    def test_add_node_with_tag(self):
+        r = self.tc.get('/add')
+        r.form["nodeName"] = "node name"
+        r.form["tags"] = "tag 1"
+        redirect = r.form.submit()
+        mainPage = redirect.follow()
+        nodePage = mainPage.click("node name", href="/nodes/0")
+        self.assertIn("tag 1", nodePage)
+
+    def test_add_node_with_two_tags(self):
+        r = self.tc.get('/add')
+        r.form["nodeName"] = "node name"
+        r.form["tags"] = "tag 1, tag 2"
+        redirect = r.form.submit()
+        mainPage = redirect.follow()
+        nodePage = mainPage.click("node name", href="/nodes/0")
+        self.assertIn("tag 1", nodePage)
+        self.assertIn("tag 2", nodePage)
+
     def xtest_add_page_has_add_button_that_submits_form(self):
         # Filed against webtest as https://github.com/Pylons/webtest/issues/134
         self.fail("don't know how to do this")

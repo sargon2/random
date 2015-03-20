@@ -21,24 +21,38 @@ class Serve(object):
     def addNodeToDB(self):
         name = flask.request.form["nodeName"]
         n = db.Node()
-        n.setTags(db.Tag("name", name))
+        tags = [db.Tag("name", name)]
+        if "tags" in flask.request.form:
+            in_tags = flask.request.form["tags"]
+            tags.append(db.Tag(in_tags))
+        n.setTags(tags)
         self.db.addNode(n)
         return flask.redirect("/")
 
     def addNodePage(self):
-        return """<form action="/items" method="POST"><input type="text" name="nodeName"/><input type="submit"/></form>"""
+        return """
+<form action="/items" method="POST">
+<input type="text" name="nodeName"/>
+<input type="text" name="tags"/>
+<input type="submit"/>
+</form>
+"""
 
     def get_app(self):
         app = flask.Flask(__name__)
         app.add_url_rule('/', view_func=self.index)
         app.add_url_rule('/items', view_func=self.addNodeToDB, methods=["POST"])
         app.add_url_rule('/add', view_func=self.addNodePage)
-        app.add_url_rule('/nodes/<int:nodeid>', view_func=self.node)
+        app.add_url_rule('/nodes/<int:nodeid>', view_func=self.nodePage)
         return app
 
-    def node(self, nodeid):
+    def nodePage(self, nodeid):
         node = self.db.getNodeById(nodeid)
-        return node.getTagValue("name")
+        ret = node.getTagValue("name")
+        ret += "<br />\n"
+        for tag in node.getTags():
+            ret += "tag: " + tag.getName()
+        return ret
 
     def add_items(self, items):
         self.items.extend(items)

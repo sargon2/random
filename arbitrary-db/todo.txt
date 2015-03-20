@@ -4,8 +4,10 @@
 (done) The default page should tell you if there are no nodes.
 (done) If you click a link on the default page to a node, you should get the node page.
 (done) If there's at least one node, the default page should provide you a way to get to at least one node.
+(done) The node page should contain a list of tags.
 
-The node page should contain a list of tags.
+Tag values
+Right now, we're only storing one tag on a node.  A tag string like "a, b" should be parsed into two tags.
 The node page should contain the node type.
 If there are 10 trillion nodes, the default page should not show all 10 trillion.
 The default page should give you a way to (filter?) by node type.
