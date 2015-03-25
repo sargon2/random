@@ -15,7 +15,7 @@ usage() {
         -h      Show this help.
 
     EXAMPLE:
-        $PROGNAME -c ./run_tests.sh
+        $PROGNAME -c . ./run_tests.sh
 EOF
 }
 
