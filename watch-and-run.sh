@@ -1,25 +1,71 @@
 #!/bin/bash
 
-function usage() {
-    echo "Usage: $0 <file/folder to watch> <command to run>"
-    exit 1
+readonly PROGNAME=$(basename $0)
+readonly PROGDIR=$(readlink -m $(dirname $0))
+readonly ARGS="$@"
+
+usage() {
+    cat <<-EOF
+    Usage: $PROGNAME <file/folder to watch> <command to run>
+
+    Run command whenever specified file or folder is changed.
+
+    OPTIONS:
+        -c      Don't clear console before run.
+        -h      Show this help.
+
+    EXAMPLE:
+        $PROGNAME -c ./run_tests.sh
+EOF
 }
 
-if [ -z "$2" ]; then
-    usage
-fi
-
-if [ ! -e "$1" ]; then
-    usage
-fi
-
-TO_WATCH=$1
-shift 1
-
-# TODO: make the clears optional
-clear
-"$@"
-while inotifywait -r -e modify -e attrib -e move -e create -e delete --exclude '\.git|\.ropeproject' "$TO_WATCH"; do
-    clear
-    "$@"
+while getopts "hc" OPTION
+do
+    case $OPTION in
+        h)
+            usage
+            exit 0
+            ;;
+        c)
+            CLEAR_CONSOLE=1
+            ;;
+        ?)
+            usage
+            exit 1
+            ;;
+    esac
 done
+shift $((OPTIND-1))
+
+if [[ -z "$1" ]]; then
+    >&2 echo "Requires file or directory."
+    usage
+    exit 1
+fi
+if [[ ! -a $1 ]]; then
+    >&2 echo "Directory does not exist."
+    usage
+    exit 1
+fi
+if [[ -z "$2" ]]; then
+    >&2 echo "Requires command."
+    usage
+    exit 1
+fi
+
+watch_and_run() {
+    TO_WATCH=$1
+    shift 1
+    if [[ -z "$CLEAR_CONSOLE" ]]; then
+        clear
+    fi
+    "$@"
+    while inotifywait -r -e modify -e attrib -e move -e create -e delete --exclude '\.git|\.ropeproject' "$TO_WATCH"; do
+        if [[ -z "$CLEAR_CONSOLE" ]]; then
+            clear
+        fi
+        "$@"
+    done
+}
+
+watch_and_run "$@"
