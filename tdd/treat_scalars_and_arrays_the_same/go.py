@@ -1,44 +1,35 @@
 import unittest2
 
-def first_arg_list_to_scalar(retval_aggregator):
+def aggregate_arg(retval_aggregator, argnum):  # TODO: name
+    # note that if the decorated method is in a class, self is argnum 0
     def decorator(f):
-        def method_replacement(self, *args, **kwargs):
-            if isinstance(args[0], list):
+        def method_replacement(*args, **kwargs):
+            if isinstance(args[argnum], list):
                 # TODO: test decorating a function instead of a method
-                # TODO: all the selfs here are weird since this method isn't in a class
                 def invoker(x):
-                    newargs = []
-                    newargs.append(x)
-                    if len(args) > 1:
-                        newargs.append(args[1:])
-                    return f(self, *newargs, **kwargs)
-                return reduce(retval_aggregator, map(invoker, args[0]))
-            return f(self, *args, **kwargs)
+                    newargs = list(args[:])
+                    newargs[argnum] = x
+                    return f(*newargs, **kwargs)
+                return reduce(retval_aggregator, map(invoker, args[argnum]))
+            return f(*args, **kwargs)
         return method_replacement
     return decorator
 
-def summer(arg1, arg2):
+def summer(arg1, arg2): # TODO: what if you want to specify this in the class? is that possible?
     return arg1 + arg2
 
 # TODO: what if the function doesn't have a return value? then we don't need the retval_aggregator.
 
 class TestSomething(unittest2.TestCase):
 
-    @first_arg_list_to_scalar(summer)
+    @aggregate_arg(summer, 1)
     def one_arg_method(self, arg):
         return arg
 
+    @aggregate_arg(summer, 1)
+    @aggregate_arg(summer, 2)
     def two_arg_method(self, arg1, arg2):
-        # TODO: these are so similar, but how to dedup them? also the one above
-        # note they affect control flow...
-        # decorator?
-        if isinstance(arg1, list):
-            return reduce(summer, map(lambda x: self.two_arg_method(x, arg2), arg1))
-
-        if isinstance(arg2, list):
-            return reduce(summer, map(lambda x: self.two_arg_method(arg1, x), arg2))
-
-        return summer(arg1, arg2)
+        return arg1 + arg2
 
     def test_one_arg(self):
         # The idea here is if method is defined the same, method(list) should iterate and method(arg) should run once.
