@@ -13,6 +13,7 @@ class TestSomething(unittest2.TestCase):
     def two_arg_method(self, arg1, arg2):
         # TODO: these are so similar, but how to dedup them? also the one above
         # note they affect control flow...
+        # decorator?
         if isinstance(arg1, list):
             return reduce(self.summer, map(lambda x: self.two_arg_method(x, arg2), arg1))
 
