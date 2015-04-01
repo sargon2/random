@@ -1,13 +1,31 @@
 import unittest2
 
+def first_arg_list_to_scalar(retval_aggregator):
+    def decorator(f):
+        def method_replacement(self, *args, **kwargs):
+            if isinstance(args[0], list):
+                # TODO: test decorating a function instead of a method
+                # TODO: all the selfs here are weird since this method isn't in a class
+                def invoker(x):
+                    newargs = []
+                    newargs.append(x)
+                    if len(args) > 1:
+                        newargs.append(args[1:])
+                    return f(self, *newargs, **kwargs)
+                return reduce(retval_aggregator, map(invoker, args[0]))
+            return f(self, *args, **kwargs)
+        return method_replacement
+    return decorator
+
+def summer(arg1, arg2):
+    return arg1 + arg2
+
+# TODO: what if the function doesn't have a return value? then we don't need the retval_aggregator.
+
 class TestSomething(unittest2.TestCase):
 
-    def summer(self, arg1, arg2):
-        return arg1 + arg2
-
+    @first_arg_list_to_scalar(summer)
     def one_arg_method(self, arg):
-        if isinstance(arg, list):
-            return reduce(self.summer, map(self.one_arg_method, arg))
         return arg
 
     def two_arg_method(self, arg1, arg2):
@@ -15,12 +33,12 @@ class TestSomething(unittest2.TestCase):
         # note they affect control flow...
         # decorator?
         if isinstance(arg1, list):
-            return reduce(self.summer, map(lambda x: self.two_arg_method(x, arg2), arg1))
+            return reduce(summer, map(lambda x: self.two_arg_method(x, arg2), arg1))
 
         if isinstance(arg2, list):
-            return reduce(self.summer, map(lambda x: self.two_arg_method(arg1, x), arg2))
+            return reduce(summer, map(lambda x: self.two_arg_method(arg1, x), arg2))
 
-        return self.summer(arg1, arg2)
+        return summer(arg1, arg2)
 
     def test_one_arg(self):
         # The idea here is if method is defined the same, method(list) should iterate and method(arg) should run once.
