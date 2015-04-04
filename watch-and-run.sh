@@ -60,7 +60,7 @@ watch_and_run() {
         clear
     fi
     "$@"
-    while inotifywait -r -e modify -e attrib -e move -e create -e delete --exclude '\.git|\.ropeproject' "$TO_WATCH"; do
+    while inotifywait -q -r -e modify -e attrib -e move -e create -e delete --exclude '\.git|\.ropeproject' "$TO_WATCH"; do
         if [[ -z "$CLEAR_CONSOLE" ]]; then
             clear
         fi
