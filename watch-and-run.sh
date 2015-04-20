@@ -61,6 +61,7 @@ watch_and_run() {
     fi
     "$@"
     while inotifywait -q -r -e modify -e attrib -e move -e create -e delete --exclude '\.git|\.ropeproject' "$TO_WATCH"; do
+        sleep 0.1  # TODO: run inotifywait in another thread and respond to each event to avoid race condition (for now sleep to mitigate it)
         if [[ -z "$CLEAR_CONSOLE" ]]; then
             clear
         fi
