@@ -1,0 +1,19 @@
+The idea is to TDD a bootstrapped compiler.
+
+The bootstrapping should be totally minimal.  We write some minimal piece in another language (python), then all code and tests from then on are in the target language.
+
+Python:
+
+assertEquals(True, compile_and_run("assertEquals(1, 1)"))
+assertEquals(False, compile_and_run("assertEquals(1, 2)"))
+
+
+Then, in the target language, we can write arbitrary asserts:
+
+def func(): # (or whatever the syntax is)
+    return 1
+assertEquals(1, func())
+
+etc.
+
+Side note: it could try processor instructions until it gets one that makes the tests pass.  If there's more than one, it can do performance analysis to tell which one makes the tests pass faster.
