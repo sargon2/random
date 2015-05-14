@@ -10,8 +10,12 @@ def make_compiler(target):
     subprocess.check_call(target + " -o new-compiler compiler-source.newlang", shell=True) # TODO: newlang is a terrible extension
     shutil.move("new-compiler", target)
 
+    # Now the new compiler was compiled by the bootstrap compiler.  We want to remove all traces of that, so let's recompile again.
+    subprocess.check_call(target + " -o new-compiler compiler-source.newlang", shell=True) # TODO: newlang is a terrible extension
+    shutil.move("new-compiler", target)
+
     # Compile again for verification
-    subprocess.check_call(target + " -o verify compiler-source.newlang", shell=True)
+    subprocess.check_call(target + " -o verify compiler-source.newlang", shell=True) # TODO: newlang is a terrible extension
     subprocess.check_call("diff " + target + " verify", shell=True)
 
 def mycompile(code):
