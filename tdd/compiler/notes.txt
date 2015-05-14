@@ -24,3 +24,22 @@ Use the bootstrap compiler to compile code in the new language to create the act
 
 Both the bootstrap and real compilers have to know how to take input arguments.  How do we dedup that?
 
+--
+
+The compiler is written in code.
+To create the compiler, the code for the compiler must be compiled.
+But how do we compile the compiler code without having the compiler in place?
+
+We must write it in another language.  But we already have the code for it!
+So we must write the compiler in two languages (existing and new) -- this is teaching the computer how the new language is the same as the old.
+Or, we must use an existing compiler for the new language.  This is just doing another compilation loop.
+
+Is the same code in two languages duplication in a TDD sense?
+
+If you remove the bootstrap compiler and make it call the new code in the new language, the computer says "but I don't know how to run that"
+If you remove the new code and use the bootstrap compiler code, then the new language is forever dependant on the existing language.
+
+The compiler outputs ASM.  Maybe I can have ASM definitions for things that both the bootstrap and new compilers use.
+
+The existing language can be ASM.  To avoid duplication and dependency on other languages, it *must* be ASM.
+
