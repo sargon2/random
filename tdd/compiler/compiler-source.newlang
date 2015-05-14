@@ -6,9 +6,11 @@ contents = read_file(infile)
 new_contents = "#!/usr/bin/env python\nimport sys\n"
 for line in contents.splitlines():
     if line == "assertEquals(1, 1)":
-        line = "if 1 == 1:\n    sys.exit(0)\nsys.exit(1)"
+        line = "if 1 != 1:\n    sys.exit(1)"
     if line == "assertEquals(1, 2)":
-        line = "if 1 == 2:\n    sys.exit(0)\nsys.exit(1)"
+        line = "if 1 != 2:\n    sys.exit(1)"
+    if line == "assertNotEquals(1, 2)":
+        line = "if 1 == 2:\n    sys.exit(1)"
     if line == "chmod(outfile, 0755)":
         line = "import os\nos.chmod(outfile, 0755)"
     if line == "contents = read_file(infile)":

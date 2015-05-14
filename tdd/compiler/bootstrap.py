@@ -3,21 +3,6 @@ import os
 import shutil
 import subprocess
 
-def make_compiler(target):
-    shutil.copy("./bootstrap-compiler.py", target)
-
-    # Do the bootstrap; after this, every bit in the compiler was written in the new language
-    subprocess.check_call(target + " -o new-compiler compiler-source.newlang", shell=True) # TODO: newlang is a terrible extension
-    shutil.move("new-compiler", target)
-
-    # Now the new compiler was compiled by the bootstrap compiler.  We want to remove all traces of that, so let's recompile again.
-    subprocess.check_call(target + " -o new-compiler compiler-source.newlang", shell=True) # TODO: newlang is a terrible extension
-    shutil.move("new-compiler", target)
-
-    # Compile again for verification
-    subprocess.check_call(target + " -o verify compiler-source.newlang", shell=True) # TODO: newlang is a terrible extension
-    subprocess.check_call("diff " + target + " verify", shell=True)
-
 def mycompile(code):
     with open("to_compile", "w") as f:
         f.write(code)
@@ -34,7 +19,7 @@ def compile_and_run(code):
 class TestCompilerBootstrap(unittest2.TestCase):
 
     def tearDown(self):
-        to_remove = ["./to_compile", "./compile", "./compiled", "./verify"]
+        to_remove = ["./to_compile", "./compiled"]
         for item in to_remove:
             try:
                 os.remove(item)
@@ -42,6 +27,5 @@ class TestCompilerBootstrap(unittest2.TestCase):
                 pass
 
     def test_assert_equals(self):
-        make_compiler("./compile")
         self.assertEquals(0, compile_and_run("assertEquals(1, 1)"))
         self.assertNotEquals(0, compile_and_run("assertEquals(1, 2)"))
