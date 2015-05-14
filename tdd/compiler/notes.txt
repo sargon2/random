@@ -17,3 +17,10 @@ assertEquals(1, func())
 etc.
 
 Side note: it could try processor instructions until it gets one that makes the tests pass.  If there's more than one, it can do performance analysis to tell which one makes the tests pass faster.
+
+
+The bootstrap compiler knows how to compile exactly one thing -- the actual compiler.
+Use the bootstrap compiler to compile code in the new language to create the actual compiler.  Then use the actual compiler to compile code in the new language.
+
+Both the bootstrap and real compilers have to know how to take input arguments.  How do we dedup that?
+
