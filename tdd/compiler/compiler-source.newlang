@@ -1,0 +1,12 @@
+#!/bin/bash
+
+contents=`cat $3`
+
+if [ "$contents" == "assertEquals(1, 1)" ]; then
+    contents=$'#!/bin/bash\n[ 1 == 1 ]'
+elif [ "$contents" == "assertEquals(1, 2)" ]; then
+    contents=$'#!/bin/bash\n[ 1 == 2 ]'
+fi
+
+echo "$contents" > $2
+chmod +x $2

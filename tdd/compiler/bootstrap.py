@@ -17,7 +17,7 @@ def make_compiler(target):
 def mycompile(code):
     with open("to_compile", "w") as f:
         f.write(code)
-    os.system("./compile -o compiled to_compile")
+    subprocess.check_call("./compile -o compiled to_compile", shell=True)
     return "./compiled"
 
 def execute(exename):
@@ -40,4 +40,4 @@ class TestCompilerBootstrap(unittest2.TestCase):
     def test_assert_equals(self):
         make_compiler("./compile")
         self.assertEquals(0, compile_and_run("assertEquals(1, 1)"))
-        self.assertEquals(1, compile_and_run("assertEquals(1, 2)"))
+        self.assertNotEquals(0, compile_and_run("assertEquals(1, 2)"))
