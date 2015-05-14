@@ -6,3 +6,4 @@ aozora/textfiles
 a.out
 .ropeproject
 *.lprof
+*.so
