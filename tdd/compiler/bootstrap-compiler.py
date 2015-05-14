@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import sys
+import os
 
 infile = sys.argv[3]
 outfile = sys.argv[2]
@@ -12,3 +13,5 @@ with open(infile) as f:
 
 with open(outfile, "w") as f:
     f.write("")
+
+os.chmod(outfile, 0755)
