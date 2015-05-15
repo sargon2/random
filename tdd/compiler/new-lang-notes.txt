@@ -69,3 +69,15 @@ What about multithreading?
 
 There should also be a #! way to run code in the new language.
 
+for(list, (a) { print a; })
+for a in list {
+    print a;
+}
+for list, (a) { print a; }
+
+fn = (a) { print a; }
+for(list, fn)
+
+for is just map without the return.
+
+if(cond, { code })
