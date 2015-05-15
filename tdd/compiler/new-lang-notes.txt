@@ -32,6 +32,8 @@ object = (constructor_arg1) {
     method1 = () {...}
 }
 
+object.method1()
+
 No way to do stuff at class declaration time.
 No way to modify function/class args.  But you can call methods on it that change its state.
 

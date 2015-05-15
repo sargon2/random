@@ -7,6 +7,8 @@ new_contents = "#!/usr/bin/env python\nimport sys\n"
 for line in contents.splitlines():
     if line == "assertEquals(1, 1)":
         line = "if 1 != 1:\n    sys.exit(1)"
+    if line == "assertEquals(2, 2)":
+        line = "if 2 != 2:\n    sys.exit(1)"
     if line == "assertEquals(1, 2)":
         line = "if 1 != 2:\n    sys.exit(1)"
     if line == "assertNotEquals(1, 2)":
