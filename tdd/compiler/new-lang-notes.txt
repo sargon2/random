@@ -81,3 +81,5 @@ for(list, fn)
 for is just map without the return.
 
 if(cond, { code })
+
+It would be cool if you could import/invoke other peoples' code and it would download transparently.

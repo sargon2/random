@@ -17,11 +17,11 @@ with open(infile) as f:
 new_contents = "#!/usr/bin/env python\nimport sys\n"
 for line in contents.splitlines():
 
-    if line == "chmod(outfile, 0755)":
+    if line == "chmod(outfile, 0755);":
         line = "import os\nos.chmod(outfile, 0755)"
-    if line == "contents = read_file(infile)":
+    if line == "contents = read_file(infile);":
         line = "with open(infile) as f:\n    contents = f.read()\n"
-    if line == "write_file(outfile, new_contents)":
+    if line == "write_file(outfile, new_contents);":
         line = "with open(outfile, \"w\") as f:\n    f.write(new_contents)\n"
 
     new_contents += line + "\n"

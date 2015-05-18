@@ -1,27 +1,27 @@
 infile = sys.argv[3]
 outfile = sys.argv[2]
 
-contents = read_file(infile)
+contents = read_file(infile);
 
 new_contents = "#!/usr/bin/env python\nimport sys\n"
 for line in contents.splitlines():
-    if line == "assertEquals(1, 1)":
+    if line == "assertEquals(1, 1);":
         line = "if 1 != 1:\n    sys.exit(1)"
-    if line == "assertEquals(2, 2)":
+    if line == "assertEquals(2, 2);":
         line = "if 2 != 2:\n    sys.exit(1)"
-    if line == "assertEquals(1, 2)":
+    if line == "assertEquals(1, 2);":
         line = "if 1 != 2:\n    sys.exit(1)"
-    if line == "assertNotEquals(1, 2)":
+    if line == "assertNotEquals(1, 2);":
         line = "if 1 == 2:\n    sys.exit(1)"
-    if line == "chmod(outfile, 0755)":
+    if line == "chmod(outfile, 0755);":
         line = "import os\nos.chmod(outfile, 0755)"
-    if line == "contents = read_file(infile)":
+    if line == "contents = read_file(infile);":
         line = "with open(infile) as f:\n    contents = f.read()\n"
-    if line == "write_file(outfile, new_contents)":
+    if line == "write_file(outfile, new_contents);":
         line = "with open(outfile, \"w\") as f:\n    f.write(new_contents)\n"
 
     new_contents += line + "\n"
 
-write_file(outfile, new_contents)
+write_file(outfile, new_contents);
 
-chmod(outfile, 0755)
+chmod(outfile, 0755);
