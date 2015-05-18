@@ -83,3 +83,36 @@ for is just map without the return.
 if(cond, { code })
 
 It would be cool if you could import/invoke other peoples' code and it would download transparently.
+
+What about while loops?
+
+while({ done = true; return done; })
+
+# old: i=0; while(i < 100) { i += 3; }
+i=0; while({i<100}, { i += 3; })
+^^ two blocks? really?
+i=0; repeat({if(i<100, {i+=3}); return i<100})
+
+
+What about do-while?
+
+old: i=0; do { i += 3; } while i < 100;
+i=0; repeat({i += 3; return i < 100;})
+^^ that means closures can change the scope they came from.  Is that a good thing?
+
+What about if(x) return; ?
+
+if(i<100, { return; } ); # nope! only returns the inner block
+
+OK.  So clearly we can't make if/while/do normal functions, because of weird problems.  But that doesn't affect the idea of functions and classes being the same thing.
+
+So:
+
+for x in list { print x; }
+for(list, (x) { ... }) is elegant...
+
+while(!done) { whatever; }
+
+do { whatever; } while(cond);
+
+
