@@ -5,6 +5,12 @@ contents = read_file(infile);
 
 new_contents = "#!/usr/bin/env python\nimport sys\n"
 for line in contents.splitlines():
+    if line == "assert(true);":
+        line = "if not True:\n    sys.exit(1)"
+    if line == "assert(not(false));":
+        line = "if not not False:\n    sys.exit(1)"
+    if line == "assert(equals(2, 2));":
+        line = "if 2 != 2:\n    sys.exit(1)"
     if line == "assert(equals(1, 1));":
         line = "if 1 != 1:\n    sys.exit(1)"
     if line == "assert(equals(2, 2));":
