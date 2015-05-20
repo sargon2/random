@@ -41,7 +41,12 @@ If you remove the new code and use the bootstrap compiler code, then the new lan
 
 The compiler outputs ASM.  Maybe I can have ASM definitions for things that both the bootstrap and new compilers use.
 
-The existing language can be ASM.  To avoid duplication and dependency on other languages, it *must* be ASM.
+The existing language can be ASM.  But even in that case, the loop that parses the input is still duplicated!
+
+I want to build up the bootstrap compiler and the real compiler simultaneously from scratch.
+ - Define empty source compiles to empty executable.
+
+Maybe it's OK for the new compiler to invoke the bootstrap compiler.
 
 Does the compiler code fopen() a file and write out ASM, or does it embed it inline?  (Or both)
 
