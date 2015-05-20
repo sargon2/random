@@ -43,3 +43,5 @@ The compiler outputs ASM.  Maybe I can have ASM definitions for things that both
 
 The existing language can be ASM.  To avoid duplication and dependency on other languages, it *must* be ASM.
 
+Does the compiler code fopen() a file and write out ASM, or does it embed it inline?  (Or both)
+
