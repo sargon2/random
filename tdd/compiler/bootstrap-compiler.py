@@ -10,6 +10,8 @@ with open(infile) as f:
     contents = f.read()
 
 # Note that contents is always the same.  So we could just hardcode the output if we wished.
+# But, that would increase duplication (since both this script and the hardcoded output would need 'import sys'
+# So that's why we read and process infile directly here.
 
 # TODO: this stuff is dup'd with compiler-source.newlang; how do I remove that duplication?
 # This one compiles to python and the other could compile to asm or whatever.
