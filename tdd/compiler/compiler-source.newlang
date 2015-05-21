@@ -1,33 +1,23 @@
-infile = sys.argv[3]
-outfile = sys.argv[2]
 
-contents = read_file(infile);
+outfile = args[2];
+infile = args[3];
 
-new_contents = "#!/usr/bin/env python\nimport sys\n"
-for line in contents.splitlines():
-    if line == "assert(true);":
-        line = "if not True:\n    sys.exit(1)"
-    if line == "assert(not(false));":
-        line = "if not not False:\n    sys.exit(1)"
-    if line == "assert(equals(2, 2));":
-        line = "if 2 != 2:\n    sys.exit(1)"
-    if line == "assert(equals(1, 1));":
-        line = "if 1 != 1:\n    sys.exit(1)"
-    if line == "assert(equals(2, 2));":
-        line = "if 2 != 2:\n    sys.exit(1)"
-    if line == "assert(equals(1, 2));":
-        line = "if 1 != 2:\n    sys.exit(1)"
-    if line == "assert(not(equals(1, 2)));":
-        line = "if 1 == 2:\n    sys.exit(1)"
-    if line == "chmod(outfile, 0755);":
-        line = "import os\nos.chmod(outfile, 0755)"
-    if line == "contents = read_file(infile);":
-        line = "with open(infile) as f:\n    contents = f.read()\n"
-    if line == "write_file(outfile, new_contents);":
-        line = "with open(outfile, \"w\") as f:\n    f.write(new_contents)\n"
+make_assembly = (infile) {
+    # TODO
+};
 
-    new_contents += line + "\n"
+write_tempfile = (contents) {
+    # TODO: This function should be in a central library somewhere...
+    # TODO
+};
 
-write_file(outfile, new_contents);
+write_executable = (assembly, outfile) {
+    # Write to file
+    assembly_file = write_tempfile(assembly);
 
-chmod(outfile, 0755);
+    # Invoke gcc to assemble
+    # `gcc -o {outfile} {assembly_file}`;
+};
+
+assembly = make_assembly(infile);
+write_executable(assembly, outfile);
