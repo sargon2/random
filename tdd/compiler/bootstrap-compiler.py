@@ -12,128 +12,139 @@ with open(infile) as f:
 
 # assignment = variable "=" value ";"
 
-class ParseWrong(BaseException):
-    pass
+# TODO: globals are bad...
 
-def try_consume(position, regex):
-    if not re.match(regex, tokens[position]):
-        # TODO: don't raise, use return code? Or is raising the right answer?
-        raise ParseWrong("Expected " + regex + ", got " + tokens[position])
+token = None
+def try_consume(regex):
+    global position
+    global token
+    token = tokens[position]
+    if re.match(regex, token):
+        position += 1
+        return True
+    return False
 
-def assignment(position):
-    try_consume(position, "[a-z]+")
-    variable = tokens[position]
-    position += 1
+def backtrack(fn):
+    def wrapper(*args, **kwargs):
+        global position
+        orig_position = position
+        result = fn(*args, **kwargs)
+        if not result:
+            position = orig_position
+        return result
+    return wrapper
 
-    try_consume(position, "=")
-    position += 1
+@backtrack
+def assignment():
+    if not try_consume("[a-z]+"): # TODO: if not, and return false are duplicated
+        return False
 
-    position = statement(position)
+    if not try_consume("="):
+        return False
 
-    return position
+    if not statement():
+        return False
 
-def arg_list(position):
-    try_consume(position, "[a-z]+")
-    arg = tokens[position]
-    position += 1
+    return True
 
-    done = False
-    while not done:
-        try:
-            position = remaining_arg(position)
-        except ParseWrong:
-            done = True
-        except:
-            raise
-    return position
+@backtrack
+def arg_list():
+    if not try_consume("[a-z]+"):
+        return False
 
-def remaining_arg(position):
-    try_consume(position, ",")
-    position += 1
+    arg = token
 
-    try_consume(position, "[a-z]+")
-    arg = tokens[position]
-    position += 1
+    while remaining_arg():
+        pass
+    return True
 
-    return position
+@backtrack
+def remaining_arg():
+    if not try_consume(","):
+        return False
 
-def function_definition(position):
-    try_consume(position, "[a-z]+")
-    fn_name = tokens[position]
-    position += 1
+    if not try_consume("[a-z]+"):
+        return False
 
-    try_consume(position, "=")
-    position += 1
+    arg = token
 
-    try_consume(position, "\(")
-    position += 1
+    return True
 
-    position = arg_list(position)
+@backtrack
+def function_definition():
+    if not try_consume("[a-z]+"):
+        return False
 
-    try_consume(position, "\)")
-    position += 1
+    fn_name = token
 
-    try_consume(position, "{")
-    position += 1
+    if not try_consume("="):
+        return False
 
-    position = statements(position)
+    if not try_consume("\("):
+        return False
 
-    try_consume(position, "}")
-    position += 1
+    if not arg_list():
+        return False
 
-    return position
+    if not try_consume("\)"):
+        return False
 
-def function_invocation(position):
-    try_consume(position, "[a-z]+")
-    fn_name = tokens[position]
-    position += 1
+    if not try_consume("{"):
+        return False
 
-    try_consume(position, "\(")
-    position += 1
+    if not statements():
+        return False
 
-    position = arg_list(position)
+    if not try_consume("}"):
+        return False
 
-    try_consume(position, "\)")
-    position += 1
+    return True
 
-    return position
+@backtrack
+def function_invocation():
+    if not try_consume("[a-z]+"):
+        return False
 
-def statement(position):
-    # TODO: this shouldn't be nested
-    try:
-        position = function_definition(position)
-    except ParseWrong:
-        try:
-            position = function_invocation(position)
-        except ParseWrong:
-            try:
-                position = assignment(position)
-            except ParseWrong:
-                try:
-                    try_consume(position, "[a-z\[\]]+")
-                    position += 1
-                except ParseWrong:
-                    raise
+    global token
+    fn_name = token
 
-    return position
+    if not try_consume("\("):
+        return False
 
+    if not arg_list():
+        return False
 
-def statements(position):
+    if not try_consume("\)"):
+        return False
+
+    print "invocation:", fn_name
+    return True
+
+@backtrack
+def statement():
+    if function_definition():
+        return True
+    if function_invocation():
+        return True
+    if assignment():
+        return True
+    if try_consume("[a-z\[\]]+"): # TODO: this isn't a statement...
+        return True
+
+    return False
+
+@backtrack
+def statements():
     done = False
     while not done:
         if position < len(tokens):
-            try:
-                position = statement(position)
-                try_consume(position, ";")
-                position += 1
-
-            except ParseWrong:
-                done = True
-            except:
-                raise
+            done = True
+            if statement():
+                if try_consume(";"):
+                    done = False
         else:
             done = True
-    return position
+    return True
 
 def remove_comments(string):
     return re.sub('#.*', '', string)
@@ -141,10 +152,9 @@ def remove_comments(string):
 contents = remove_comments(contents)
 
 tokens = re.findall("[a-z0-9\[\]_]+|=|;|\(|\)|,|{|}|`", contents)
-try:
-    position = statements(0)
-except ParseWrong as e:
-    print "Parse error:", e
+position = 0
+if not statements():
+    print "Parse error"
 else:
     if position < len(tokens):
         print "Parse error: tokens left, position is ", position
