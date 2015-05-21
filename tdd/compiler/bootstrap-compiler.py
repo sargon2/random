@@ -15,116 +15,117 @@ with open(infile) as f:
 class ParseWrong(BaseException):
     pass
 
-# TODO: instead of passing around the modified token list, pass around an index into the (immutable) token list
+def try_consume(position, regex):
+    if not re.match(regex, tokens[position]):
+        # TODO: don't raise, use return code? Or is raising the right answer?
+        raise ParseWrong("Expected " + regex + ", got " + tokens[position])
 
-def try_consume(token, regex):
-    if re.match(regex, token):
-        return token
-    # TODO: don't raise, use return code? or return an object that contains token and bool 'matched'?
-    # Or is raising the right answer?
-    raise ParseWrong("Expected " + regex + ", got " + token)
+def assignment(position):
+    try_consume(position, "[a-z]+")
+    variable = tokens[position]
+    position += 1
 
-def assignment(tokens):
-    variable = try_consume(tokens[0], "[a-z]+")
-    tokens = tokens[1:]
+    try_consume(position, "=")
+    position += 1
 
-    try_consume(tokens[0], "=")
-    tokens = tokens[1:]
+    position = statement(position)
 
-    tokens = statement(tokens)
+    return position
 
-    return tokens
-
-def arg_list(tokens):
-    arg = try_consume(tokens[0], "[a-z]+")
-    tokens = tokens[1:]
+def arg_list(position):
+    try_consume(position, "[a-z]+")
+    arg = tokens[position]
+    position += 1
 
     done = False
     while not done:
         try:
-            tokens = remaining_arg(tokens)
+            position = remaining_arg(position)
         except ParseWrong:
             done = True
         except:
             raise
-    return tokens
+    return position
 
-def remaining_arg(tokens):
-    try_consume(tokens[0], ",")
-    tokens = tokens[1:]
+def remaining_arg(position):
+    try_consume(position, ",")
+    position += 1
 
-    arg = try_consume(tokens[0], "[a-z]+")
-    tokens = tokens[1:]
+    try_consume(position, "[a-z]+")
+    arg = tokens[position]
+    position += 1
 
-    return tokens
+    return position
 
-def function_definition(tokens):
-    fn_name = try_consume(tokens[0], "[a-z]+")
-    tokens = tokens[1:]
+def function_definition(position):
+    try_consume(position, "[a-z]+")
+    fn_name = tokens[position]
+    position += 1
 
-    try_consume(tokens[0], "=")
-    tokens = tokens[1:]
+    try_consume(position, "=")
+    position += 1
 
-    try_consume(tokens[0], "\(")
-    tokens = tokens[1:]
+    try_consume(position, "\(")
+    position += 1
 
-    tokens = arg_list(tokens)
+    position = arg_list(position)
 
-    try_consume(tokens[0], "\)")
-    tokens = tokens[1:]
+    try_consume(position, "\)")
+    position += 1
 
-    try_consume(tokens[0], "{")
-    tokens = tokens[1:]
+    try_consume(position, "{")
+    position += 1
 
-    tokens = statements(tokens)
+    position = statements(position)
 
-    try_consume(tokens[0], "}")
-    tokens = tokens[1:]
+    try_consume(position, "}")
+    position += 1
 
-    return tokens
+    return position
 
-def function_invocation(tokens):
-    fn_name = try_consume(tokens[0], "[a-z]+")
-    tokens = tokens[1:]
+def function_invocation(position):
+    try_consume(position, "[a-z]+")
+    fn_name = tokens[position]
+    position += 1
 
-    try_consume(tokens[0], "\(")
-    tokens = tokens[1:]
+    try_consume(position, "\(")
+    position += 1
 
-    tokens = arg_list(tokens)
+    position = arg_list(position)
 
-    try_consume(tokens[0], "\)")
-    tokens = tokens[1:]
+    try_consume(position, "\)")
+    position += 1
 
-    return tokens
+    return position
 
-def statement(tokens):
+def statement(position):
     # TODO: this shouldn't be nested
     try:
-        tokens = function_definition(tokens)
+        position = function_definition(position)
     except ParseWrong:
         try:
-            tokens = function_invocation(tokens)
+            position = function_invocation(position)
         except ParseWrong:
             try:
-                tokens = assignment(tokens)
+                position = assignment(position)
             except ParseWrong:
                 try:
-                    try_consume(tokens[0], "[a-z\[\]]+")
-                    tokens = tokens[1:]
+                    try_consume(position, "[a-z\[\]]+")
+                    position += 1
                 except ParseWrong:
                     raise
 
-    return tokens
+    return position
 
 
-def statements(tokens):
+def statements(position):
     done = False
     while not done:
-        if tokens:
+        if position < len(tokens):
             try:
-                tokens = statement(tokens)
-                try_consume(tokens[0], ";")
-                tokens = tokens[1:]
+                position = statement(position)
+                try_consume(position, ";")
+                position += 1
 
             except ParseWrong:
                 done = True
@@ -132,7 +133,7 @@ def statements(tokens):
                 raise
         else:
             done = True
-    return tokens
+    return position
 
 def remove_comments(string):
     return re.sub('#.*', '', string)
@@ -141,12 +142,12 @@ contents = remove_comments(contents)
 
 tokens = re.findall("[a-z0-9\[\]_]+|=|;|\(|\)|,|{|}|`", contents)
 try:
-    tokens = statements(tokens)
+    position = statements(0)
 except ParseWrong as e:
     print "Parse error:", e
 else:
-    if tokens:
-        print "Parse error: tokens left", tokens
+    if position < len(tokens):
+        print "Parse error: tokens left, position is ", position
 
 with open(outfile, "w") as f:
     f.write("")
