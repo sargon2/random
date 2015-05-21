@@ -15,10 +15,14 @@ with open(infile) as f:
 class ParseWrong(BaseException):
     pass
 
+# TODO: instead of passing around the modified token list, pass around an index into the (immutable) token list
+
 def try_consume(token, regex):
     if re.match(regex, token):
         return token
-    raise ParseWrong("Expected " + regex + ", got " + token) # TODO: can we avoid the raise?
+    # TODO: don't raise, use return code? or return an object that contains token and bool 'matched'?
+    # Or is raising the right answer?
+    raise ParseWrong("Expected " + regex + ", got " + token)
 
 def assignment(tokens):
     variable = try_consume(tokens[0], "[a-z]+")
@@ -94,6 +98,7 @@ def function_invocation(tokens):
     return tokens
 
 def statement(tokens):
+    # TODO: this shouldn't be nested
     try:
         tokens = function_definition(tokens)
     except ParseWrong:
