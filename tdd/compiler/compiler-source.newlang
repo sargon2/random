@@ -16,7 +16,7 @@ write_executable = (assembly, outfile) {
     assembly_file = write_tempfile(assembly);
 
     # Invoke gcc to assemble
-    # `gcc -o {outfile} {assembly_file}`;
+    # `gcc -o {outfile} {assembly_file}`; # TODO
 };
 
 assembly = make_assembly(infile);

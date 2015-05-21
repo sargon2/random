@@ -39,11 +39,17 @@ def assignment():
     if not try_consume("[a-z]+"): # TODO: if not, and return false are duplicated
         return False
 
+    var = token
+
     if not try_consume("="):
         return False
 
     if not statement():
-        return False
+        if not try_consume("[a-z\[\]]+"):
+            return False
+        val = token
+    else:
+        val = "statement..."
 
     return True
 
@@ -117,7 +123,7 @@ def function_invocation():
     if not try_consume("\)"):
         return False
 
-    print "invocation:", fn_name
+    print fn_name + "()"
     return True
 
 @backtrack
@@ -127,8 +133,6 @@ def statement():
     if function_invocation():
         return True
     if assignment():
-        return True
-    if try_consume("[a-z\[\]]+"): # TODO: this isn't a statement...
         return True
 
     return False
@@ -153,11 +157,9 @@ contents = remove_comments(contents)
 
 tokens = re.findall("[a-z0-9\[\]_]+|=|;|\(|\)|,|{|}|`", contents)
 position = 0
-if not statements():
-    print "Parse error"
-else:
-    if position < len(tokens):
-        print "Parse error: tokens left, position is ", position
+statements()
+if position < len(tokens):
+    print "Parse error: tokens left, position is ", position
 
 with open(outfile, "w") as f:
     f.write("")
