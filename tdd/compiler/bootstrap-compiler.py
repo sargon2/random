@@ -36,21 +36,22 @@ def backtrack(fn):
 
 @backtrack
 def assignment():
-    if not try_consume("[a-z]+"): # TODO: if not, and return false are duplicated
-        return False
 
-    var = token
+    word = lambda: try_consume("[a-z]+") # TODO: lambda and try_consume are dup'd
+    equals = lambda: try_consume("=")
+    other_word = lambda: try_consume("[a-z\[\]]+")
 
-    if not try_consume("="):
-        return False
+    def statement_or_otherword(): # TODO: generic or
+        if not statement():
+            if not other_word():
+                return False
+        return True
 
-    if not statement():
-        if not try_consume("[a-z\[\]]+"):
+    l = [word, equals, statement_or_otherword]
+
+    for item in l: # TODO: generic and
+        if not item():
             return False
-        val = token
-    else:
-        val = "statement..."
-
     return True
 
 @backtrack
