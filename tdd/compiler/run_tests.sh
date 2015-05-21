@@ -1,5 +1,6 @@
 #!/bin/bash -ex
 
+rm -f compile || :
 ./make_compiler.sh ./compile
 nosetests bootstrap.py
 ./compile -o asserts asserts.newlang
