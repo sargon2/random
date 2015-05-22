@@ -155,13 +155,21 @@ class remaining_arg(object):
         return tocode(self.result)
 
 class arg_list(object):
+    def defn(self):
+        return ZeroOrOne(Each(word, ZeroOrMore(remaining_arg())))
+
     def parse(self):
-        return ZeroOrOne(Each(word, ZeroOrMore(remaining_arg()))).parse()
+        return parse(self)
+
+    def tocode(self):
+        return tocode(self.result)
 
 class function_definition(object):
+    def defn(self):
+        return Each(word, equals, open_paren, arg_list(), close_paren, open_brace, statements(), close_brace)
+
     def parse(self):
-        self.result = Each(word, equals, open_paren, arg_list(), close_paren, open_brace, statements(), close_brace).parse()
-        return self
+        return parse(self)
 
     def tocode(self):
         global indent
@@ -171,17 +179,21 @@ class function_definition(object):
         return ret
 
 class function_invocation(object):
+    def defn(self):
+        return Each(word, open_paren, arg_list(), close_paren)
+
     def parse(self):
-        self.result = Each(word, open_paren, arg_list(), close_paren).parse()
-        return self
+        return parse(self)
 
     def tocode(self):
-        return indent + tocode(self.result)
+        return indent + tocode(self.result) # TODO: statement should be the only thing with indent on it...
 
 class invoke_system(object):
+    def defn(self):
+        return backtick
+
     def parse(self):
-        self.result = backtick.parse()
-        return self
+        return parse(self)
 
     def tocode(self):
         global indent
@@ -192,8 +204,14 @@ class invoke_system(object):
         return indent + "os.system(\"" + command + "\")"
 
 class statement(object):
+    def defn(self):
+        return Or(function_definition(), function_invocation(), assignment(), invoke_system())
+
     def parse(self):
-        return Or(function_definition(), function_invocation(), assignment(), invoke_system()).parse()
+        return parse(self)
+
+    def tocode(self):
+        return tocode(self.result)
 
 class statement_with_semi(object):
     def parse(self):
