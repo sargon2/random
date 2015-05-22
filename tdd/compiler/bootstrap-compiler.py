@@ -12,16 +12,24 @@ with open(infile) as f:
 
 # TODO: globals are bad...
 
+indent = ""
+
 class SingleToken(object):
     def __init__(self, token):
         self.token = token
-    def get(self):
+    def parse(self):
         return self.token
     def __repr__(self):
         return "\"" + self.token + "\""
+    def tocode(self):
+        if self.token == "args[2]":
+            return "sys.argv[2]"
+        if self.token == "args[3]":
+            return "sys.argv[3]"
+        return self.token
 
 class Falsy(object):
-    def get(self):
+    def parse(self):
         return Falsy()
 
 token = None
@@ -51,10 +59,11 @@ class Or(object):
         self.args = args
 
     @backtrack
-    def get(self):
+    def parse(self):
         for item in self.args:
-            r = item.get()
+            r = item.parse()
             if not isinstance(r, Falsy):
+                self.result = r
                 return r
         return Falsy()
 
@@ -63,100 +72,162 @@ class Each(object):
         self.args = args
 
     @backtrack
-    def get(self):
+    def parse(self):
         ret = []
         for item in self.args:
-            r = item.get()
+            r = item.parse()
             if isinstance(r, Falsy):
                 return Falsy()
             ret.append(r)
+
         return ret
+
+    def __repr__(self):
+        return "Each: " + str(self.result)
 
 class ZeroOrMore(object):
 
     def __init__(self, arg):
         self.arg = arg
 
-    def get(self):
+    def parse(self):
         done = False
         ret = []
         while not done:
-            r = self.arg.get()
+            r = self.arg.parse()
             if not isinstance(r, Falsy):
                 ret.append(r)
             else:
                 done = True
         return ret
 
-class Literal(object):
+    def set(self, item):
+        self.item = item
+
+    def __repr__(self):
+        return "Or: " + str(self.item)
+
+class literal(object):
     def __init__(self, regex):
         self.regex = regex
 
-    def get(self):
+    def parse(self):
         return try_consume(self.regex)
 
-word = Literal("[a-z\[\]]+") # TODO: "Literal" dup'd
-equals = Literal("=")
-comma = Literal(",")
-open_paren = Literal("\(")
-close_paren = Literal("\)")
-open_brace = Literal("{")
-close_brace = Literal("}")
-semicolon = Literal(";")
+    def set(self, item):
+        self.item = item
+
+    def __repr__(self):
+        return str(self.item)
+
+word = literal("[a-z\[\]]+") # TODO: "literal" dup'd
+equals = literal("=")
+comma = literal(",")
+open_paren = literal("\(")
+close_paren = literal("\)")
+open_brace = literal("{")
+close_brace = literal("}")
+semicolon = literal(";")
 
 # TODO: class boilerplate dup'd
 # TODO: literals don't have () but classes do (neither should, really)
-# TODO: "get" is a terrible function name
 # TODO: return objects instead of lists
 class assignment(object):
-    def get(self):
-        return Each(word, equals, Or(statement(), word)).get()
+    def parse(self):
+        self.result = Each(word, equals, Or(statement(), word)).parse()
+        if isinstance(self.result, Falsy):
+            return self.result
+        return self
+
+    def __repr__(self):
+        return "Assignment: " + str(self.result)
+
+    def tocode(self):
+        return indent + tocode(self.result[0]) + " = " + tocode(self.result[2])
 
 class remaining_arg(object):
-    def get(self):
-        return Each(comma, word).get()
+    def parse(self):
+        return Each(comma, word).parse()
 
 class arg_list(object):
-    def get(self):
-        return Each(word, ZeroOrMore(remaining_arg())).get()
+    def parse(self):
+        return Each(word, ZeroOrMore(remaining_arg())).parse()
 
 class function_definition(object):
-    def get(self):
-        result = Each(word, equals, open_paren, arg_list(), close_paren, open_brace, statements(), close_brace).get()
-        if not isinstance(result, Falsy):
-            print "function definition for", result[0]
-        return result
+    def parse(self):
+        self.result = Each(word, equals, open_paren, arg_list(), close_paren, open_brace, statements(), close_brace).parse()
+        if isinstance(self.result, Falsy): # TODO: lots of these checks dup'd
+            return self.result
+        return self
+
+    def tocode(self):
+        global indent
+        indent += "    "
+        ret = "def " + tocode(self.result[0]) + "(" + tocode(self.result[3]) + "):\n" + tocode(self.result[6]) + indent + "pass"
+        indent = indent[4:]
+        return ret
 
 class function_invocation(object):
-    def get(self):
-        return Each(word, open_paren, arg_list(), close_paren).get()
+    def parse(self):
+        return Each(word, open_paren, arg_list(), close_paren).parse()
 
 class statement(object):
-    def get(self):
-        return Or(function_definition(), function_invocation(), assignment()).get()
+    def parse(self):
+        return Or(function_definition(), function_invocation(), assignment()).parse()
 
 class statement_with_semi(object):
-    def get(self):
-        return Each(statement(), semicolon).get()
+    def parse(self):
+        return Each(statement(), semicolon).parse()
 
 class statements(object):
-    def get(self):
-        return ZeroOrMore(statement_with_semi()).get()
+    def parse(self):
+        self.result = ZeroOrMore(statement_with_semi()).parse()
+        if isinstance(self.result, Falsy):
+            return self.result
+        return self
+    def __repr__(self):
+        return "statements: " + str(self.result)
+    def tocode(self):
+        ret = ""
+        for stmt_with_semi in self.result:
+            ret += tocode(stmt_with_semi[0]) + "\n" # strip semicolons
+        return ret
+
+class program(object):
+    def parse(self):
+        self.result = statements().parse()
+        if isinstance(self.result, Falsy):
+            return self.result
+        return self
+
+    def tocode(self):
+        ret = "#!/usr/bin/env python\nimport sys\n"
+        ret += tocode(self.result)
+        return ret
 
 
 def remove_comments(string):
     return re.sub('#.*', '', string)
 
+def tocode(element):
+    if isinstance(element, list):
+        ret = ""
+        for item in element:
+            ret += tocode(item)
+        return ret
+    return element.tocode()
+
 contents = remove_comments(contents)
 
 tokens = re.findall("[a-z0-9\[\]_]+|=|;|\(|\)|,|{|}|`", contents) # TODO: dup'd with literals above
 position = 0
-parsed = statements().get()
+s = program()
+s.parse()
+parsed = s
 if position < len(tokens):
     print "Parse error: tokens left, position is ", position
-print parsed
 
 with open(outfile, "w") as f:
-    f.write("")
+    f.write(parsed.tocode())
 
 os.chmod(outfile, 0755)
