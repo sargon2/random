@@ -15,16 +15,16 @@ with open(infile) as f:
 indent = ""
 
 class SingleToken(object):
-    def __init__(self, token):
-        self.token = token
+    def __init__(self, result):
+        self.result = result
     def parse(self):
-        return self.token
+        return self.result
     def tocode(self):
-        if self.token == "args[2]":
+        if self.result == "args[2]":
             return "sys.argv[2]"
-        if self.token == "args[3]":
+        if self.result == "args[3]":
             return "sys.argv[3]"
-        return self.token
+        return self.result
 
 token = None
 def try_consume(regex):
@@ -56,7 +56,7 @@ class Or(object):
     def parse(self):
         for item in self.args:
             r = item.parse()
-            if r is not None:
+            if r is not None and r.result is not None:
                 self.result = r
                 return r
         return None
@@ -128,13 +128,10 @@ backtick = literal("`[^`]+`");
 
 # TODO: class boilerplate dup'd
 # TODO: literals don't have () but classes do (neither should, really)
-# TODO: return objects instead of lists
 class assignment(object):
     def parse(self):
         self.result = Each(word, equals, Or(statement(), word)).parse()
-        if self.result is None:
-            return self.result
-        return self
+        return self # TODO: returning self is weird
 
     def tocode(self):
         return indent + tocode(self.result[0]) + " = " + tocode(self.result[2])
@@ -150,8 +147,6 @@ class arg_list(object):
 class function_definition(object):
     def parse(self):
         self.result = Each(word, equals, open_paren, arg_list(), close_paren, open_brace, statements(), close_brace).parse()
-        if self.result is None: # TODO: lots of these checks dup'd
-            return self.result
         return self
 
     def tocode(self):
@@ -164,8 +159,6 @@ class function_definition(object):
 class function_invocation(object):
     def parse(self):
         self.result = Each(word, open_paren, arg_list(), close_paren).parse()
-        if self.result is None:
-            return self.result
         return self
 
     def tocode(self):
@@ -174,9 +167,8 @@ class function_invocation(object):
 class invoke_system(object):
     def parse(self):
         self.result = backtick.parse()
-        if self.result is None:
-            return self.result
         return self
+
     def tocode(self):
         global indent
         command = tocode(self.result)
