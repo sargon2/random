@@ -214,13 +214,22 @@ class statement(object):
         return tocode(self.result)
 
 class statement_with_semi(object):
+    def defn(self):
+        return Each(statement(), semicolon)
+
     def parse(self):
-        return Each(statement(), semicolon).parse()
+        self.result = self.defn().parse()
+        return self.result # TODO: should be 'return self' (actually should be like the other parse methods) (actually the whole method should be gone)
+
+    def tocode(self):
+        return tocode(self.result)
 
 class statements(object):
+    def defn(self):
+        return ZeroOrMore(statement_with_semi())
+
     def parse(self):
-        self.result = ZeroOrMore(statement_with_semi()).parse()
-        return self
+        return parse(self)
 
     def tocode(self):
         ret = ""
@@ -229,9 +238,11 @@ class statements(object):
         return ret
 
 class program(object):
+    def defn(self):
+        return statements()
+
     def parse(self):
-        self.result = statements().parse()
-        return self
+        return parse(self)
 
     def tocode(self):
         ret = "#!/usr/bin/env python\nimport sys\nimport os\n"
