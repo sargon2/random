@@ -34,25 +34,22 @@ def backtrack(fn):
         return result
     return wrapper
 
-@backtrack
-def assignment():
+def Or(*args):
+    for item in args:
+        if item():
+            return True
+    return False
 
-    word = lambda: try_consume("[a-z]+") # TODO: lambda and try_consume are dup'd
-    equals = lambda: try_consume("=")
-    other_word = lambda: try_consume("[a-z\[\]]+")
-
-    def statement_or_otherword(): # TODO: generic or
-        if not statement():
-            if not other_word():
-                return False
-        return True
-
-    l = [word, equals, statement_or_otherword]
-
-    for item in l: # TODO: generic and
+def Each(*args):
+    for item in args:
         if not item():
             return False
     return True
+
+word = lambda: try_consume("[a-z\[\]]+") # TODO: lambda and try_consume are dup'd
+equals = lambda: try_consume("=")
+
+assignment = lambda: Each(word, equals, lambda: Or(statement, word))
 
 @backtrack
 def arg_list():
