@@ -85,6 +85,16 @@ class Each(object):
     def __repr__(self):
         return "Each: " + str(self.result)
 
+class ZeroOrOne(object):
+    def __init__(self, arg):
+        self.arg = arg
+
+    def parse(self):
+        r = self.arg.parse()
+        if isinstance(r, Falsy):
+            return []
+        return r
+
 class ZeroOrMore(object):
 
     def __init__(self, arg):
@@ -153,7 +163,7 @@ class remaining_arg(object):
 
 class arg_list(object):
     def parse(self):
-        return Each(word, ZeroOrMore(remaining_arg())).parse()
+        return ZeroOrOne(Each(word, ZeroOrMore(remaining_arg()))).parse()
 
 class function_definition(object):
     def parse(self):
@@ -171,7 +181,13 @@ class function_definition(object):
 
 class function_invocation(object):
     def parse(self):
-        return Each(word, open_paren, arg_list(), close_paren).parse()
+        self.result = Each(word, open_paren, arg_list(), close_paren).parse()
+        if isinstance(self.result, Falsy):
+            return self.result
+        return self
+
+    def tocode(self):
+        return indent + tocode(self.result)
 
 class invoke_system(object):
     def parse(self):

@@ -6,9 +6,19 @@ make_assembly = (infile) {
     # TODO
 };
 
-write_tempfile = (contents) {
-    # TODO: This function should be in a central library somewhere...
+# TODO: a lot of these functions should be in a central library somewhere...
+tempfile = () {
     # TODO
+};
+
+write_file = (filename, contents) {
+    # TODO
+};
+
+write_tempfile = (contents) {
+    # TODO
+    filename = tempfile();
+    write_file(filename, contents);
 };
 
 write_executable = (assembly, outfile) {
