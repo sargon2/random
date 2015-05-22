@@ -101,11 +101,15 @@ class ZeroOrMore(object):
                 done = True
         return ret
 
-    def set(self, item):
-        self.item = item
-
     def __repr__(self):
         return "Or: " + str(self.item)
+
+class OneOrMore(object):
+    def __init__(self, arg):
+        self.arg = arg
+
+    def parse(self):
+        return Each(self.arg, ZeroOrMore(self.arg)).parse()
 
 class literal(object):
     def __init__(self, regex):
@@ -113,9 +117,6 @@ class literal(object):
 
     def parse(self):
         return try_consume(self.regex)
-
-    def set(self, item):
-        self.item = item
 
     def __repr__(self):
         return str(self.item)
@@ -128,6 +129,7 @@ close_paren = literal("\)")
 open_brace = literal("{")
 close_brace = literal("}")
 semicolon = literal(";")
+backtick = literal("`[^`]+`");
 
 # TODO: class boilerplate dup'd
 # TODO: literals don't have () but classes do (neither should, really)
@@ -171,9 +173,23 @@ class function_invocation(object):
     def parse(self):
         return Each(word, open_paren, arg_list(), close_paren).parse()
 
+class invoke_system(object):
+    def parse(self):
+        self.result = backtick.parse()
+        if isinstance(self.result, Falsy):
+            return self.result
+        return self
+    def tocode(self):
+        global indent
+        command = tocode(self.result)
+        command = command[1:-1] # strip backticks
+        command = command.replace("{", "\" + ")
+        command = command.replace("}", " + \"")
+        return indent + "os.system(\"" + command + "\")"
+
 class statement(object):
     def parse(self):
-        return Or(function_definition(), function_invocation(), assignment()).parse()
+        return Or(function_definition(), function_invocation(), assignment(), invoke_system()).parse()
 
 class statement_with_semi(object):
     def parse(self):
@@ -201,7 +217,7 @@ class program(object):
         return self
 
     def tocode(self):
-        ret = "#!/usr/bin/env python\nimport sys\n"
+        ret = "#!/usr/bin/env python\nimport sys\nimport os\n"
         ret += tocode(self.result)
         return ret
 
@@ -219,13 +235,14 @@ def tocode(element):
 
 contents = remove_comments(contents)
 
-tokens = re.findall("[a-z0-9\[\]_]+|=|;|\(|\)|,|{|}|`", contents) # TODO: dup'd with literals above
+tokens = re.findall("[a-z0-9\[\]_]+|=|;|\(|\)|,|{|}|`[^`]+`", contents) # TODO: dup'd with literals above
 position = 0
 s = program()
 s.parse()
 parsed = s
 if position < len(tokens):
     print "Parse error: tokens left, position is ", position
+    print tokens[position:]
 
 with open(outfile, "w") as f:
     f.write(parsed.tocode())
