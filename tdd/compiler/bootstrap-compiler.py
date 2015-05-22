@@ -19,8 +19,6 @@ class SingleToken(object):
         self.token = token
     def parse(self):
         return self.token
-    def __repr__(self):
-        return "\"" + self.token + "\""
     def tocode(self):
         if self.token == "args[2]":
             return "sys.argv[2]"
@@ -28,28 +26,24 @@ class SingleToken(object):
             return "sys.argv[3]"
         return self.token
 
-class Falsy(object):
-    def parse(self):
-        return Falsy()
-
 token = None
 def try_consume(regex):
     global position
     global token
     if position >= len(tokens):
-        return Falsy()
+        return None
     token = tokens[position]
     if re.match(regex, token):
         position += 1
         return SingleToken(token)
-    return Falsy()
+    return None
 
 def backtrack(fn):
     def wrapper(*args, **kwargs):
         global position
         orig_position = position
         result = fn(*args, **kwargs)
-        if isinstance(result, Falsy):
+        if result is None:
             position = orig_position
         return result
     return wrapper
@@ -62,10 +56,10 @@ class Or(object):
     def parse(self):
         for item in self.args:
             r = item.parse()
-            if not isinstance(r, Falsy):
+            if r is not None:
                 self.result = r
                 return r
-        return Falsy()
+        return None
 
 class Each(object):
     def __init__(self, *args):
@@ -76,14 +70,11 @@ class Each(object):
         ret = []
         for item in self.args:
             r = item.parse()
-            if isinstance(r, Falsy):
-                return Falsy()
+            if r is None:
+                return r
             ret.append(r)
 
         return ret
-
-    def __repr__(self):
-        return "Each: " + str(self.result)
 
 class ZeroOrOne(object):
     def __init__(self, arg):
@@ -91,7 +82,7 @@ class ZeroOrOne(object):
 
     def parse(self):
         r = self.arg.parse()
-        if isinstance(r, Falsy):
+        if r is None:
             return []
         return r
 
@@ -105,14 +96,11 @@ class ZeroOrMore(object):
         ret = []
         while not done:
             r = self.arg.parse()
-            if not isinstance(r, Falsy):
+            if r is not None:
                 ret.append(r)
             else:
                 done = True
         return ret
-
-    def __repr__(self):
-        return "Or: " + str(self.item)
 
 class OneOrMore(object):
     def __init__(self, arg):
@@ -127,9 +115,6 @@ class literal(object):
 
     def parse(self):
         return try_consume(self.regex)
-
-    def __repr__(self):
-        return str(self.item)
 
 word = literal("[a-z\[\]]+") # TODO: "literal" dup'd
 equals = literal("=")
@@ -147,12 +132,9 @@ backtick = literal("`[^`]+`");
 class assignment(object):
     def parse(self):
         self.result = Each(word, equals, Or(statement(), word)).parse()
-        if isinstance(self.result, Falsy):
+        if self.result is None:
             return self.result
         return self
-
-    def __repr__(self):
-        return "Assignment: " + str(self.result)
 
     def tocode(self):
         return indent + tocode(self.result[0]) + " = " + tocode(self.result[2])
@@ -168,7 +150,7 @@ class arg_list(object):
 class function_definition(object):
     def parse(self):
         self.result = Each(word, equals, open_paren, arg_list(), close_paren, open_brace, statements(), close_brace).parse()
-        if isinstance(self.result, Falsy): # TODO: lots of these checks dup'd
+        if self.result is None: # TODO: lots of these checks dup'd
             return self.result
         return self
 
@@ -182,7 +164,7 @@ class function_definition(object):
 class function_invocation(object):
     def parse(self):
         self.result = Each(word, open_paren, arg_list(), close_paren).parse()
-        if isinstance(self.result, Falsy):
+        if self.result is None:
             return self.result
         return self
 
@@ -192,7 +174,7 @@ class function_invocation(object):
 class invoke_system(object):
     def parse(self):
         self.result = backtick.parse()
-        if isinstance(self.result, Falsy):
+        if self.result is None:
             return self.result
         return self
     def tocode(self):
@@ -214,11 +196,8 @@ class statement_with_semi(object):
 class statements(object):
     def parse(self):
         self.result = ZeroOrMore(statement_with_semi()).parse()
-        if isinstance(self.result, Falsy):
-            return self.result
         return self
-    def __repr__(self):
-        return "statements: " + str(self.result)
+
     def tocode(self):
         ret = ""
         for stmt_with_semi in self.result:
@@ -228,8 +207,6 @@ class statements(object):
 class program(object):
     def parse(self):
         self.result = statements().parse()
-        if isinstance(self.result, Falsy):
-            return self.result
         return self
 
     def tocode(self):
