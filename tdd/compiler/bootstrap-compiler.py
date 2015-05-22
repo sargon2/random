@@ -41,7 +41,7 @@ def backtrack(fn):
         global position
         orig_position = position
         result = fn(*args, **kwargs)
-        if result == False or isinstance(result, Falsy):
+        if isinstance(result, Falsy):
             position = orig_position
         return result
     return wrapper
@@ -54,7 +54,7 @@ class Or(object):
     def get(self):
         for item in self.args:
             r = item.get()
-            if not r == False and not isinstance(r, Falsy):
+            if not isinstance(r, Falsy):
                 return r
         return Falsy()
 
@@ -67,7 +67,7 @@ class Each(object):
         ret = []
         for item in self.args:
             r = item.get()
-            if r == False or isinstance(r, Falsy):
+            if isinstance(r, Falsy):
                 return Falsy()
             ret.append(r)
         return ret
@@ -82,7 +82,7 @@ class ZeroOrMore(object):
         ret = []
         while not done:
             r = self.arg.get()
-            if not r == False and not isinstance(r, Falsy):
+            if not isinstance(r, Falsy):
                 ret.append(r)
             else:
                 done = True
@@ -107,6 +107,7 @@ semicolon = Literal(";")
 # TODO: class boilerplate dup'd
 # TODO: literals don't have () but classes do (neither should, really)
 # TODO: "get" is a terrible function name
+# TODO: return objects instead of lists
 class assignment(object):
     def get(self):
         return Each(word, equals, Or(statement(), word)).get()
@@ -121,7 +122,10 @@ class arg_list(object):
 
 class function_definition(object):
     def get(self):
-        return Each(word, equals, open_paren, arg_list(), close_paren, open_brace, statements(), close_brace).get()
+        result = Each(word, equals, open_paren, arg_list(), close_paren, open_brace, statements(), close_brace).get()
+        if not isinstance(result, Falsy):
+            print "function definition for", result[0]
+        return result
 
 class function_invocation(object):
     def get(self):
