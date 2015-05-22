@@ -46,33 +46,21 @@ def Each(*args):
             return False
     return True
 
-word = lambda: try_consume("[a-z\[\]]+") # TODO: lambda and try_consume are dup'd
-equals = lambda: try_consume("=")
-
-assignment = lambda: Each(word, equals, lambda: Or(statement, word))
-
-@backtrack
-def arg_list():
-    if not try_consume("[a-z]+"):
-        return False
-
-    arg = token
-
-    while remaining_arg():
+def ZeroOrMore(arg):
+    while arg():
         pass
     return True
 
-@backtrack
-def remaining_arg():
-    if not try_consume(","):
-        return False
+word = lambda: try_consume("[a-z\[\]]+") # TODO: lambda and try_consume are dup'd
+equals = lambda: try_consume("=")
+comma = lambda: try_consume(",")
 
-    if not try_consume("[a-z]+"):
-        return False
+assignment = lambda: Each(word, equals, lambda: Or(statement, word))
 
-    arg = token
+remaining_arg = lambda: Each(comma, word)
 
-    return True
+arg_list = lambda: Each(word, lambda: ZeroOrMore(remaining_arg))
+
 
 @backtrack
 def function_definition():
@@ -135,7 +123,6 @@ def statement():
 
     return False
 
-@backtrack
 def statements():
     done = False
     while not done:
