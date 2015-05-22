@@ -126,19 +126,33 @@ close_brace = literal("}")
 semicolon = literal(";")
 backtick = literal("`[^`]+`");
 
+def parse(ob):
+    ob.result = ob.defn().parse()
+    if ob.result is None:
+        return None
+    return ob
+
 # TODO: class boilerplate dup'd
 # TODO: literals don't have () but classes do (neither should, really)
 class assignment(object):
-    def parse(self):
-        self.result = Each(word, equals, Or(statement(), word)).parse()
-        return self # TODO: returning self is weird
+    def defn(self):
+        return Each(word, equals, Or(statement(), word))
+
+    def parse(self): # TODO: boilerplate
+        return parse(self)
 
     def tocode(self):
         return indent + tocode(self.result[0]) + " = " + tocode(self.result[2])
 
 class remaining_arg(object):
+    def defn(self):
+        return Each(comma, word)
+
     def parse(self):
-        return Each(comma, word).parse()
+        return parse(self)
+
+    def tocode(self): # TODO: lots of these dup'd
+        return tocode(self.result)
 
 class arg_list(object):
     def parse(self):
@@ -211,6 +225,8 @@ def remove_comments(string):
     return re.sub('#.*', '', string)
 
 def tocode(element):
+    if element is None:
+        return ""
     if isinstance(element, list):
         ret = ""
         for item in element:
