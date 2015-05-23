@@ -25,6 +25,8 @@ class SingleToken(object):
         if self.result == "args[3]":
             return "sys.argv[3]"
         return self.result
+    def __repr__(self):
+        return self.result
 
 token = None
 def try_consume(regex):
@@ -38,12 +40,20 @@ def try_consume(regex):
         return SingleToken(token)
     return None
 
+def is_bad_parse(result):
+    if result is None:
+        return True
+    if isinstance(result, list):
+        return False
+    if result.result is None:
+        return True
+
 def backtrack(fn):
     def wrapper(*args, **kwargs):
         global position
         orig_position = position
         result = fn(*args, **kwargs)
-        if result is None:
+        if is_bad_parse(result):
             position = orig_position
         return result
     return wrapper
@@ -55,8 +65,8 @@ class Or(object):
     @backtrack
     def parse(self):
         for item in self.args:
-            r = item.parse()
-            if r is not None and r.result is not None:
+            r = item().parse()
+            if not is_bad_parse(r):
                 self.result = r
                 return r
         return None
@@ -69,11 +79,12 @@ class Each(object):
     def parse(self):
         ret = []
         for item in self.args:
-            r = item.parse()
-            if r is None:
+            r = item().parse()
+            if is_bad_parse(r):
                 return r
             ret.append(r)
 
+        self.result = ret
         return ret
 
 class ZeroOrOne(object):
@@ -81,9 +92,11 @@ class ZeroOrOne(object):
         self.arg = arg
 
     def parse(self):
-        r = self.arg.parse()
-        if r is None:
+        r = self.arg().parse()
+        if is_bad_parse(r):
+            self.result = []
             return []
+        self.result = r
         return r
 
 class ZeroOrMore(object):
@@ -95,11 +108,12 @@ class ZeroOrMore(object):
         done = False
         ret = []
         while not done:
-            r = self.arg.parse()
-            if r is not None:
+            r = self.arg().parse()
+            if not is_bad_parse(r):
                 ret.append(r)
             else:
                 done = True
+        self.result = ret
         return ret
 
 class OneOrMore(object):
@@ -107,7 +121,7 @@ class OneOrMore(object):
         self.arg = arg
 
     def parse(self):
-        return Each(self.arg, ZeroOrMore(self.arg)).parse()
+        return Each(self.arg, lambda: ZeroOrMore(self.arg)).parse()
 
 class literal(object):
     def __init__(self, regex):
@@ -116,19 +130,20 @@ class literal(object):
     def parse(self):
         return try_consume(self.regex)
 
-word = literal("[a-z\[\]]+") # TODO: "literal" dup'd
-equals = literal("=")
-comma = literal(",")
-open_paren = literal("\(")
-close_paren = literal("\)")
-open_brace = literal("{")
-close_brace = literal("}")
-semicolon = literal(";")
-backtick = literal("`[^`]+`");
+# TODO: "lambda" dup'd
+word = lambda: literal("[a-z\[\]]+") # TODO: "literal" dup'd
+equals = lambda: literal("=")
+comma = lambda: literal(",")
+open_paren = lambda: literal("\(")
+close_paren = lambda: literal("\)")
+open_brace = lambda: literal("{")
+close_brace = lambda: literal("}")
+semicolon = lambda: literal(";")
+backtick = lambda: literal("`[^`]+`");
 
 def parse(ob):
     ob.result = ob.defn().parse()
-    if ob.result is None:
+    if is_bad_parse(ob.result):
         return None
     return ob
 
@@ -136,10 +151,11 @@ def parse(ob):
 # TODO: literals don't have () but classes do (neither should, really)
 class assignment(object):
     def defn(self):
-        return Each(word, equals, Or(statement(), word))
+        return Each(word, equals, lambda: Or(statement, word)) # TODO: 'lambda' shouldn't be there
 
     def parse(self): # TODO: boilerplate
-        return parse(self)
+        r = parse(self)
+        return r
 
     def tocode(self):
         return indent + tocode(self.result[0]) + " = " + tocode(self.result[2])
@@ -156,7 +172,7 @@ class remaining_arg(object):
 
 class arg_list(object):
     def defn(self):
-        return ZeroOrOne(Each(word, ZeroOrMore(remaining_arg())))
+        return ZeroOrOne(lambda: Each(word, lambda: ZeroOrMore(remaining_arg)))
 
     def parse(self):
         return parse(self)
@@ -166,7 +182,7 @@ class arg_list(object):
 
 class function_definition(object):
     def defn(self):
-        return Each(word, equals, open_paren, arg_list(), close_paren, open_brace, statements(), close_brace)
+        return Each(word, equals, open_paren, arg_list, close_paren, open_brace, statements, close_brace)
 
     def parse(self):
         return parse(self)
@@ -180,7 +196,7 @@ class function_definition(object):
 
 class function_invocation(object):
     def defn(self):
-        return Each(word, open_paren, arg_list(), close_paren)
+        return Each(word, open_paren, arg_list, close_paren)
 
     def parse(self):
         return parse(self)
@@ -190,7 +206,7 @@ class function_invocation(object):
 
 class invoke_system(object):
     def defn(self):
-        return backtick
+        return backtick()
 
     def parse(self):
         return parse(self)
@@ -205,37 +221,38 @@ class invoke_system(object):
 
 class statement(object):
     def defn(self):
-        return Or(function_definition(), function_invocation(), assignment(), invoke_system())
+        return Or(function_definition, function_invocation, assignment, invoke_system)
 
     def parse(self):
         return parse(self)
 
     def tocode(self):
-        return tocode(self.result)
+        r = tocode(self.result)
+        return r
 
 class statement_with_semi(object):
     def defn(self):
-        return Each(statement(), semicolon)
+        return Each(statement, semicolon)
 
     def parse(self):
-        self.result = self.defn().parse()
-        return self.result # TODO: should be 'return self' (actually should be like the other parse methods) (actually the whole method should be gone)
+        r = parse(self)
+        return r
 
     def tocode(self):
-        return tocode(self.result)
+        r = tocode(self.result[0]) + "\n" # strip semis
+        return r
 
 class statements(object):
     def defn(self):
-        return ZeroOrMore(statement_with_semi())
+        return ZeroOrMore(statement_with_semi)
 
     def parse(self):
-        return parse(self)
+        r = parse(self)
+        return r
 
     def tocode(self):
-        ret = ""
-        for stmt_with_semi in self.result:
-            ret += tocode(stmt_with_semi[0]) + "\n" # strip semicolons
-        return ret
+        r = tocode(self.result)
+        return r
 
 class program(object):
     def defn(self):
@@ -267,9 +284,7 @@ contents = remove_comments(contents)
 
 tokens = re.findall("[a-z0-9\[\]_]+|=|;|\(|\)|,|{|}|`[^`]+`", contents) # TODO: dup'd with literals above
 position = 0
-s = program()
-s.parse()
-parsed = s
+parsed = parse(program())
 if position < len(tokens):
     print "Parse error: tokens left, position is ", position
     print tokens[position:]
