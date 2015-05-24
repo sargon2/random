@@ -150,6 +150,7 @@ open_brace = lambda: literal("{")
 close_brace = lambda: literal("}")
 semicolon = lambda: literal(";")
 backtick = lambda: literal("`[^`]+`");
+return_word = lambda: literal("return")
 
 def parse(ob):
     if hasattr(ob, 'defn'): # TODO: reflection is bad..
@@ -207,9 +208,15 @@ class invoke_system(object):
         command = command.replace("}", " + \"")
         return indent + "os.system(\"" + command + "\")"
 
+class return_stmt(object):
+    def defn(self):
+        return Each(return_word, statement)
+    def tocode(self):
+        return indent + tocode(self.result)
+
 class statement(object):
     def defn(self):
-        return Or(function_definition, function_invocation, assignment, invoke_system)
+        return Or(function_definition, function_invocation, assignment, invoke_system, return_stmt)
 
     def tocode(self):
         return tocode(self.result)
@@ -252,7 +259,7 @@ def tocode(element):
 
 contents = remove_comments(contents)
 
-tokens = re.findall("[a-z0-9\[\]_]+|=|;|\(|\)|,|{|}|`[^`]+`", contents) # TODO: dup'd with literals above
+tokens = re.findall("[a-z0-9\[\]_]+|=|;|\(|\)|,|{|}|`[^`]+`|return", contents) # TODO: dup'd with literals above
 position = 0
 parsed = parse(program())
 if position < len(tokens):
