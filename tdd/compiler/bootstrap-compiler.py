@@ -56,7 +56,10 @@ def backtrack(fn):
         return result
     return wrapper
 
-class Or(object):
+def Or(*args):
+    return lambda: Or_ob(*args)
+
+class Or_ob(object):
     def __init__(self, *args):
         self.args = args
 
@@ -69,7 +72,9 @@ class Or(object):
                 return r
         return None
 
-class Each(object):
+def Each(*args):
+    return lambda: Each_ob(*args)
+class Each_ob(object):
     def __init__(self, *args):
         self.args = args
 
@@ -85,7 +90,9 @@ class Each(object):
         self.result = ret
         return ret
 
-class ZeroOrOne(object):
+def ZeroOrOne(*args):
+    return lambda: ZeroOrOne_ob(*args)
+class ZeroOrOne_ob(object):
     def __init__(self, arg):
         self.arg = arg
 
@@ -97,7 +104,10 @@ class ZeroOrOne(object):
         self.result = r
         return r
 
-class ZeroOrMore(object):
+def ZeroOrMore(*args):
+    return lambda: ZeroOrMore_ob(*args)
+
+class ZeroOrMore_ob(object):
 
     def __init__(self, arg):
         self.arg = arg
@@ -119,7 +129,7 @@ class OneOrMore(object):
         self.arg = arg
 
     def parse(self):
-        return parse(Each(self.arg, lambda: ZeroOrMore(self.arg)))
+        return parse(Each(self.arg, ZeroOrMore(self.arg)))
 
 class literal(object):
     def __init__(self, regex):
@@ -143,7 +153,7 @@ backtick = lambda: literal("`[^`]+`");
 
 def parse(ob):
     if hasattr(ob, 'defn'): # TODO: reflection is bad..
-        ob.result = parse(ob.defn())
+        ob.result = parse(ob.defn()())
     else:
         ob.result = ob.parse()
     if is_bad_parse(ob.result):
@@ -151,10 +161,9 @@ def parse(ob):
     return ob
 
 # TODO: class boilerplate dup'd
-# TODO: literals don't have () but classes do (neither should, really)
 class assignment(object):
     def defn(self):
-        return Each(word, equals, lambda: Or(statement, word)) # TODO: 'lambda' shouldn't be there
+        return Each(word, equals, Or(statement, word))
 
     def tocode(self):
         # TODO: result.result is weird
@@ -166,7 +175,7 @@ class remaining_arg(object):
 
 class arg_list(object):
     def defn(self):
-        return ZeroOrOne(lambda: Each(word, lambda: ZeroOrMore(remaining_arg)))
+        return ZeroOrOne(Each(word, ZeroOrMore(remaining_arg)))
 
 class function_definition(object):
     def defn(self):
@@ -188,7 +197,7 @@ class function_invocation(object):
 
 class invoke_system(object):
     def defn(self):
-        return backtick()
+        return backtick
 
     def tocode(self):
         global indent
@@ -218,7 +227,7 @@ class statements(object):
 
 class program(object):
     def defn(self):
-        return statements()
+        return statements
 
     def tocode(self):
         ret = "#!/usr/bin/env python\nimport sys\nimport os\n"
