@@ -12,8 +12,6 @@ with open(infile) as f:
 
 # TODO: globals are bad...
 
-indent = ""
-
 class SingleToken(object):
     def __init__(self, result):
         self.result = result
@@ -139,6 +137,8 @@ class literal(object):
         self.result = try_consume(self.regex)
         return self.result
 
+def indent_all(text):
+    return "\n".join(["    " + s for s in text.splitlines()])
 
 # TODO: "lambda" dup'd
 word = lambda: literal("[a-z\[\]]+") # TODO: "literal" dup'd
@@ -168,7 +168,7 @@ class assignment(object):
 
     def tocode(self):
         # TODO: result.result is weird
-        return indent + tocode(self.result.result[0]) + " = " + tocode(self.result.result[2])
+        return tocode(self.result.result[0]) + " = " + tocode(self.result.result[2])
 
 class remaining_arg(object):
     def defn(self):
@@ -183,43 +183,35 @@ class function_definition(object):
         return Each(word, equals, open_paren, arg_list, close_paren, open_brace, statements, close_brace)
 
     def tocode(self):
-        global indent
-        indent += "    "
-        ret = "def " + tocode(self.result.result[0]) + "(" + tocode(self.result.result[3]) + "):\n" + tocode(self.result.result[6]) + indent + "pass"
-        indent = indent[4:]
+        ret = "def " + tocode(self.result.result[0]) + "(" + tocode(self.result.result[3]) + "):\n"
+        ret = ret + indent_all(tocode(self.result.result[6]) + "pass")
         return ret
 
 class function_invocation(object):
     def defn(self):
         return Each(word, open_paren, arg_list, close_paren)
 
-    def tocode(self):
-        return indent + tocode(self.result) # TODO: statement should be the only thing with indent on it...
-
 class invoke_system(object):
     def defn(self):
         return backtick
 
     def tocode(self):
-        global indent
         command = tocode(self.result)
         command = command[1:-1] # strip backticks
         command = command.replace("{", "\" + ")
         command = command.replace("}", " + \"")
-        return indent + "os.system(\"" + command + "\")"
+        return "os.system(\"" + command + "\")"
 
 class return_stmt(object):
     def defn(self):
         return Each(return_word, statement)
+
     def tocode(self):
-        return indent + tocode(self.result)
+        return tocode(self.result.result[0]) + " " + tocode(self.result.result[1])
 
 class statement(object):
     def defn(self):
         return Or(function_definition, function_invocation, assignment, invoke_system, return_stmt)
-
-    def tocode(self):
-        return tocode(self.result)
 
 class statement_with_semi(object):
     def defn(self):
