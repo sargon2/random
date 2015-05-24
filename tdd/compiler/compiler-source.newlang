@@ -18,7 +18,8 @@ write_file = (filename, contents) {
 write_tempfile = (contents) {
     # TODO
     filename = tempfile();
-    return write_file(filename, contents);
+    write_file(filename, contents);
+    return filename;
 };
 
 write_executable = (assembly, outfile) {

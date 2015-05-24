@@ -172,9 +172,13 @@ def parse(ob):
         return None
     return ob
 
+class statement_or_word(object):
+    def defn(self):
+        return Or(statement, word)
+
 class assignment(object):
     def defn(self):
-        return Each(word, equals, Or(statement, word))
+        return Each(word, equals, statement_or_word)
 
     def tocode(self):
         # TODO: result.result is weird
@@ -194,7 +198,11 @@ class function_definition(object):
 
     def tocode(self):
         ret = "def " + tocode(self.result.result[0]) + "(" + tocode(self.result.result[3]) + "):\n"
-        ret = ret + indent_all(tocode(self.result.result[6]) + "pass")
+        inner = tocode(self.result.result[6])
+        if inner:
+            ret = ret + indent_all(tocode(self.result.result[6]))
+        else:
+            ret = ret + indent_all("pass")
         return ret
 
 class function_invocation(object):
@@ -214,7 +222,7 @@ class invoke_system(object):
 
 class return_stmt(object):
     def defn(self):
-        return Each(return_word, statement)
+        return Each(return_word, statement_or_word)
 
     def tocode(self):
         return tocode(self.result.result[0]) + " " + tocode(self.result.result[1])
