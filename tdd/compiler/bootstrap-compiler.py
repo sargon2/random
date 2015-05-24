@@ -10,7 +10,7 @@ infile = sys.argv[3]
 with open(infile) as f:
     contents = f.read()
 
-# TODO: globals are bad...
+# TODO: globals are bad, make a class so they can be instance variables instead
 
 class SingleToken(object):
     def __init__(self, result):
@@ -66,7 +66,7 @@ class Or_ob(object):
         for item in self.args:
             if isinstance(item, str):
                 item = literal(item)
-            r = parse(item())
+            r = parse(item)
             if not is_bad_parse(r):
                 self.result = r
                 return r
@@ -84,7 +84,7 @@ class Each_ob(object):
         for item in self.args:
             if isinstance(item, str):
                 item = literal(item)
-            r = parse(item())
+            r = parse(item)
             if is_bad_parse(r):
                 return r
             ret.append(r)
@@ -99,7 +99,7 @@ class ZeroOrOne_ob(object):
         self.arg = arg
 
     def parse(self):
-        r = parse(self.arg())
+        r = parse(self.arg)
         if is_bad_parse(r):
             self.result = []
             return []
@@ -118,7 +118,7 @@ class ZeroOrMore_ob(object):
         done = False
         ret = []
         while not done:
-            r = parse(self.arg())
+            r = parse(self.arg)
             if not is_bad_parse(r):
                 ret.append(r)
             else:
@@ -126,7 +126,7 @@ class ZeroOrMore_ob(object):
         self.result = ret
         return ret
 
-class OneOrMore(object):
+class OneOrMore_ob(object):
     def __init__(self, arg):
         self.arg = arg
 
@@ -162,11 +162,10 @@ literals = [word, equals, comma, open_paren, close_paren, open_brace, close_brac
 def parse(ob):
     if isinstance(ob, str):
         ob = literal(ob)
+    ob = ob()
     if hasattr(ob, 'defn'): # TODO: reflection is bad..
         defn = ob.defn()
-        if isinstance(defn, str):
-            defn = literal(defn)
-        ob.result = parse(defn())
+        ob.result = parse(defn)
     else:
         ob.result = ob.parse()
     if is_bad_parse(ob.result):
@@ -265,7 +264,7 @@ contents = remove_comments(contents)
 all_literals = "|".join(literals)
 tokens = re.findall(all_literals, contents)
 position = 0
-parsed = parse(program())
+parsed = parse(program)
 if position < len(tokens):
     print "Parse error: tokens left, position is ", position
     print tokens[position:]
