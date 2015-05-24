@@ -64,6 +64,8 @@ class Or_ob(object):
     @backtrack
     def parse(self):
         for item in self.args:
+            if isinstance(item, str):
+                item = literal(item)
             r = parse(item())
             if not is_bad_parse(r):
                 self.result = r
@@ -80,6 +82,8 @@ class Each_ob(object):
     def parse(self):
         ret = []
         for item in self.args:
+            if isinstance(item, str):
+                item = literal(item)
             r = parse(item())
             if is_bad_parse(r):
                 return r
@@ -129,7 +133,9 @@ class OneOrMore(object):
     def parse(self):
         return parse(Each(self.arg, ZeroOrMore(self.arg)))
 
-class literal(object):
+def literal(*args):
+    return lambda: literal_ob(*args)
+class literal_ob(object):
     def __init__(self, regex):
         self.regex = regex
 
@@ -140,28 +146,33 @@ class literal(object):
 def indent_all(text):
     return "\n".join(["    " + s for s in text.splitlines()])
 
-# TODO: "lambda" dup'd
-word = lambda: literal("[a-z\[\]]+") # TODO: "literal" dup'd
-equals = lambda: literal("=")
-comma = lambda: literal(",")
-open_paren = lambda: literal("\(")
-close_paren = lambda: literal("\)")
-open_brace = lambda: literal("{")
-close_brace = lambda: literal("}")
-semicolon = lambda: literal(";")
-backtick = lambda: literal("`[^`]+`");
-return_word = lambda: literal("return")
+word = "[a-z0-9\[\]_]+"
+equals = "="
+comma = ","
+open_paren = "\("
+close_paren = "\)"
+open_brace = "{"
+close_brace = "}"
+semicolon = ";"
+backtick = "`[^`]+`"
+return_word = "return"
+
+literals = [word, equals, comma, open_paren, close_paren, open_brace, close_brace, semicolon, backtick, return_word]
 
 def parse(ob):
+    if isinstance(ob, str):
+        ob = literal(ob)
     if hasattr(ob, 'defn'): # TODO: reflection is bad..
-        ob.result = parse(ob.defn()())
+        defn = ob.defn()
+        if isinstance(defn, str):
+            defn = literal(defn)
+        ob.result = parse(defn())
     else:
         ob.result = ob.parse()
     if is_bad_parse(ob.result):
         return None
     return ob
 
-# TODO: class boilerplate dup'd
 class assignment(object):
     def defn(self):
         return Each(word, equals, Or(statement, word))
@@ -251,7 +262,8 @@ def tocode(element):
 
 contents = remove_comments(contents)
 
-tokens = re.findall("[a-z0-9\[\]_]+|=|;|\(|\)|,|{|}|`[^`]+`|return", contents) # TODO: dup'd with literals above
+all_literals = "|".join(literals)
+tokens = re.findall(all_literals, contents)
 position = 0
 parsed = parse(program())
 if position < len(tokens):
