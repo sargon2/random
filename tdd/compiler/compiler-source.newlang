@@ -3,31 +3,15 @@ outfile = args[2];
 infile = args[3];
 
 make_assembly = (infile) {
+    infile_contents = read_file(infile);
     # TODO
-};
-
-# TODO: a lot of these functions should be in a central library somewhere...
-tempfile = () {
-    # TODO
-};
-
-write_file = (filename, contents) {
-    # TODO
-};
-
-write_tempfile = (contents) {
-    # TODO
-    filename = tempfile();
-    write_file(filename, contents);
-    return filename;
 };
 
 write_executable = (assembly, outfile) {
-    # Write to file
-    assembly_file = write_tempfile(assembly);
-
     # Invoke gcc to assemble
-    `gcc -o {outfile} {assembly_file}`;
+    # `gcc -o {outfile} {assembly_file}`;
+    # TDOO: after stdin works, remove echo hi |
+    `echo hi | gcc -x assembler -o {outfile} -`(assembly);
 };
 
 assembly = make_assembly(infile);

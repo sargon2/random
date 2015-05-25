@@ -156,8 +156,9 @@ close_brace = "}"
 semicolon = ";"
 backtick = "`[^`]+`"
 return_word = "return"
+string = "\"[^\"]*\""
 
-literals = [word, equals, comma, open_paren, close_paren, open_brace, close_brace, semicolon, backtick, return_word]
+literals = [word, equals, comma, open_paren, close_paren, open_brace, close_brace, semicolon, backtick, return_word, string]
 
 def parse(ob):
     if isinstance(ob, str):
@@ -172,13 +173,13 @@ def parse(ob):
         return None
     return ob
 
-class statement_or_word(object):
+class assignable_value(object):
     def defn(self):
-        return Or(statement, word)
+        return Or(statement, word, string_def)
 
 class assignment(object):
     def defn(self):
-        return Each(word, equals, statement_or_word)
+        return Each(word, equals, assignable_value)
 
     def tocode(self):
         # TODO: result.result is weird
@@ -211,18 +212,24 @@ class function_invocation(object):
 
 class invoke_system(object):
     def defn(self):
-        return backtick
+        return Each(backtick, ZeroOrOne(Each(open_paren, arg_list, close_paren)))
 
     def tocode(self):
-        command = tocode(self.result)
+        # TODO: wow. Should be self.result[1]
+        assembly_var = repr(self.result.result[1].result.result[1].result.result.result[0].result)
+        command = tocode(self.result.result[0])
         command = command[1:-1] # strip backticks
         command = command.replace("{", "\" + ")
         command = command.replace("}", " + \"")
-        return "os.system(\"" + command + "\")"
+        return "#TODO: input '" + assembly_var + "'\nos.system(\"" + command + "\")"
+
+class string_def(object):
+    def defn(self):
+        return string
 
 class return_stmt(object):
     def defn(self):
-        return Each(return_word, statement_or_word)
+        return Each(return_word, assignable_value)
 
     def tocode(self):
         return tocode(self.result.result[0]) + " " + tocode(self.result.result[1])
