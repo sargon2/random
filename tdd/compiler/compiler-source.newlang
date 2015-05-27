@@ -25,8 +25,7 @@ make_assembly = (infile) {
 write_executable = (assembly, outfile) {
     # Invoke gcc to assemble
     # `gcc -o {outfile} {assembly_file}`;
-    # TODO: after stdin works, remove echo hi |
-    `echo hi | gcc -x assembler -o {outfile} -`(assembly);
+    `gcc -x assembler -o {outfile} -`(assembly);
 };
 
 assembly = make_assembly(infile);

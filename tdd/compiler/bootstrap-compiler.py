@@ -219,7 +219,7 @@ class invoke_system(object):
         command = command[1:-1] # strip backticks
         command = command.replace("{", "\" + ")
         command = command.replace("}", " + \"")
-        return "#TODO: input '" + assembly_var + "'\nos.system(\"" + command + "\")"
+        return "p = subprocess.Popen(\"" + command + "\", stdin=subprocess.PIPE, shell=True)\np.communicate(input=" + assembly_var + ")"
 
 class string_def(object):
     def defn(self):
@@ -268,7 +268,15 @@ class program(object):
         return statements
 
     def tocode(self):
-        ret = "#!/usr/bin/env python\nimport sys\nimport os\n"
+        ret = """#!/usr/bin/env python
+import sys
+import os
+import subprocess
+
+def read_file(arg):
+    with open(arg) as f:
+        return f.read()
+"""
         ret += tocode(self.result)
         return ret
 
