@@ -2,6 +2,21 @@
 outfile = args[2];
 infile = args[3];
 
+word = "[a-z0-9\[\]_]+";
+equals = "=";
+comma = ",";
+open_paren = "\(";
+close_paren = "\)";
+open_brace = "{";
+close_brace = "}";
+semicolon = ";";
+backtick = "`[^`]+`";
+return_word = "return";
+# string = "\"[^\"]*\"";
+
+# literals = [word, equals, comma, open_paren, close_paren, open_brace, close_brace, semicolon, backtick, return_word, string];
+literals = [word, equals, comma, open_paren, close_paren, open_brace, close_brace, semicolon, backtick, return_word];
+
 make_assembly = (infile) {
     infile_contents = read_file(infile);
     # TODO
@@ -10,7 +25,7 @@ make_assembly = (infile) {
 write_executable = (assembly, outfile) {
     # Invoke gcc to assemble
     # `gcc -o {outfile} {assembly_file}`;
-    # TDOO: after stdin works, remove echo hi |
+    # TODO: after stdin works, remove echo hi |
     `echo hi | gcc -x assembler -o {outfile} -`(assembly);
 };
 

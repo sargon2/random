@@ -16,10 +16,6 @@ class SingleToken(object):
     def __init__(self, result):
         self.result = result
     def tocode(self):
-        if self.result == "args[2]":
-            return "sys.argv[2]"
-        if self.result == "args[3]":
-            return "sys.argv[3]"
         return self.result
     def __repr__(self):
         return self.result
@@ -146,7 +142,7 @@ class literal_ob(object):
 def indent_all(text):
     return "\n".join(["    " + s for s in text.splitlines()])
 
-word = "[a-z0-9\[\]_]+"
+word = "[a-z0-9_]+"
 equals = "="
 comma = ","
 open_paren = "\("
@@ -157,8 +153,10 @@ semicolon = ";"
 backtick = "`[^`]+`"
 return_word = "return"
 string = "\"[^\"]*\""
+open_bracket = "\["
+close_bracket = "\]"
 
-literals = [word, equals, comma, open_paren, close_paren, open_brace, close_brace, semicolon, backtick, return_word, string]
+literals = [word, equals, comma, open_paren, close_paren, open_brace, close_brace, semicolon, backtick, return_word, string, open_bracket, close_bracket]
 
 def parse(ob):
     if isinstance(ob, str):
@@ -175,7 +173,7 @@ def parse(ob):
 
 class assignable_value(object):
     def defn(self):
-        return Or(statement, word, string_def)
+        return Or(string_def, array_def, array_ref, statement, word)
 
 class assignment(object):
     def defn(self):
@@ -226,6 +224,22 @@ class invoke_system(object):
 class string_def(object):
     def defn(self):
         return string
+
+class array_def(object):
+    def defn(self):
+        return Each(open_bracket, arg_list, close_bracket)
+
+class array_ref(object):
+    def defn(self):
+        return Each(word, open_bracket, assignable_value, close_bracket)
+    def tocode(self):
+        ret = ""
+        ary = tocode(self.result.result[0])
+        if ary == "args":
+            ary = "sys.argv"
+        ret += ary
+        ret += tocode(self.result.result[1:4])
+        return ret
 
 class return_stmt(object):
     def defn(self):
