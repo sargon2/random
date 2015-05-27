@@ -7,3 +7,4 @@ a.out
 .ropeproject
 *.lprof
 *.so
+tdd/compiler/compile
