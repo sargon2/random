@@ -26,7 +26,6 @@ make_assembly = (infile) {
 
 write_executable = (assembly, outfile) {
     # Invoke gcc to assemble
-    # `gcc -o {outfile} {assembly_file}`;
     `gcc -x assembler -o {outfile} -`(assembly);
 };
 
