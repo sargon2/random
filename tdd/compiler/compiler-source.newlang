@@ -34,7 +34,7 @@ tocode = (ast) {
 };
 
 parse = (grammar) {
-    grammar = grammar(); # TODO: instantiating grammar is a weird python side effect
+    grammar = grammar();
     defn = grammar.defn();
     return parse(defn);
 };

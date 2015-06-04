@@ -139,8 +139,8 @@ class literal_ob(object):
         self.result = try_consume(self.regex)
         return self.result
 
-def indent_all(text):
-    return "\n".join(["    " + s for s in text.splitlines()])
+def indent_all(text, num=1):
+    return "\n".join([("    "*num) + s for s in text.splitlines()])
 
 word = "[a-z0-9_]+"
 equals = "="
@@ -197,17 +197,32 @@ class function_definition(object):
         return Each(word, equals, open_paren, arg_list, close_paren, open_brace, statements, close_brace)
 
     def tocode(self):
-        ret = "def " + tocode(self.result.result[0]) + "(" + tocode(self.result.result[3]) + "):\n"
+        class_name = tocode(self.result.result[0])
+        arg_list = tocode(self.result.result[3])
+        method_body = tocode(self.result.result[6])
+
+        ret = "class " + class_name + "():\n"
+        ret += "    def invoke(self, " + arg_list + "):\n"
         inner = tocode(self.result.result[6])
         if inner:
-            ret = ret + indent_all(tocode(self.result.result[6]))
+            ret = ret + indent_all(method_body, 2)
         else:
-            ret = ret + indent_all("pass")
+            ret = ret + indent_all("pass", 2)
+        ret += "\n" # TODO: why is this needed?
+        ret += indent_all("return self", 2) # If there's a return statement before this, that will take effect.  If there's no return statement, assume we're instantiating an "object".
+        ret += "\n" + class_name + " = " + class_name + "()"
+        ret += "\nself." + class_name + " = " + class_name
         return ret
 
 class function_invocation(object):
     def defn(self):
         return Each(word, open_paren, arg_list, close_paren)
+
+    def tocode(self):
+        function_name = tocode(self.result.result[0])
+        args = tocode(self.result.result[2])
+
+        return function_name + ".invoke(" + args + ")"
 
 class method_invocation(object):
     def defn(self):
@@ -251,7 +266,9 @@ class return_stmt(object):
         return Each(return_word, assignable_value)
 
     def tocode(self):
-        return tocode(self.result.result[0]) + " " + tocode(self.result.result[1])
+        returning = tocode(self.result.result[1])
+        ret = "self.final_result = " + returning
+        return ret
 
 class statement(object):
     def defn(self):
@@ -278,11 +295,17 @@ import sys
 import os
 import subprocess
 
-def read_file(arg):
-    with open(arg) as f:
-        return f.read()
+class read_file(object):
+    def invoke(self, arg):
+        with open(arg) as f:
+            return f.read()
+read_file = read_file()
+
+class everything(object):
+    def invoke(self):
 """
-        ret += tocode(self.result)
+        ret += indent_all(tocode(self.result), 2)
+        ret += "\neverything().invoke()"
         return ret
 
 
