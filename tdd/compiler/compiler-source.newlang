@@ -17,11 +17,32 @@ return_word = "return";
 # literals = [word, equals, comma, open_paren, close_paren, open_brace, close_brace, semicolon, backtick, return_word, string];
 literals = [word, equals, comma, open_paren, close_paren, open_brace, close_brace, semicolon, backtick, return_word];
 
+statements = () {
+};
+
+program = () {
+    defn = () {
+        return statements;
+    };
+
+    tocode = () {
+        return ".global main\nmain:\n";
+    };
+};
+
+tocode = (ast) {
+};
+
+parse = (grammar) {
+    grammar = grammar(); # TODO: instantiating grammar is a weird python side effect
+    defn = grammar.defn();
+    return parse(defn);
+};
+
 make_assembly = (infile) {
     infile_contents = read_file(infile);
-    assembly = ".global main\nmain:\n";
-    # TODO
-    return assembly;
+    parse_tree = parse(program);
+    return tocode(parse_tree);
 };
 
 write_executable = (assembly, outfile) {

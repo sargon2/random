@@ -155,8 +155,9 @@ return_word = "return"
 string = "\"[^\"]*\""
 open_bracket = "\["
 close_bracket = "\]"
+period = "\."
 
-literals = [word, equals, comma, open_paren, close_paren, open_brace, close_brace, semicolon, backtick, return_word, string, open_bracket, close_bracket]
+literals = [word, equals, comma, open_paren, close_paren, open_brace, close_brace, semicolon, backtick, return_word, string, open_bracket, close_bracket, period]
 
 def parse(ob):
     if isinstance(ob, str):
@@ -208,6 +209,10 @@ class function_invocation(object):
     def defn(self):
         return Each(word, open_paren, arg_list, close_paren)
 
+class method_invocation(object):
+    def defn(self):
+        return Each(word, period, function_invocation)
+
 class invoke_system(object):
     def defn(self):
         return Each(backtick, ZeroOrOne(Each(open_paren, arg_list, close_paren)))
@@ -250,7 +255,7 @@ class return_stmt(object):
 
 class statement(object):
     def defn(self):
-        return Or(function_definition, function_invocation, assignment, invoke_system, return_stmt)
+        return Or(function_definition, function_invocation, method_invocation, assignment, invoke_system, return_stmt)
 
 class statement_with_semi(object):
     def defn(self):
