@@ -2,7 +2,7 @@
 outfile = args[2];
 infile = args[3];
 
-word = "[a-z0-9\[\]_]+";
+word = "[a-zA-Z0-9\[\]_]+";
 equals = "=";
 comma = ",";
 open_paren = "\(";
@@ -17,7 +17,29 @@ return_word = "return";
 # literals = [word, equals, comma, open_paren, close_paren, open_brace, close_brace, semicolon, backtick, return_word, string];
 literals = [word, equals, comma, open_paren, close_paren, open_brace, close_brace, semicolon, backtick, return_word];
 
+zeroOrMore = (grammar) {
+    return grammar;
+};
+
+each = (arg1, arg2) {
+    return 3; # TODO
+};
+
+statement = () {
+    defn = () {
+    };
+};
+
+statement_with_semi = () {
+    defn = () {
+        return each(statement, semicolon);
+    };
+};
+
 statements = () {
+    defn = () {
+        return zeroOrMore(statement_with_semi);
+    };
 };
 
 program = () {

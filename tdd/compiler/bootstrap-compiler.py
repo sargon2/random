@@ -142,7 +142,7 @@ class literal_ob(object):
 def indent_all(text, num=1):
     return "\n".join([("    "*num) + s for s in text.splitlines()])
 
-word = "[a-z0-9_]+"
+word = "[a-zA-Z0-9_]+"
 equals = "="
 comma = ","
 open_paren = "\("
@@ -203,13 +203,14 @@ class function_definition(object):
 
         ret = "class " + class_name + "():\n"
         ret += "    def invoke(self, " + arg_list + "):\n"
+        ret += "        self.final_result = self\n" # if there's no return statement, it's a constructor
         inner = tocode(self.result.result[6])
         if inner:
             ret = ret + indent_all(method_body, 2)
         else:
             ret = ret + indent_all("pass", 2)
         ret += "\n" # TODO: why is this needed?
-        ret += indent_all("return self", 2) # If there's a return statement before this, that will take effect.  If there's no return statement, assume we're instantiating an "object".
+        ret += indent_all("return self", 2)
         ret += "\n" + class_name + " = " + class_name + "()"
         ret += "\nself." + class_name + " = " + class_name
         return ret
@@ -222,7 +223,7 @@ class function_invocation(object):
         function_name = tocode(self.result.result[0])
         args = tocode(self.result.result[2])
 
-        return function_name + ".invoke(" + args + ")"
+        return function_name + ".invoke(" + args + ").final_result"
 
 class method_invocation(object):
     def defn(self):
@@ -298,7 +299,8 @@ import subprocess
 class read_file(object):
     def invoke(self, arg):
         with open(arg) as f:
-            return f.read()
+            self.final_result = f.read()
+            return self
 read_file = read_file()
 
 class everything(object):
