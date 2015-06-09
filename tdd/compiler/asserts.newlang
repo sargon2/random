@@ -1,0 +1,4 @@
+assert(true);
+assert(not(false));
+assert(equals(1, 1));
+assert(not(equals(1, 2)));
