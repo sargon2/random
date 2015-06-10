@@ -12,29 +12,13 @@ with open(infile) as f:
 
 # TODO: globals are bad, make a class so they can be instance variables instead
 
-# TODO: all the lambdas are weird.  It would be better to have item_ob and item = item_ob() at least (i.e. remove the instantiation call from parse())
-# TODO: pass the code around instead of making it global -- should remove the need for backtrack
-# TODO: keep track of position and matchlen instead of using re.findall() (re.findall() dups the re checks)
-
-class SingleToken(object):
+class SingleToken(object): # TODO: we probably don't need both this and literal
     def __init__(self, result):
         self.result = result
     def tocode(self):
         return self.result
     def __repr__(self):
         return self.result
-
-token = None
-def try_consume(regex):
-    global position
-    global token
-    if position >= len(tokens):
-        return None
-    token = tokens[position]
-    if re.match(regex, token):
-        position += 1
-        return SingleToken(token)
-    return None
 
 def is_bad_parse(result):
     if result is None:
@@ -44,16 +28,6 @@ def is_bad_parse(result):
     if result.result is None:
         return True
 
-def backtrack(fn):
-    def wrapper(*args, **kwargs):
-        global position
-        orig_position = position
-        result = fn(*args, **kwargs)
-        if is_bad_parse(result):
-            position = orig_position
-        return result
-    return wrapper
-
 def Or(*args):
     return lambda: Or_ob(*args)
 
@@ -61,14 +35,14 @@ class Or_ob(object):
     def __init__(self, *args):
         self.args = args
 
-    @backtrack
-    def parse(self):
+    def parse(self, code):
         for item in self.args:
             if isinstance(item, str):
                 item = literal(item)
-            r = parse(item)
+            r = parse(code, item)
             if not is_bad_parse(r):
                 self.result = r
+                self.matchlen = r.matchlen
                 return r
         return None
 
@@ -78,17 +52,21 @@ class Each_ob(object):
     def __init__(self, *args):
         self.args = args
 
-    @backtrack
-    def parse(self):
+    def parse(self, code):
+        total_matchlen = 0
         ret = []
         for item in self.args:
             if isinstance(item, str):
                 item = literal(item)
-            r = parse(item)
+            r = parse(code, item)
             if is_bad_parse(r):
                 return r
             ret.append(r)
+            matchlen = r.matchlen
+            total_matchlen += matchlen
+            code = code[matchlen:]
 
+        self.matchlen = total_matchlen
         self.result = ret
         return ret
 
@@ -98,12 +76,14 @@ class ZeroOrOne_ob(object):
     def __init__(self, arg):
         self.arg = arg
 
-    def parse(self):
-        r = parse(self.arg)
+    def parse(self, code):
+        r = parse(code, self.arg)
         if is_bad_parse(r):
+            self.matchlen = 0
             self.result = []
             return []
         self.result = r
+        self.matchlen = r.matchlen
         return r
 
 def ZeroOrMore(*args):
@@ -114,24 +94,30 @@ class ZeroOrMore_ob(object):
     def __init__(self, arg):
         self.arg = arg
 
-    def parse(self):
+    def parse(self, code):
+        total_matchlen = 0
         done = False
         ret = []
         while not done:
-            r = parse(self.arg)
+            r = parse(code, self.arg)
             if not is_bad_parse(r):
+                matchlen = r.matchlen
+                total_matchlen += matchlen
                 ret.append(r)
             else:
+                matchlen = 0
                 done = True
+            code = code[matchlen:]
         self.result = ret
+        self.matchlen = total_matchlen
         return ret
 
 class OneOrMore_ob(object):
     def __init__(self, arg):
         self.arg = arg
 
-    def parse(self):
-        return parse(Each(self.arg, ZeroOrMore(self.arg)))
+    def parse(self, code):
+        return parse(code, Each(self.arg, ZeroOrMore(self.arg)))
 
 def literal(*args):
     return lambda: literal_ob(*args)
@@ -139,8 +125,12 @@ class literal_ob(object):
     def __init__(self, regex):
         self.regex = regex
 
-    def parse(self):
-        self.result = try_consume(self.regex)
+    def parse(self, code):
+        match = re.match("^\s*(" + self.regex + ")", code)
+        if not match:
+            return None
+        self.result = SingleToken(match.group(1))
+        self.matchlen = len(match.group(0))
         return self.result
 
 def indent_all(text, num=1):
@@ -161,17 +151,22 @@ open_bracket = "\["
 close_bracket = "\]"
 period = "\."
 
-literals = [word, equals, comma, open_paren, close_paren, open_brace, close_brace, semicolon, backtick, return_word, string, open_bracket, close_bracket, period]
-
-def parse(ob):
+def parse(code, ob):
     if isinstance(ob, str):
         ob = literal(ob)
     ob = ob()
     if hasattr(ob, 'defn'): # TODO: reflection is bad..
         defn = ob.defn()
-        ob.result = parse(defn)
+        # We're using hasattr here as a check to see if we'll have a parse method.
+        # If we don't have a parse method, we call the global parse method.  This is simulating inheritance.
+        #
+        # Instead, make a container class that knows how to parse and takes an inner class as a constructor argument.
+        # Then, we shouldn't need the hasattr check.
+        ob.result = parse(code, defn)
+        if ob.result:
+            ob.matchlen = ob.result.matchlen
     else:
-        ob.result = ob.parse()
+        ob.result = ob.parse(code)
     if is_bad_parse(ob.result):
         return None
     return ob
@@ -332,13 +327,10 @@ def tocode(element):
 
 contents = remove_comments(contents)
 
-all_literals = "|".join(literals)
-tokens = re.findall(all_literals, contents)
-position = 0
-parsed = parse(program)
-if position < len(tokens):
-    print "Parse error: tokens left, position is ", position
-    print tokens[position:]
+parsed = parse(contents, program)
+#if position < len(tokens):
+#    print "Parse error: tokens left, position is ", position
+#    print tokens[position:]
 
 with open(outfile, "w") as f:
     f.write(parsed.tocode())
