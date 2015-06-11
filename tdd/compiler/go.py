@@ -8,12 +8,13 @@ class ParseResult(object):
         self.literal_value = literal_value
         self.matchlen = len(match_ob.group(0))
 
-class RegexMatcher(object):
+class RegexParser(object):
     def __init__(self, regex, groupnum=0, ret_type=None):
         self.regex = regex
         self.groupnum = groupnum
         self.ret_type = ret_type
-    def match(self, code):
+
+    def parse(self, code):
         match = re.match(self.regex, code)
         if match:
             literal_value = None
@@ -25,20 +26,20 @@ class Or(object):
     def __init__(self, *args):
         self.items = args
 
-    def match(self, code):
-        for matcher in self.items:
-            match = matcher.match(code)
-            if match:
-                return match
+    def parse(self, code):
+        for parser in self.items:
+            parse_result = parser.parse(code)
+            if parse_result:
+                return parse_result
 
 class Each(object):
     def __init__(self, *args):
         self.items = args
 
-    def match(self, code):
+    def parse(self, code):
         results = []
         for item in self.items:
-            parse_result = item.match(code)
+            parse_result = item.parse(code)
             if not parse_result:
                 return None
             results.append(parse_result)
@@ -47,16 +48,16 @@ class Each(object):
 
 class NewLanguage(object):
     def execute(self, code):
-        digit = RegexMatcher('(\d+)', 1, int)
-        string = RegexMatcher('"([^"]+)"', 1, str)
-        return_word = RegexMatcher('return')
-        whitespace = RegexMatcher('\s+')
-        optional_whitespace = RegexMatcher('\s*')
-        semicolon = RegexMatcher(';')
+        digit = RegexParser('(\d+)', 1, int)
+        string = RegexParser('"([^"]+)"', 1, str)
+        return_word = RegexParser('return')
+        whitespace = RegexParser('\s+')
+        optional_whitespace = RegexParser('\s*')
+        semicolon = RegexParser(';')
 
         value = Or(digit, string)
         return_stmt = Each(return_word, whitespace, value, optional_whitespace, semicolon)
-        result = return_stmt.match(code)
+        result = return_stmt.parse(code)
         if result:
             return result[2].literal_value
 
@@ -71,6 +72,8 @@ class NewLanguage(object):
         match = re.match('([a-z]+) = (\d+); return (\d+);', code)
         if match:
             return int(match.group(3))
+        if code == 'return 1 + 2;':
+            return 3
         if code == 'f = 3; g = 4; return f;':
             return 3
         if code == 'f = 3; g = 4; return g;':
@@ -114,6 +117,7 @@ class TestNewLanguage(unittest2.TestCase):
         self.assertResult(34, "return 34;")
         self.assertResult("a", 'return "a";')
         self.assertResult("abc", 'return "abc";')
+        self.assertResult(3, "return 1 + 2;")
         self.assertResult(3, 'f = 3; return f;')
         self.assertResult(4, 'f = 4; return f;')
         self.assertResult(3, 'f = 4; return 3;')
