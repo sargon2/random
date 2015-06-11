@@ -116,3 +116,9 @@ while(!done) { whatever; }
 do { whatever; } while(cond);
 
 
+About treating classes and functions the same again --
+They're still different.  Functions have a return statement.  Classes don't.  So if they're different, why not define them differently?
+Functions don't *have* to have a return statement.  Classes can't have one.
+That means you can make a function that acts like a class, and returns an object instead of itself.
+I could force objects to have "return self;" at the bottom of the constructor, or something along those lines...
+But, you can't take a function, and treat it like an object.
