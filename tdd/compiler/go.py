@@ -8,8 +8,19 @@ class ParseResult(object):
         self.literal_value = literal_value
         self.matchlen = len(match_ob.group(0))
 
+    def __repr__(self):
+        return "ParseResult('" + str(self.literal_value) + "')"
+
+class EOF(object):
+    def __init__(self):
+        self.matchlen = 0
+    def parse(self, code):
+        if code == '':
+            return self
+        return None
+
 class RegexParser(object):
-    def __init__(self, regex, groupnum=0, ret_type=None):
+    def __init__(self, regex, groupnum=0, ret_type=str):
         self.regex = regex
         self.groupnum = groupnum
         self.ret_type = ret_type
@@ -18,8 +29,7 @@ class RegexParser(object):
         match = re.match(self.regex, code)
         if match:
             literal_value = None
-            if self.ret_type:
-                literal_value = self.ret_type(match.group(self.groupnum))
+            literal_value = self.ret_type(match.group(self.groupnum))
             return ParseResult(match, literal_value)
 
 class Or(object):
@@ -31,6 +41,40 @@ class Or(object):
             parse_result = parser.parse(code)
             if parse_result:
                 return parse_result
+
+class ResultList(object):
+    def __init__(self, items):
+        self.items = items
+        total_matchlen = 0
+        for item in items:
+            total_matchlen += item.matchlen
+        self.matchlen = total_matchlen
+
+    def __getitem__(self, key):
+        return self.items[key]
+
+    def __repr__(self):
+        return repr(self.items)
+
+class ZeroOrMore(object):
+    def __init__(self, arg):
+        self.item = arg
+
+    def parse(self, code):
+        results = []
+        while(True):
+            result = self.item.parse(code)
+            if not result:
+                return ResultList(results)
+            code = code[result.matchlen:]
+            results.append(result)
+
+class OneOrMore(object):
+    def __init__(self, arg):
+        self.item = arg
+
+    def parse(self, code):
+        return Each(self.item, ZeroOrMore(self.item)).parse(code)
 
 class Each(object):
     def __init__(self, *args):
@@ -44,28 +88,34 @@ class Each(object):
                 return None
             results.append(parse_result)
             code = code[parse_result.matchlen:]
-        return results
+        return ResultList(results)
 
 class NewLanguage(object):
     def execute(self, code):
         digit = RegexParser('(\d+)', 1, int)
-        string = RegexParser('"([^"]+)"', 1, str)
+        string = RegexParser('"([^"]+)"', 1)
         return_word = RegexParser('return')
         whitespace = RegexParser('\s+')
         optional_whitespace = RegexParser('\s*')
         semicolon = RegexParser(';')
+        word = RegexParser('[a-z]+')
+        equals = RegexParser('=')
+        eof = EOF()
 
-        value = Or(digit, string)
+        value = Or(digit, string, word)
         return_stmt = Each(return_word, whitespace, value, optional_whitespace, semicolon)
-        result = return_stmt.parse(code)
+        assignment = Each(word, optional_whitespace, equals, optional_whitespace, value, semicolon)
+        statement = Each(Or(return_stmt, assignment), optional_whitespace)
+        statements = Each(optional_whitespace, OneOrMore(statement), eof)
+        result = statements.parse(code)
         if result:
-            return result[2].literal_value
+            # Option: traverse the AST, look for return statements
+            # Option: traverse the AST, interpret each node
+            # Option: make everything generate python, execute it
+            return result[1][0][0][2].literal_value
 
 
     def runNewLang(self, code):
-        result = self.execute(code)
-        if result:
-            return result
         match = re.match('([a-z]+) = (\d+); return ([a-z]+);', code)
         if match:
             return int(match.group(2))
@@ -82,6 +132,10 @@ class NewLanguage(object):
             return 3
         if code == 'f = (arg) { return arg; }; return f(3);':
             return 3
+
+        result = self.execute(code)
+        if result:
+            return result
 
 class TestNewLanguage(unittest2.TestCase):
     def runNewLang(self, code):
@@ -107,12 +161,14 @@ class TestNewLanguage(unittest2.TestCase):
         self.assertResult(1, "return 1;")
         self.assertResult(2, "return 2;")
         self.assertResult(1, "return  1;")
+        self.assertResult(1, "  return 1;  ")
         self.assertResult(1, "return  1 ;")
         self.assertIsParseError("return1;")
         self.assertIsParseError("return 1")
         self.assertIsParseError("")
         self.assertIsParseError(" ")
         self.assertIsParseError("\n")
+        self.assertResult(1, "return 1;return 2;")
         self.assertResult(1, "return 1; return 2;")
         self.assertResult(34, "return 34;")
         self.assertResult("a", 'return "a";')
