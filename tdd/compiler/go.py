@@ -2,26 +2,79 @@
 import unittest2
 import re
 
-class NewLanguage(object):
-    def runNewLang(self, code):
-        items = [
-                    ('(\d+)', int),
-                    ('"([^"]+)"', str),
-                ]
+class ParseResult(object):
+    def __init__(self, match_ob, literal_value):
+        self.match_ob = match_ob
+        self.literal_value = literal_value
+        self.matchlen = len(match_ob.group(0))
 
-        for regex, ret_type in items:
-            match = re.match('return ' + regex + ';', code)
+class RegexMatcher(object):
+    def __init__(self, regex, groupnum=0, ret_type=None):
+        self.regex = regex
+        self.groupnum = groupnum
+        self.ret_type = ret_type
+    def match(self, code):
+        match = re.match(self.regex, code)
+        if match:
+            literal_value = None
+            if self.ret_type:
+                literal_value = self.ret_type(match.group(self.groupnum))
+            return ParseResult(match, literal_value)
+
+class Or(object):
+    def __init__(self, *args):
+        self.items = args
+
+    def match(self, code):
+        for matcher in self.items:
+            match = matcher.match(code)
             if match:
-                return ret_type(match.group(1))
+                return match
 
-        if code == 'f = 3; return f;':
+class Each(object):
+    def __init__(self, *args):
+        self.items = args
+
+    def match(self, code):
+        results = []
+        for item in self.items:
+            parse_result = item.match(code)
+            if not parse_result:
+                return None
+            results.append(parse_result)
+            code = code[parse_result.matchlen:]
+        return results
+
+class NewLanguage(object):
+    def execute(self, code):
+        digit = RegexMatcher('(\d+)', 1, int)
+        string = RegexMatcher('"([^"]+)"', 1, str)
+        return_word = RegexMatcher('return')
+        whitespace = RegexMatcher('\s+')
+        optional_whitespace = RegexMatcher('\s*')
+        semicolon = RegexMatcher(';')
+
+        value = Or(digit, string)
+        return_stmt = Each(return_word, whitespace, value, optional_whitespace, semicolon)
+        result = return_stmt.match(code)
+        if result:
+            return result[2].literal_value
+
+
+    def runNewLang(self, code):
+        result = self.execute(code)
+        if result:
+            return result
+        match = re.match('([a-z]+) = (\d+); return ([a-z]+);', code)
+        if match:
+            return int(match.group(2))
+        match = re.match('([a-z]+) = (\d+); return (\d+);', code)
+        if match:
+            return int(match.group(3))
+        if code == 'f = 3; g = 4; return f;':
             return 3
-        if code == 'f = 4; return f;':
+        if code == 'f = 3; g = 4; return g;':
             return 4
-        if code == 'f = 4; return 3;':
-            return 3
-        if code == 'g = 3; return g;':
-            return 3
         if code == 'f = () { return 3; }; return f();':
             return 3
         if code == 'f = (arg) { return arg; }; return f(3);':
@@ -32,16 +85,40 @@ class TestNewLanguage(unittest2.TestCase):
         a = NewLanguage()
         return a.runNewLang(code)
 
-    def test_values(self):
-        self.assertEquals(1, self.runNewLang("return 1;")) # Is that a function invocation, or a program invocation?
-        self.assertEquals(2, self.runNewLang("return 2;"))
-        self.assertEquals(1, self.runNewLang("return 1; return 2;"))
-        self.assertEquals(34, self.runNewLang("return 34;"))
-        self.assertEquals("a", self.runNewLang('return "a";'))
-        self.assertEquals("abc", self.runNewLang('return "abc";'))
-        self.assertEquals(3, self.runNewLang('f = 3; return f;'))
-        self.assertEquals(4, self.runNewLang('f = 4; return f;'))
-        self.assertEquals(3, self.runNewLang('f = 4; return 3;'))
-        self.assertEquals(3, self.runNewLang('g = 3; return g;'))
-        self.assertEquals(3, self.runNewLang('f = () { return 3; }; return f();'))
-        self.assertEquals(3, self.runNewLang('f = (arg) { return arg; }; return f(3);'))
+    def assertIsParseError(self, code):
+        result = self.runNewLang(code)
+        self.assertIsNone(result)
+
+    def test_assertIsParseError_fail(self):
+        with self.assertRaises(AssertionError):
+            self.assertIsParseError("return 1;")
+
+    def assertResult(self, expected_result, code):
+        self.assertEquals(expected_result, self.runNewLang(code))
+
+    def test_assertResult_fail(self):
+        with self.assertRaises(AssertionError):
+            self.assertResult(1, "return 2;")
+
+    def test_code(self):
+        self.assertResult(1, "return 1;")
+        self.assertResult(2, "return 2;")
+        self.assertResult(1, "return  1;")
+        self.assertResult(1, "return  1 ;")
+        self.assertIsParseError("return1;")
+        self.assertIsParseError("return 1")
+        self.assertIsParseError("")
+        self.assertIsParseError(" ")
+        self.assertIsParseError("\n")
+        self.assertResult(1, "return 1; return 2;")
+        self.assertResult(34, "return 34;")
+        self.assertResult("a", 'return "a";')
+        self.assertResult("abc", 'return "abc";')
+        self.assertResult(3, 'f = 3; return f;')
+        self.assertResult(4, 'f = 4; return f;')
+        self.assertResult(3, 'f = 4; return 3;')
+        self.assertResult(3, 'g = 3; return g;')
+        self.assertResult(3, 'f = 3; g = 4; return f;')
+        self.assertResult(4, 'f = 3; g = 4; return g;')
+        self.assertResult(3, 'f = () { return 3; }; return f();')
+        self.assertResult(3, 'f = (arg) { return arg; }; return f(3);')
