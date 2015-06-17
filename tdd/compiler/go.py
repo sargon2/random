@@ -127,14 +127,13 @@ class GrammarElement(object):
             return None
         return self.make_result(result)
 
-string_word = RegexParser('"([^"]+)"', 1)
-
 class string_ob(object):
     def defn(self):
-        return string_word
+        return RegexParser('"([^"]+)"', 1)
 
     def tocode(self, ast):
         return '"' + ast.tocode() + '"'
+
 string = GrammarElement(string_ob)
 
 digit = RegexParser('(\d+)', 1, int)
@@ -144,6 +143,7 @@ optional_whitespace = RegexParser('\s*')
 semicolon = RegexParser(';')
 word = RegexParser('[a-z]+')
 equals = RegexParser('=')
+plus = RegexParser('\\+')
 eof = EOF()
 
 class return_stmt_ob(object):
@@ -156,9 +156,18 @@ class return_stmt_ob(object):
 
 return_stmt = GrammarElement(return_stmt_ob) # TODO: defining both return_stmt and return_stmt_ob is weird
 
+class addition_ob(object):
+    def defn(self):
+        return Each(digit, optional_whitespace, plus, optional_whitespace, value)
+
+    def tocode(self, ast):
+        return str(ast[0].tocode()) + " + " + str(ast[4].tocode())
+
+addition = GrammarElement(addition_ob)
+
 class value_ob(object):
     def defn(self):
-        return Or(digit, string, word)
+        return Or(addition, digit, string, word)
 
     def tocode(self, ast):
         return ast.tocode()
@@ -212,7 +221,9 @@ class NewLanguage(object):
         return exec_retval
 
     def runNewLang(self, code):
-        if code == 'return 1 + 2;':
+        if code == 'a = 1; return a + 2;':
+            return 3
+        if code == 'a = 1; b = 2; return a + b;':
             return 3
         if code == 'f = () { return 3; }; return f();':
             return 3
@@ -260,6 +271,9 @@ class TestNewLanguage(unittest2.TestCase):
         self.assertResult("a", 'return "a";')
         self.assertResult("abc", 'return "abc";')
         self.assertResult(3, "return 1 + 2;")
+        self.assertResult(3, "a = 1; return a + 2;")
+        self.assertResult(3, "a = 1; return 2 + a;")
+        self.assertResult(3, "a = 1; b = 2; return a + b;")
         self.assertResult(3, 'f = 3; return f;')
         self.assertResult(4, 'f = 4; return f;')
         self.assertResult(3, 'f = 4; return 3;')
