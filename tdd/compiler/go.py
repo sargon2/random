@@ -2,18 +2,26 @@
 import unittest2
 import re
 
+def indent(string):
+    ret = ""
+    lines = string.splitlines()
+    for line in lines:
+        ret += "    " + line + "\n"
+    return ret
+
 class ParseResult(object):
     def __init__(self, match_ob, literal_value):
         self.match_ob = match_ob
         self.literal_value = literal_value
         self.matchlen = len(match_ob.group(0))
 
-    def __repr__(self):
-        return "ParseResult('" + str(self.literal_value) + "')"
+    def tocode(self):
+        return self.literal_value
 
 class EOF(object):
     def __init__(self):
         self.matchlen = 0
+
     def parse(self, code):
         if code == '':
             return self
@@ -50,11 +58,14 @@ class ResultList(object):
             total_matchlen += item.matchlen
         self.matchlen = total_matchlen
 
+    def tocode(self):
+        code = ""
+        for item in self.items:
+            code += str(item.tocode())
+        return code
+
     def __getitem__(self, key):
         return self.items[key]
-
-    def __repr__(self):
-        return repr(self.items)
 
 class ZeroOrMore(object):
     def __init__(self, arg):
@@ -88,47 +99,121 @@ class Each(object):
                 return None
             results.append(parse_result)
             code = code[parse_result.matchlen:]
+
         return ResultList(results)
+
+class GrammarElementResult(object):
+    def __init__(self, inner, result):
+        self.result = result
+        self.inner = inner
+        self.matchlen = result.matchlen
+
+    def tocode(self):
+        return self.inner.tocode(self.result)
+
+class GrammarElement(object):
+    def __init__(self, inner):
+        self.inner = inner()
+
+    def defn(self):
+        return self.inner.defn()
+
+    def make_result(self, result):
+        return GrammarElementResult(self.inner, result)
+
+    def parse(self, code):
+        result = self.defn().parse(code)
+        if result is None:
+            return None
+        return self.make_result(result)
+
+string_word = RegexParser('"([^"]+)"', 1)
+
+class string_ob(object):
+    def defn(self):
+        return string_word
+
+    def tocode(self, ast):
+        return '"' + ast.tocode() + '"'
+string = GrammarElement(string_ob)
+
+digit = RegexParser('(\d+)', 1, int)
+return_word = RegexParser('return')
+whitespace = RegexParser('\s+')
+optional_whitespace = RegexParser('\s*')
+semicolon = RegexParser(';')
+word = RegexParser('[a-z]+')
+equals = RegexParser('=')
+eof = EOF()
+
+class return_stmt_ob(object):
+    def defn(self):
+        return Each(return_word, whitespace, value, optional_whitespace, semicolon)
+
+    def tocode(self, ast):
+        return "return " + str(ast[2].tocode()) + "\n"
+        return return_stmt_result(result)
+
+return_stmt = GrammarElement(return_stmt_ob) # TODO: defining both return_stmt and return_stmt_ob is weird
+
+class value_ob(object):
+    def defn(self):
+        return Or(digit, string, word)
+
+    def tocode(self, ast):
+        return ast.tocode()
+
+value = GrammarElement(value_ob)
+
+class assignment_ob(object):
+    def defn(self):
+        return Each(word, optional_whitespace, equals, optional_whitespace, value, semicolon)
+
+    def tocode(self, ast):
+        return ast[0].tocode() + " = " + str(ast[4].tocode()) + '\n'
+
+assignment = GrammarElement(assignment_ob)
+
+class statement_ob(object):
+    def defn(self):
+        return Each(Or(return_stmt, assignment), optional_whitespace)
+
+    def tocode(self, ast):
+        return ast[0].tocode()
+
+statement = GrammarElement(statement_ob)
+
+class statements_ob(object):
+    def defn(self):
+        return Each(optional_whitespace, OneOrMore(statement), eof)
+
+    def tocode(self, ast):
+        ret = "def outermost_function():\n"
+        ret += indent(ast[1].tocode()) # ignore leading whitespace and eof
+        ret += "exec_retval = outermost_function()"
+        return ret
+
+statements = GrammarElement(statements_ob)
 
 class NewLanguage(object):
     def execute(self, code):
-        digit = RegexParser('(\d+)', 1, int)
-        string = RegexParser('"([^"]+)"', 1)
-        return_word = RegexParser('return')
-        whitespace = RegexParser('\s+')
-        optional_whitespace = RegexParser('\s*')
-        semicolon = RegexParser(';')
-        word = RegexParser('[a-z]+')
-        equals = RegexParser('=')
-        eof = EOF()
 
-        # TODO: convert these to classes.  Instantiate them in the grammar.
-        # Then the classes' parse() methods can return ParseResult objects that contain the literal python code already generated.
-        value = Or(digit, string, word)
-        return_stmt = Each(return_word, whitespace, value, optional_whitespace, semicolon)
-        assignment = Each(word, optional_whitespace, equals, optional_whitespace, value, semicolon)
-        statement = Each(Or(return_stmt, assignment), optional_whitespace)
-        statements = Each(optional_whitespace, OneOrMore(statement), eof)
         result = statements.parse(code)
         if result:
-            # TODO: make everything generate python, execute it
-            # exec("a = 3"); print a => 3
-            return result[1][0][0][2].literal_value
+            code = result.tocode()
+            return self.exec_python(code)
 
+    def exec_python(self, code):
+        exec_retval = None
+        #print "code is:"
+        #print code
+        #print "end code"
+        exec(code)
+        return exec_retval
 
     def runNewLang(self, code):
-        match = re.match('([a-z]+) = (\d+); return ([a-z]+);', code)
-        if match:
-            return int(match.group(2))
-        match = re.match('([a-z]+) = (\d+); return (\d+);', code)
-        if match:
-            return int(match.group(3))
         if code == 'return 1 + 2;':
             return 3
-        if code == 'f = 3; g = 4; return f;':
-            return 3
-        if code == 'f = 3; g = 4; return g;':
-            return 4
         if code == 'f = () { return 3; }; return f();':
             return 3
         if code == 'f = (arg) { return arg; }; return f(3);':
@@ -152,7 +237,7 @@ class TestNewLanguage(unittest2.TestCase):
             self.assertIsParseError("return 1;")
 
     def assertResult(self, expected_result, code):
-        self.assertEquals(expected_result, self.runNewLang(code))
+        self.assertEquals(expected_result, self.runNewLang(code), msg="expected '{}' from '{}'".format(expected_result, code))
 
     def test_assertResult_fail(self):
         with self.assertRaises(AssertionError):
