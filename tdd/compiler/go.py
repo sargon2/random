@@ -102,6 +102,8 @@ class NewLanguage(object):
         equals = RegexParser('=')
         eof = EOF()
 
+        # TODO: convert these to classes.  Instantiate them in the grammar.
+        # Then the classes' parse() methods can return ParseResult objects that contain the literal python code already generated.
         value = Or(digit, string, word)
         return_stmt = Each(return_word, whitespace, value, optional_whitespace, semicolon)
         assignment = Each(word, optional_whitespace, equals, optional_whitespace, value, semicolon)
@@ -109,9 +111,8 @@ class NewLanguage(object):
         statements = Each(optional_whitespace, OneOrMore(statement), eof)
         result = statements.parse(code)
         if result:
-            # Option: traverse the AST, look for return statements
-            # Option: traverse the AST, interpret each node
-            # Option: make everything generate python, execute it
+            # TODO: make everything generate python, execute it
+            # exec("a = 3"); print a => 3
             return result[1][0][0][2].literal_value
 
 
