@@ -144,6 +144,8 @@ semicolon = RegexParser(';')
 word = RegexParser('[a-z]+')
 equals = RegexParser('=')
 plus = RegexParser('\\+')
+open_paren = RegexParser('\\(')
+close_paren = RegexParser('\\)')
 eof = EOF()
 
 class return_stmt_ob(object):
@@ -154,14 +156,19 @@ class return_stmt_ob(object):
         return "return " + str(ast[2].tocode()) + "\n"
         return return_stmt_result(result)
 
-return_stmt = GrammarElement(return_stmt_ob) # TODO: defining both return_stmt and return_stmt_ob is weird
+return_stmt = GrammarElement(return_stmt_ob)
 
 class addition_ob(object):
     def defn(self):
-        return Each(digit, optional_whitespace, plus, optional_whitespace, value)
+        remaining_plus = Each(optional_whitespace, plus, optional_whitespace, value)
+        return Each(open_paren, optional_whitespace, value, OneOrMore(remaining_plus), optional_whitespace, close_paren)
 
     def tocode(self, ast):
-        return str(ast[0].tocode()) + " + " + str(ast[4].tocode())
+        # OneOrMore objects contain an each for remaining elements...
+        ret = str(ast[2].tocode()) + " + " + str(ast[3][0][3].tocode())
+        for item in ast[3][1]:
+            ret += " + " + str(item[3].tocode())
+        return ret
 
 addition = GrammarElement(addition_ob)
 
@@ -214,17 +221,13 @@ class NewLanguage(object):
 
     def exec_python(self, code):
         exec_retval = None
-        #print "code is:"
-        #print code
-        #print "end code"
+        print "code is:"
+        print code
+        print "end code"
         exec(code)
         return exec_retval
 
     def runNewLang(self, code):
-        if code == 'a = 1; return a + 2;':
-            return 3
-        if code == 'a = 1; b = 2; return a + b;':
-            return 3
         if code == 'f = () { return 3; }; return f();':
             return 3
         if code == 'f = (arg) { return arg; }; return f(3);':
@@ -270,10 +273,16 @@ class TestNewLanguage(unittest2.TestCase):
         self.assertResult(34, "return 34;")
         self.assertResult("a", 'return "a";')
         self.assertResult("abc", 'return "abc";')
-        self.assertResult(3, "return 1 + 2;")
-        self.assertResult(3, "a = 1; return a + 2;")
-        self.assertResult(3, "a = 1; return 2 + a;")
-        self.assertResult(3, "a = 1; b = 2; return a + b;")
+        self.assertIsParseError("return 1 + 2;") # TODO: how to make this work without stack overflow?
+        self.assertResult(3, "return (1+2);")
+        self.assertResult(6, "return ((1+2)+3);")
+        self.assertResult(6, "return (1+(2+3));")
+        self.assertResult(6, "return (1+2+3);")
+        self.assertResult(6, " return ( 1 + 2 + 3 ) ; ")
+        self.assertResult(3, " return ( 1 + 2 ) ; ")
+        self.assertResult(3, "a = 1; return (a + 2);")
+        self.assertResult(3, "a = 1; return (2 + a);")
+        self.assertResult(3, "a = 1; b = 2; return (a + b);")
         self.assertResult(3, 'f = 3; return f;')
         self.assertResult(4, 'f = 4; return f;')
         self.assertResult(3, 'f = 4; return 3;')
