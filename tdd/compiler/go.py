@@ -10,10 +10,9 @@ def indent(string):
     return ret
 
 class ParseResult(object):
-    def __init__(self, match_ob, literal_value):
-        self.match_ob = match_ob
+    def __init__(self, literal_value):
         self.literal_value = literal_value
-        self.matchlen = len(match_ob.group(0))
+        self.matchlen = len(self.literal_value)
 
     def tocode(self):
         return self.literal_value
@@ -28,17 +27,16 @@ class EOF(object):
         return None
 
 class RegexParser(object):
-    def __init__(self, regex, groupnum=0):
+    def __init__(self, regex):
         self.regex = regex
-        self.groupnum = groupnum
 
     def parse(self, code):
         match = re.match(self.regex, code)
         if match:
             #print code
             #print "matched", self.regex
-            literal_value = match.group(self.groupnum)
-            return ParseResult(match, literal_value)
+            literal_value = match.group(0)
+            return ParseResult(literal_value)
 
 class Or(object):
     def __init__(self, *args):
@@ -143,16 +141,8 @@ class GrammarElement(object):
             return None
         return self.make_result(result)
 
-class string_ob(object):
-    def defn(self):
-        return RegexParser('"([^"]+)"', 1) # TODO: should we just include the quotes?  it would simply RegexParser
-
-    def tocode(self, ast):
-        return '"' + ast.tocode() + '"'
-
-string = GrammarElement(string_ob)
-
 digit = RegexParser('\d+')
+string = RegexParser('"([^"]+)"')
 return_word = RegexParser('return')
 whitespace = RegexParser('\s+')
 optional_whitespace = RegexParser('\s*')
@@ -292,11 +282,11 @@ program = GrammarElement(program_ob)
 
 class NewLanguage(object):
     def execute(self, code):
-
         result = program.parse(code)
-        if result is not None:
-            code = result.tocode()
-            return self.exec_python(code)
+        if result is None:
+            return None # TODO: raise exception?
+        code = result.tocode()
+        return self.exec_python(code)
 
     def exec_python(self, code):
         exec_retval = None
