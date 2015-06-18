@@ -251,10 +251,10 @@ function_definition = GrammarElement(function_definition_ob)
 
 class function_invocation_ob(object):
     def defn(self):
-        return Each(word, open_paren, optional_whitespace, list_of(value), optional_whitespace, close_paren, optional_whitespace)
+        return Each(word, optional_whitespace, open_paren, optional_whitespace, list_of(value), optional_whitespace, close_paren, optional_whitespace)
 
     def tocode(self, ast):
-        ret = ast[0].tocode() + "(" + ast[3].tocode() + ")"
+        ret = ast[0].tocode() + "(" + ast[4].tocode() + ")"
         return ret
 
 function_invocation = GrammarElement(function_invocation_ob)
@@ -357,3 +357,5 @@ class TestNewLanguage(unittest2.TestCase):
         self.assertResult(3, 'f = (arg) { return arg; }; return f(3);')
         self.assertResult(3, 'f = (arg1, arg2) { return arg1; }; return f(3, 4);')
         self.assertResult(4, 'f = (arg1, arg2) { return arg2; }; return f(3, 4);')
+        self.assertResult(3, ' f = ( arg1 , arg2 ) { return arg1 ; } ; return f ( 3 , 4 ) ; ')
+        self.assertResult(3, 'f=(arg1,arg2){return arg1;};return f(3,4);')
