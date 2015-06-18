@@ -36,6 +36,8 @@ class RegexParser(object):
     def parse(self, code):
         match = re.match(self.regex, code)
         if match:
+            #print code
+            #print "matched", self.regex
             literal_value = None
             literal_value = self.ret_type(match.group(self.groupnum))
             return ParseResult(match, literal_value)
@@ -47,7 +49,7 @@ class Or(object):
     def parse(self, code):
         for parser in self.items:
             parse_result = parser.parse(code)
-            if parse_result:
+            if parse_result is not None:
                 return parse_result
 
 class ResultList(object):
@@ -67,6 +69,12 @@ class ResultList(object):
     def __getitem__(self, key):
         return self.items[key]
 
+    def __len__(self):
+        return len(self.items)
+
+    def __repr__(self):
+        return "ResultList(" + repr(self.items) + ")"
+
 class ZeroOrMore(object):
     def __init__(self, arg):
         self.item = arg
@@ -75,7 +83,7 @@ class ZeroOrMore(object):
         results = []
         while(True):
             result = self.item.parse(code)
-            if not result:
+            if result is None:
                 return ResultList(results)
             code = code[result.matchlen:]
             results.append(result)
@@ -87,6 +95,16 @@ class OneOrMore(object):
     def parse(self, code):
         return Each(self.item, ZeroOrMore(self.item)).parse(code)
 
+class ZeroOrOne(object):
+    def __init__(self, arg):
+        self.item = arg
+
+    def parse(self, code):
+        result = self.item.parse(code)
+        if result is None:
+            return ResultList([])
+        return ResultList([result])
+
 class Each(object):
     def __init__(self, *args):
         self.items = args
@@ -95,7 +113,7 @@ class Each(object):
         results = []
         for item in self.items:
             parse_result = item.parse(code)
-            if not parse_result:
+            if parse_result is None:
                 return None
             results.append(parse_result)
             code = code[parse_result.matchlen:]
@@ -146,11 +164,14 @@ equals = RegexParser('=')
 plus = RegexParser('\\+')
 open_paren = RegexParser('\\(')
 close_paren = RegexParser('\\)')
+open_brace = RegexParser("{")
+close_brace = RegexParser("}")
+comma = RegexParser(",")
 eof = EOF()
 
 class return_stmt_ob(object):
     def defn(self):
-        return Each(return_word, whitespace, value, optional_whitespace, semicolon)
+        return Each(return_word, whitespace, value, optional_whitespace)
 
     def tocode(self, ast):
         return "return " + str(ast[2].tocode()) + "\n"
@@ -174,7 +195,7 @@ addition = GrammarElement(addition_ob)
 
 class value_ob(object):
     def defn(self):
-        return Or(addition, digit, string, word)
+        return Or(function_invocation, addition, digit, string, word)
 
     def tocode(self, ast):
         return ast.tocode()
@@ -183,7 +204,7 @@ value = GrammarElement(value_ob)
 
 class assignment_ob(object):
     def defn(self):
-        return Each(word, optional_whitespace, equals, optional_whitespace, value, semicolon)
+        return Each(word, optional_whitespace, equals, optional_whitespace, value)
 
     def tocode(self, ast):
         return ast[0].tocode() + " = " + str(ast[4].tocode()) + '\n'
@@ -192,49 +213,103 @@ assignment = GrammarElement(assignment_ob)
 
 class statement_ob(object):
     def defn(self):
-        return Each(Or(return_stmt, assignment), optional_whitespace)
+        return Each(Or(function_definition, return_stmt, assignment), optional_whitespace, semicolon, optional_whitespace)
 
     def tocode(self, ast):
         return ast[0].tocode()
 
 statement = GrammarElement(statement_ob)
 
+class list_of_ob(object):
+    def __init__(self, item):
+        self.item = item
+
+    def defn(self):
+        return Each(ZeroOrOne(self.item), ZeroOrMore(Each(comma, self.item)))
+
+    def tocode(self, ast):
+        if len(ast[0]):
+            ret = ast[0].tocode()
+            # TODO: rest of items
+            return ret
+        return ""
+
+def list_of(value):
+    return GrammarElement(lambda: list_of_ob(value))
+
+class function_definition_ob(object):
+    def defn(self):
+        return Each(
+                word, optional_whitespace,
+                equals, optional_whitespace,
+                open_paren, optional_whitespace,
+                list_of(word), optional_whitespace,
+                close_paren, optional_whitespace,
+                open_brace, optional_whitespace,
+                statements, optional_whitespace,
+                close_brace, optional_whitespace)
+
+    def tocode(self, ast):
+        ret = "def "
+        ret += ast[0].tocode() # fn name
+        ret += "("
+        ret += ast[6].tocode() # arg list
+        ret += "):\n"
+        ret += indent(ast[12].tocode()) # statements
+        return ret
+
+function_definition = GrammarElement(function_definition_ob)
+
+class function_invocation_ob(object):
+    def defn(self):
+        return Each(word, open_paren, optional_whitespace, list_of(value), optional_whitespace, close_paren, optional_whitespace)
+
+    def tocode(self, ast):
+        ret = ast[0].tocode() + "(" + ast[3].tocode() + ")"
+        return ret
+
+function_invocation = GrammarElement(function_invocation_ob)
+
 class statements_ob(object):
     def defn(self):
-        return Each(optional_whitespace, OneOrMore(statement), eof)
+        return Each(optional_whitespace, OneOrMore(statement))
+
+    def tocode(self, ast):
+        return ast[1].tocode()
+
+statements = GrammarElement(statements_ob)
+
+class program_ob(object):
+    def defn(self):
+        return Each(statements, eof)
 
     def tocode(self, ast):
         ret = "def outermost_function():\n"
-        ret += indent(ast[1].tocode()) # ignore leading whitespace and eof
+        ret += indent(ast[0].tocode()) # ignore leading whitespace and eof
         ret += "exec_retval = outermost_function()"
         return ret
 
-statements = GrammarElement(statements_ob)
+program = GrammarElement(program_ob)
 
 class NewLanguage(object):
     def execute(self, code):
 
-        result = statements.parse(code)
-        if result:
+        result = program.parse(code)
+        if result is not None:
             code = result.tocode()
             return self.exec_python(code)
 
     def exec_python(self, code):
         exec_retval = None
-        print "code is:"
-        print code
-        print "end code"
+        #print "code is:"
+        #print code
+        #print "end code"
         exec(code)
         return exec_retval
 
     def runNewLang(self, code):
-        if code == 'f = () { return 3; }; return f();':
-            return 3
-        if code == 'f = (arg) { return arg; }; return f(3);':
-            return 3
-
         result = self.execute(code)
-        if result:
+        if result is not None:
             return result
 
 class TestNewLanguage(unittest2.TestCase):
@@ -291,3 +366,5 @@ class TestNewLanguage(unittest2.TestCase):
         self.assertResult(4, 'f = 3; g = 4; return g;')
         self.assertResult(3, 'f = () { return 3; }; return f();')
         self.assertResult(3, 'f = (arg) { return arg; }; return f(3);')
+        #self.assertResult(3, 'f = (arg1, arg2) { return arg1; }; return f(3, 4);')
+        #self.assertResult(4, 'f = (arg1, arg2) { return arg2; }; return f(3, 4);')
