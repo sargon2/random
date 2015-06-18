@@ -28,18 +28,16 @@ class EOF(object):
         return None
 
 class RegexParser(object):
-    def __init__(self, regex, groupnum=0, ret_type=str):
+    def __init__(self, regex, groupnum=0):
         self.regex = regex
         self.groupnum = groupnum
-        self.ret_type = ret_type
 
     def parse(self, code):
         match = re.match(self.regex, code)
         if match:
             #print code
             #print "matched", self.regex
-            literal_value = None
-            literal_value = self.ret_type(match.group(self.groupnum))
+            literal_value = match.group(self.groupnum)
             return ParseResult(match, literal_value)
 
 class Or(object):
@@ -154,12 +152,12 @@ class string_ob(object):
 
 string = GrammarElement(string_ob)
 
-digit = RegexParser('(\d+)', 1, int)
+digit = RegexParser('(\d+)', 1)
 return_word = RegexParser('return')
 whitespace = RegexParser('\s+')
 optional_whitespace = RegexParser('\s*')
 semicolon = RegexParser(';')
-word = RegexParser('[a-z]+')
+word = RegexParser('[a-z][a-z0-9]*')
 equals = RegexParser('=')
 plus = RegexParser('\\+')
 open_paren = RegexParser('\\(')
@@ -225,12 +223,13 @@ class list_of_ob(object):
         self.item = item
 
     def defn(self):
-        return Each(ZeroOrOne(self.item), ZeroOrMore(Each(comma, self.item)))
+        return Each(ZeroOrOne(self.item), ZeroOrMore(Each(optional_whitespace, comma, optional_whitespace, self.item)))
 
     def tocode(self, ast):
         if len(ast[0]):
             ret = ast[0].tocode()
-            # TODO: rest of items
+            for item in ast[1]:
+                ret += ", " + str(item[3].tocode()) # TODO: why do I need this str?
             return ret
         return ""
 
@@ -366,5 +365,5 @@ class TestNewLanguage(unittest2.TestCase):
         self.assertResult(4, 'f = 3; g = 4; return g;')
         self.assertResult(3, 'f = () { return 3; }; return f();')
         self.assertResult(3, 'f = (arg) { return arg; }; return f(3);')
-        #self.assertResult(3, 'f = (arg1, arg2) { return arg1; }; return f(3, 4);')
-        #self.assertResult(4, 'f = (arg1, arg2) { return arg2; }; return f(3, 4);')
+        self.assertResult(3, 'f = (arg1, arg2) { return arg1; }; return f(3, 4);')
+        self.assertResult(4, 'f = (arg1, arg2) { return arg2; }; return f(3, 4);')
