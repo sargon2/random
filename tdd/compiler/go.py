@@ -61,7 +61,7 @@ class ResultList(object):
     def tocode(self):
         code = ""
         for item in self.items:
-            code += str(item.tocode())
+            code += item.tocode()
         return code
 
     def __getitem__(self, key):
@@ -145,14 +145,14 @@ class GrammarElement(object):
 
 class string_ob(object):
     def defn(self):
-        return RegexParser('"([^"]+)"', 1)
+        return RegexParser('"([^"]+)"', 1) # TODO: should we just include the quotes?  it would simply RegexParser
 
     def tocode(self, ast):
         return '"' + ast.tocode() + '"'
 
 string = GrammarElement(string_ob)
 
-digit = RegexParser('(\d+)', 1)
+digit = RegexParser('\d+')
 return_word = RegexParser('return')
 whitespace = RegexParser('\s+')
 optional_whitespace = RegexParser('\s*')
@@ -172,7 +172,7 @@ class return_stmt_ob(object):
         return Each(return_word, whitespace, value, optional_whitespace)
 
     def tocode(self, ast):
-        return "return " + str(ast[2].tocode()) + "\n"
+        return "return " + ast[2].tocode() + "\n"
         return return_stmt_result(result)
 
 return_stmt = GrammarElement(return_stmt_ob)
@@ -184,9 +184,9 @@ class addition_ob(object):
 
     def tocode(self, ast):
         # OneOrMore objects contain an each for remaining elements...
-        ret = str(ast[2].tocode()) + " + " + str(ast[3][0][3].tocode())
+        ret = ast[2].tocode() + " + " + ast[3][0][3].tocode()
         for item in ast[3][1]:
-            ret += " + " + str(item[3].tocode())
+            ret += " + " + item[3].tocode()
         return ret
 
 addition = GrammarElement(addition_ob)
@@ -205,7 +205,7 @@ class assignment_ob(object):
         return Each(word, optional_whitespace, equals, optional_whitespace, value)
 
     def tocode(self, ast):
-        return ast[0].tocode() + " = " + str(ast[4].tocode()) + '\n'
+        return ast[0].tocode() + " = " + ast[4].tocode() + '\n'
 
 assignment = GrammarElement(assignment_ob)
 
@@ -229,7 +229,7 @@ class list_of_ob(object):
         if len(ast[0]):
             ret = ast[0].tocode()
             for item in ast[1]:
-                ret += ", " + str(item[3].tocode()) # TODO: why do I need this str?
+                ret += ", " + item[3].tocode()
             return ret
         return ""
 
