@@ -62,9 +62,15 @@ class TestNewLanguage(unittest2.TestCase):
         self.assertResult(3, ' f = ( arg1 , arg2 ) { return arg1 ; } ; return f ( 3 , 4 ) ; ')
         self.assertResult(3, 'f=(arg1,arg2){return arg1;};return f(3,4);')
 
-    def xtest_bootstrap(self):
+    @unittest2.skip("not passing yet")
+    def test_bootstrap(self):
         # Bootstrap compile:
-        subprocess.check_output(["./bootstrap-compile", "-o", "compile", "compiler-source.newlang"])
+        try:
+            subprocess.check_output(["./bootstrap-compile", "-o", "compile", "compiler-source.newlang"])
+        except Exception as e:
+            print "Output:"
+            print e.output
+            raise
 
         # Get rid of all traces of the bootstrap compiler:
         subprocess.check_output(["./compile", "-o", "compile", "compiler-source.newlang"])

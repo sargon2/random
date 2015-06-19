@@ -8,13 +8,15 @@ return_word = RegexParser('return')
 whitespace = RegexParser('\s+')
 optional_whitespace = RegexParser('\s*')
 semicolon = RegexParser(';')
-word = RegexParser('[a-z][a-z0-9]*')
+word = RegexParser('[a-z][_a-z0-9]*')
 equals = RegexParser('=')
 plus = RegexParser('\\+')
 open_paren = RegexParser('\\(')
 close_paren = RegexParser('\\)')
 open_brace = RegexParser("{")
 close_brace = RegexParser("}")
+open_bracket = RegexParser("\\[")
+close_bracket = RegexParser("\\]")
 comma = RegexParser(",")
 eof = EOF()
 
@@ -42,9 +44,18 @@ class addition_ob(object):
 
 addition = GrammarElement(addition_ob)
 
+class array_ref_ob(object):
+    def defn(self):
+        return Each(word, open_bracket, digit, close_bracket)
+
+    def tocode(self, ast):
+        return ast.tocode()
+
+array_ref = GrammarElement(array_ref_ob)
+
 class value_ob(object):
     def defn(self):
-        return Or(function_invocation, addition, digit, string, word)
+        return Or(function_invocation, addition, digit, string, array_ref, word)
 
     def tocode(self, ast):
         return ast.tocode()
@@ -62,7 +73,7 @@ assignment = GrammarElement(assignment_ob)
 
 class statement_ob(object):
     def defn(self):
-        return Each(Or(function_definition, return_stmt, assignment), optional_whitespace, semicolon, optional_whitespace)
+        return Each(Or(function_definition, function_invocation, return_stmt, assignment), optional_whitespace, semicolon, optional_whitespace)
 
     def tocode(self, ast):
         return ast[0].tocode()
