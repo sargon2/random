@@ -137,7 +137,7 @@ class program_ob(object):
         ret = "#!/usr/bin/env python\n"
         ret += "def outermost_function():\n"
         ret += indent(ast[0].tocode()) # ignore leading whitespace and eof
-        ret += "exec_retval = outermost_function()"
+        ret += "exec_retval = outermost_function()\n"
         return ret
 
 program = GrammarElement(program_ob)
