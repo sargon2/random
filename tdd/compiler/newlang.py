@@ -49,7 +49,10 @@ class array_ref_ob(object):
         return Each(word, open_bracket, digit, close_bracket)
 
     def tocode(self, ast):
-        return ast.tocode()
+        varname = ast[0].tocode()
+        if varname == "args":
+            varname = "sys.argv"
+        return varname + "[" + ast[2].tocode() + "]"
 
 array_ref = GrammarElement(array_ref_ob)
 
@@ -146,6 +149,13 @@ class program_ob(object):
 
     def tocode(self, ast):
         ret = "#!/usr/bin/env python\n"
+        ret += "import sys\n"
+        ret += "def read_file(filename):\n"
+        ret += "    with open(filename) as f:\n"
+        ret += "        return f.read()\n"
+        ret += "def write_file(filename, contents):\n"
+        ret += "    with open(filename, \"w\") as f:\n"
+        ret += "        f.write(contents)\n"
         ret += "def outermost_function():\n"
         ret += indent(ast[0].tocode()) # ignore leading whitespace and eof
         ret += "exec_retval = outermost_function()\n"
