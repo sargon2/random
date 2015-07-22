@@ -13,14 +13,14 @@ with open(infile1, "rb") as f1:
         with open(outfile, "wb") as o:
             # Read size
             size = ""
-            for i in range(0, 4):
+            for i in xrange(0, 4):
                 size1 = f1.read(1)
                 size2 = f2.read(1)
                 size += chr(ord(size1) ^ ord(size2))
 
             # Read and decrypt data
             size = struct.unpack("I", size)[0]
-            for i in range(0, size):
+            for i in xrange(0, size):
                 byte = f1.read(1)
                 byte2 = f2.read(1)
                 r = ord(byte) ^ ord(byte2)

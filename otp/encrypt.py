@@ -26,7 +26,7 @@ def writeit(outfile1, outfile2, generator):
                 k2.write(chr(a))
 
 def pad(num):
-    for i in range(0, num):
+    for i in xrange(0, num):
         yield chr(0)
 
 # http://stackoverflow.com/a/19164783
