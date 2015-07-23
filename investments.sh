@@ -3,7 +3,7 @@
 function display {
     # http://www.jarloo.com/yahoo_finance/
     echo -n "$1: $";
-    curl -s "http://download.finance.yahoo.com/d/quotes.csv?s=$1&f=l1b3b2" | dos2unix | sed 's/,/ (/' | sed 's/,/ - /' | sed 's/$/)/g'
+    curl -s "http://download.finance.yahoo.com/d/quotes.csv?s=$1&f=l1ba" | dos2unix | sed 's/,/ (/' | sed 's/,/ - /' | sed 's/$/)/g'
 }
 
 
