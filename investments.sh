@@ -1,17 +1,5 @@
 #!/bin/bash
 
-function display {
-    # http://www.jarloo.com/yahoo_finance/
-    echo -n "$1: $";
-    curl -s "http://download.finance.yahoo.com/d/quotes.csv?s=$1&f=l1ba" | dos2unix | sed 's/,/ (/' | sed 's/,/ - /' | sed 's/$/)/g'
-}
+STOCKS=vfinx,vbk,hpq
 
-
-echo "stock: last price (bid - ask)"
-display "VFINX"
-display "VBK"
-display "HPQ"
-
-#echo -n "Bitcoin: ";
-#curl -s 'https://mtgox.com/api/0/data/ticker.php'
-#curl -s 'https://mtgox.com/api/1/BTCUSD/ticker' | tr '}' '\n' | grep last\" | grep -o "\"display\":\"[^\"]\+" | cut -c 12-
+curl -s "http://finance.google.com/finance/info?q=$STOCKS" | egrep "\"t\"|l_fix" | paste -s -d' \n' | sed 's/,\"t\" : //' | sed 's/ ,\"l_fix\" : /: \$/' | tr -d '\"'
