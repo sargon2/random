@@ -56,9 +56,19 @@ class array_ref_ob(object):
 
 array_ref = GrammarElement(array_ref_ob)
 
+class backticks_ob(object):
+    def defn(self):
+        return RegexParser('`([^`]+)`')
+
+    def tocode(self, ast):
+        to_execute = ast.match_ob.group(1)
+        return "subprocess.check_output(\"" + to_execute + "\", shell=True)"
+
+backticks = GrammarElement(backticks_ob)
+
 class value_ob(object):
     def defn(self):
-        return Or(function_invocation, addition, digit, string, array_ref, word)
+        return Or(function_invocation, addition, digit, string, array_ref, word, backticks)
 
     def tocode(self, ast):
         return ast.tocode()
@@ -150,6 +160,7 @@ class program_ob(object):
     def tocode(self, ast):
         ret = "#!/usr/bin/env python\n"
         ret += "import sys\n"
+        ret += "import subprocess\n"
         ret += "def read_file(filename):\n"
         ret += "    with open(filename) as f:\n"
         ret += "        return f.read()\n"
@@ -178,11 +189,12 @@ class NewLanguage(object):
         return self.exec_python(python_code)
 
     def exec_python(self, code):
-        exec_retval = None
         #print "code is:"
         #print code
         #print "end code"
-        exec(code)
+        # We have to execute in the global scope so that imports work.
+        exec(code, globals())
+        global exec_retval
         return exec_retval
 
     def runNewLang(self, code):

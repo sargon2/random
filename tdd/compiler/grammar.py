@@ -10,9 +10,10 @@ def indent(string):
     return ret
 
 class ParseResult(object):
-    def __init__(self, literal_value):
+    def __init__(self, literal_value, match_ob=None):
         self.literal_value = literal_value
         self.matchlen = len(self.literal_value)
+        self.match_ob = match_ob
 
     def tocode(self):
         return self.literal_value
@@ -36,7 +37,7 @@ class RegexParser(object):
             #print code
             #print "matched", self.regex
             literal_value = match.group(0)
-            return ParseResult(literal_value)
+            return ParseResult(literal_value, match)
 
 class Or(object):
     def __init__(self, *args):

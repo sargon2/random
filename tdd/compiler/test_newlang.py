@@ -61,6 +61,8 @@ class TestNewLanguage(unittest2.TestCase):
         self.assertResult(4, 'f = (arg1, arg2) { return arg2; }; return f(3, 4);')
         self.assertResult(3, ' f = ( arg1 , arg2 ) { return arg1 ; } ; return f ( 3 , 4 ) ; ')
         self.assertResult(3, 'f=(arg1,arg2){return arg1;};return f(3,4);')
+        self.assertResult('3\n', 'a=`echo 3`;return a;')
+        self.assertResult('3\n', 'a = ` echo 3 ; ` ; return a ;')
 
     @unittest2.skip("not passing yet")
     def test_bootstrap(self):
