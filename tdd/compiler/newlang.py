@@ -25,7 +25,7 @@ class return_stmt_ob(object):
         return Each(return_word, whitespace, value, optional_whitespace)
 
     def tocode(self, ast):
-        return "return " + ast[2].tocode() + "\n"
+        return "return " + ast[2].tocode()
         return return_stmt_result(result)
 
 return_stmt = GrammarElement(return_stmt_ob)
@@ -80,7 +80,7 @@ class assignment_ob(object):
         return Each(word, optional_whitespace, equals, optional_whitespace, value)
 
     def tocode(self, ast):
-        return ast[0].tocode() + " = " + ast[4].tocode() + '\n'
+        return ast[0].tocode() + " = " + ast[4].tocode()
 
 assignment = GrammarElement(assignment_ob)
 
@@ -89,7 +89,7 @@ class statement_ob(object):
         return Each(Or(function_definition, function_invocation, return_stmt, assignment), optional_whitespace, semicolon, optional_whitespace)
 
     def tocode(self, ast):
-        return ast[0].tocode()
+        return ast[0].tocode() + "\n"
 
 statement = GrammarElement(statement_ob)
 
