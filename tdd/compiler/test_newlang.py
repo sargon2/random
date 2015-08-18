@@ -85,8 +85,8 @@ class TestNewLanguage(unittest2.TestCase):
             raise
 
         # Get rid of all traces of the bootstrap compiler:
-        subprocess.check_output(["./compile", "-o", "compile", "compiler-source.newlang"])
+        print subprocess.check_output(["./compile", "-o", "compile", "compiler-source.newlang"])
 
         # Verify:
-        subprocess.check_output(["./compile", "-o", "verify", "compiler-source.newlang"])
-        subprocess.check_output(["diff", "compile", "verify"])
+        print subprocess.check_output(["./compile", "-o", "verify", "compiler-source.newlang"])
+        print subprocess.check_output(["diff", "compile", "verify"])
