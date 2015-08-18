@@ -8,3 +8,4 @@ a.out
 *.lprof
 *.so
 tdd/compiler/compile
+delme.txt

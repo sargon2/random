@@ -65,9 +65,16 @@ class TestNewLanguage(unittest2.TestCase):
         self.assertResult('3\n', 'a = ` echo 3 ; ` ; return a ;')
         self.assertResult(3, 'f = (arg1) { return arg1; }; g = (arg1) { return arg1; }; return (f(1) + g(2));')
         self.assertResult(3, 'f = (arg1) { return arg1; }; f(4); return 3;')
+        self.assertResult("text from file", 'a = "text from file"; write_file("delme.txt", a); return read_file("delme.txt");')
+        self.assertResult("3\n", 'a = 3; return `echo {a}`;')
+        self.assertResult("catted str", 'a = "catted str"; return `cat`(a);')
         # TODO: backticks as a statement
+        # TODO: return code from backticks
+        # TODO: comments
+        # TODO: prints
+        # TODO: in compiler-source.newlang, print the output of gcc instead of eating it
 
-    @unittest2.skip("not passing yet")
+    # @unittest2.skip("not passing yet")
     def test_bootstrap(self):
         # Bootstrap compile:
         try:

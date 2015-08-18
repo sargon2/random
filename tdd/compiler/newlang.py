@@ -18,6 +18,8 @@ close_brace = RegexParser("}")
 open_bracket = RegexParser("\\[")
 close_bracket = RegexParser("\\]")
 comma = RegexParser(",")
+backtick = RegexParser('`')
+anything_except_backtick_or_braces = RegexParser('[^`{}]+')
 eof = EOF()
 
 class return_stmt_ob(object):
@@ -56,13 +58,49 @@ class array_ref_ob(object):
 
 array_ref = GrammarElement(array_ref_ob)
 
-class backticks_ob(object):
+class brace_expension_ob(object):
     def defn(self):
-        return RegexParser('`([^`]+)`')
+        return Each(open_brace, value, close_brace)
 
     def tocode(self, ast):
-        to_execute = ast.match_ob.group(1)
-        return "subprocess.check_output(\"" + to_execute + "\", shell=True)"
+        return "\" + str(" + ast[1].tocode() + ") + \""
+
+brace_expansion = GrammarElement(brace_expension_ob)
+
+class backticks_ob(object):
+    def defn(self):
+        return Each(
+                backtick,
+                OneOrMore(
+                    Each(
+                        Or(
+                            anything_except_backtick_or_braces,
+                            brace_expansion
+                        ),
+                        optional_whitespace
+                    )
+                ),
+                backtick,
+                optional_whitespace,
+                ZeroOrOne(
+                    Each(
+                        open_paren,
+                        optional_whitespace,
+                        value,
+                        optional_whitespace,
+                        close_paren
+                    )
+                )
+            )
+
+    def tocode(self, ast):
+        # TODO: un-plumb match_ob from ast
+        # If we have an argument list...
+        to_execute = ast[1].tocode()
+        if len(ast[4]):
+            return "invoke_process_with_stdin(\"" + to_execute + "\", " + ast[4][0][2].tocode() + ")"
+        else:
+            return "subprocess.check_output(\"" + to_execute + "\", shell=True)"
 
 backticks = GrammarElement(backticks_ob)
 
@@ -158,6 +196,7 @@ class program_ob(object):
         return Each(statements, eof)
 
     def tocode(self, ast):
+        # TODO: lots of duplication here with 'ret +='
         ret = "#!/usr/bin/env python\n"
         ret += "import sys\n"
         ret += "import subprocess\n"
@@ -167,6 +206,9 @@ class program_ob(object):
         ret += "def write_file(filename, contents):\n"
         ret += "    with open(filename, \"w\") as f:\n"
         ret += "        f.write(contents)\n"
+        ret += "def invoke_process_with_stdin(command, stdin):\n"
+        ret += "    p = subprocess.Popen(command, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)\n"
+        ret += "    return p.communicate(input=str(stdin))[0].decode()\n"
         ret += "def outermost_function():\n"
         ret += indent(ast[0].tocode()) # ignore leading whitespace and eof
         ret += "exec_retval = outermost_function()\n"
