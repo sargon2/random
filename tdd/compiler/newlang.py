@@ -219,7 +219,12 @@ program = GrammarElement(program_ob)
 class NewLanguage(object):
 
     def compile_string(self, code):
-        result = program.parse(code)
+        # Remove comments
+        newcode = ""
+        for line in code.splitlines():
+            newline = re.sub("#.*", "", line)
+            newcode += newline + "\n"
+        result = program.parse(newcode)
         if result is None:
             return None # TODO: raise exception?
         return result.tocode()

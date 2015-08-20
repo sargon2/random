@@ -68,6 +68,7 @@ class TestNewLanguage(unittest2.TestCase):
         self.assertResult("text from file", 'a = "text from file"; write_file("delme.txt", a); return read_file("delme.txt");')
         self.assertResult("3\n", 'a = 3; return `echo {a}`;')
         self.assertResult("catted str", 'a = "catted str"; return `cat`(a);')
+        self.assertResult(3, "# comment\nreturn 3; # comment")
         # TODO: backticks as a statement
         # TODO: return code from backticks
         # TODO: comments
@@ -78,7 +79,7 @@ class TestNewLanguage(unittest2.TestCase):
     def test_bootstrap(self):
         # Bootstrap compile:
         try:
-            subprocess.check_output(["./bootstrap-compile", "-o", "compile", "compiler-source.newlang"])
+            print subprocess.check_output(["./bootstrap-compile", "-o", "compile", "compiler-source.newlang"])
         except Exception as e:
             print "Output:"
             print e.output
