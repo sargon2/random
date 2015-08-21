@@ -1,5 +1,9 @@
 contents = read_file(args[3]);
+
+for(splitlines(contents), (line) {
+    if(equal(line, "contents = read_file(args[3]);"), {
+    });
+);
 # TODO: parse contents to create assembly
 assembly = ".global main\nmain:\n";
-a = `gcc -x assembler -o {args[2]} -`(assembly);
-print(a);
+print(`gcc -x assembler -o {args[2]} -`(assembly));

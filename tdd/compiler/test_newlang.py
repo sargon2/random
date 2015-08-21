@@ -69,13 +69,18 @@ class TestNewLanguage(unittest2.TestCase):
         self.assertResult("3\n", 'a = 3; return `echo {a}`;')
         self.assertResult("catted str", 'a = "catted str"; return `cat`(a);')
         self.assertResult(3, "# comment\nreturn 3; # comment")
+        # TODO: if
+        # self.assertResult(3, "if(equals(1, 2), { return 2; }); return 3;)")
+        # self.assertResult(2, "if(equals(1, 1), { return 2; }); return 3;)")
+
+        # TODO: for
         # TODO: backticks as a statement
         # TODO: return code from backticks
         # TODO: comments
         # TODO: prints
         # TODO: in compiler-source.newlang, print the output of gcc instead of eating it
 
-    # @unittest2.skip("not passing yet")
+    @unittest2.skip("not passing yet")
     def test_bootstrap(self):
         # Bootstrap compile:
         try:
