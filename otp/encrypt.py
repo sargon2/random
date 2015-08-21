@@ -5,7 +5,14 @@ import os
 import struct
 import math
 
+if len(sys.argv) == 1:
+    print "Usage:", sys.argv[0], "<file to encrypt> [number of output files (default 2)]"
+    sys.exit(1)
+
 infile = sys.argv[1]
+num_files = 2
+if len(sys.argv) > 2:
+    num_files = int(sys.argv[2])
 
 size = os.stat(infile).st_size
 
@@ -16,14 +23,18 @@ def readit(filename):
             yield byte
             byte = f.read(1)
 
-def writeit(outfile1, outfile2, generator):
-    with open(outfile1, "ab") as k1:
-        with open(outfile2, "ab") as k2:
-            for byte in generator:
-                r = ord(os.urandom(1))
-                a = ord(byte) ^ r
-                k1.write(chr(r))
-                k2.write(chr(a))
+def writeit(outfiles, generator):
+    fds = []
+    for outfile in outfiles:
+        fds.append(open(outfile, "ab"))
+    for byte in generator:
+        first = ord(byte)
+        for i in range(1, num_files):
+            r = ord(os.urandom(1))
+            fds[i].write(chr(r))
+            first ^= r
+        fds[0].write(chr(first))
+    # TODO: close fds
 
 def pad(num):
     for i in xrange(0, num):
@@ -47,19 +58,17 @@ def get_padding_size(num):
     return s - num
 
 
-outfile1 = infile + ".k1"
-outfile2 = infile + ".k2"
+outfiles = []
+for i in range(0, num_files):
+    outfiles.append(infile + ".k" + str(i))
 
-if(os.path.exists(outfile1)):
-    print outfile1 + " exists"
-    sys.exit(1)
-
-if(os.path.exists(outfile2)):
-    print outfile2 + " exists"
-    sys.exit(1)
+for outfile in outfiles:
+    if(os.path.exists(outfile)):
+        print outfile + " exists"
+        sys.exit(1)
 
 size_bytes = struct.pack("I", size)
 
-writeit(outfile1, outfile2, size_bytes)
-writeit(outfile1, outfile2, readit(infile))
-writeit(outfile1, outfile2, pad(get_padding_size(size+4)))
+writeit(outfiles, size_bytes)
+writeit(outfiles, readit(infile))
+writeit(outfiles, pad(get_padding_size(size+4)))
