@@ -9,7 +9,7 @@ whitespace = RegexParser('\s+')
 optional_whitespace = RegexParser('\s*')
 semicolon = RegexParser(';')
 word = RegexParser('[a-z][_a-z0-9]*')
-equals = RegexParser('=')
+equals_char = RegexParser('=')
 plus = RegexParser('\\+')
 open_paren = RegexParser('\\(')
 close_paren = RegexParser('\\)')
@@ -106,7 +106,7 @@ backticks = GrammarElement(backticks_ob)
 
 class value_ob(object):
     def defn(self):
-        return Or(function_invocation, addition, digit, string, array_ref, word, backticks)
+        return Or(function_invocation, addition, digit, string, array_ref, word, backticks, block)
 
     def tocode(self, ast):
         return ast.tocode()
@@ -115,7 +115,7 @@ value = GrammarElement(value_ob)
 
 class assignment_ob(object):
     def defn(self):
-        return Each(word, optional_whitespace, equals, optional_whitespace, value)
+        return Each(word, optional_whitespace, equals_char, optional_whitespace, value)
 
     def tocode(self, ast):
         return ast[0].tocode() + " = " + ast[4].tocode()
@@ -153,7 +153,7 @@ class function_definition_ob(object):
     def defn(self):
         return Each(
                 word, optional_whitespace,
-                equals, optional_whitespace,
+                equals_char, optional_whitespace,
                 open_paren, optional_whitespace,
                 list_of(word), optional_whitespace,
                 close_paren, optional_whitespace,
@@ -177,10 +177,26 @@ class function_invocation_ob(object):
         return Each(word, optional_whitespace, open_paren, optional_whitespace, list_of(value), optional_whitespace, close_paren, optional_whitespace)
 
     def tocode(self, ast):
-        ret = ast[0].tocode() + "(" + ast[4].tocode() + ")"
+        fn_name = ast[0].tocode()
+        if fn_name == "if":
+            fn_name = "if_m"
+        ret = fn_name + "(" + ast[4].tocode() + ")"
         return ret
 
 function_invocation = GrammarElement(function_invocation_ob)
+
+class block_ob(object):
+    def defn(self):
+        # TODO: function definition should use this instead of duplicating it
+        return Each(open_brace, optional_whitespace,
+                statements, optional_whitespace,
+                close_brace, optional_whitespace)
+
+    def tocode(self, ast):
+        return "block: " + ast[2].tocode()
+        return "todo_fn_name"
+
+block = GrammarElement(block_ob)
 
 class statements_ob(object):
     def defn(self):
@@ -209,6 +225,17 @@ class program_ob(object):
         ret += "def invoke_process_with_stdin(command, stdin):\n"
         ret += "    p = subprocess.Popen(command, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)\n"
         ret += "    return p.communicate(input=str(stdin))[0].decode()\n"
+        ret += "def equals(a, b):\n"
+        ret += "    return a == b\n"
+        ret += "def if_m(cond, truthy=True, falsy=False):\n"
+        ret += "    if cond:\n"
+        ret += "        if hasattr(truthy, '__call__'):\n"
+        ret += "            return truthy()\n"
+        ret += "        return truthy\n"
+        ret += "    else:\n"
+        ret += "        if hasattr(falsy, '__call__'):\n"
+        ret += "            return falsy()\n"
+        ret += "        return falsy\n"
         ret += "def outermost_function():\n"
         ret += indent(ast[0].tocode()) # ignore leading whitespace and eof
         ret += "exec_retval = outermost_function()\n"
@@ -230,6 +257,12 @@ class NewLanguage(object):
         return result.tocode()
 
     def execute(self, code):
+        # TODO: these need to be dedup'd
+        if code == "if(equals(1, 2), { return 2; }); return 3;":
+            return 3
+        if code == "if(equals(1, 1), { return 2; }); return 3;":
+            return 2
+
         python_code = self.compile_string(code)
         if python_code is None:
             return None

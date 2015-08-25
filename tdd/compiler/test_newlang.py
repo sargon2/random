@@ -69,9 +69,14 @@ class TestNewLanguage(unittest2.TestCase):
         self.assertResult("3\n", 'a = 3; return `echo {a}`;')
         self.assertResult("catted str", 'a = "catted str"; return `cat`(a);')
         self.assertResult(3, "# comment\nreturn 3; # comment")
-        # TODO: if
-        # self.assertResult(3, "if(equals(1, 2), { return 2; }); return 3;)")
-        # self.assertResult(2, "if(equals(1, 1), { return 2; }); return 3;)")
+
+    def test_if(self):
+        self.assertResult(3, "if(equals(1, 2), { return 2; }); return 3;")
+        self.assertResult(2, "if(equals(1, 1), { return 2; }); return 3;")
+        self.assertResult(3, "return if(equals(1, 1), 3);")
+        self.assertResult(4, "return if(equals(1, 2), 3, 4);")
+        self.assertResult(False, "return if(equals(1, 2), 3);")
+        self.assertResult(True, "return if(equals(2, 2));")
 
         # TODO: for
         # TODO: backticks as a statement

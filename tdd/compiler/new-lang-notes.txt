@@ -122,3 +122,36 @@ Functions don't *have* to have a return statement.  Classes can't have one.
 That means you can make a function that acts like a class, and returns an object instead of itself.
 I could force objects to have "return self;" at the bottom of the constructor, or something along those lines...
 But, you can't take a function, and treat it like an object.
+
+mymethod = () { if (equals(1, 2), { return 3; }); return 4; }
+mymethod()
+
+what does that return?
+
+a = if(equals(1, 2), { return 3; });
+a = if(equals(1, 2), { return 3; }, { return 4; });
+a = if(equals(1, 2), 3);
+a = if(equals(1, 2), 3, 4);
+
+Seems like the 'return' in the if should return the outer method.
+
+We want if to be a method.  Then how do you return from inside an if in python?
+
+myretmethod = lambda: special_return_object
+tmp_ob = if_m(True, myretmethod)
+if tmp_ob is a special return object:
+    return
+var = tmp_ob
+
+--
+a = if(equals(1, 2), { return 3; });
+
+becomes:
+
+mymethod = lambda: special_return_object(3)
+x = if_m(equals(1, 2), mymethod)
+if x is a special return object:
+    return x.value
+a = x
+
+This is the first time I'm reordering the AST.
