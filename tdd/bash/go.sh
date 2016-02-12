@@ -46,8 +46,8 @@ assertFails assertNotEquals f f
 
 
 assertEquals "a" "a"
-assertFails assertEquals "a" "b"
-assertFails assertEquals "a" 1
+assertNotEquals "a" "b"
+assertNotEquals "a" 1
 assertEquals "asdf" "asdf"
 assertEquals "1" "1"
 assertEquals "3" "3"
