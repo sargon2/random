@@ -1,0 +1,19 @@
+Why do we want to do calculations on the GPU?  Because they're faster.
+
+So, our test should read assertIsFast(calculation).
+
+But that kind of test is unreliable!  How do we make it repeatable?
+
+We could run it multiple times, then assert based on the fastest/slowest/average time.
+
+Which of those is most reliable?
+
+TODO: Run a short(ish) calculation hundreds of times and graph the results to determine which measurement is most reliable.
+
+Is it reliable enough for TDD?
+
+But we can TDD that too!  How about: assertIsReliable(test) or (more granular) assertDataConsistent(speedRunResults)
+
+But even that will be too slow...
+
+That's a good candidate for a "slow" test suite that's only run occasionally.
