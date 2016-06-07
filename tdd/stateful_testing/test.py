@@ -1,89 +1,45 @@
+# My try1 code had a weird smell with @collect.  So I wanted to go through the process again to see if I could do better the 2nd time.
+
 import unittest2
-import statefulboolean
-import os
+import storage
+import types
 
-# Problem.  How do we TDD something with permanant state?
-# When we start the test run, it has a state.  We don't know what that state is.
+# TODO: the module is storing in cwd so try a chdir
+# TODO: store 2 values, get both back
 
-# We have operations get_state() and set_state().
+class TestStoreState(unittest2.TestCase):
+    # There's a list of all modules in sys.modules.  I tried reloading all those, and it actually reloaded the unittest2/nosetest state, aborting the test run!
+    # So, we just reload things in the global state in this class.
+    def reload_python_state(self):
+        for name, val in globals().items():
+            if isinstance(val, types.ModuleType):
+                reload(val)
 
-# Since the test starts with new state each time, it has no way to verify that the state is stored across reboots.
+    # We have to be able to store and get things from memory to test that our reload_python_state method works.
+    def assert_store_get_memory(self, value):
+        storage.store_in_memory(value)
+        self.assertEquals(value, storage.get_from_memory())
 
-# Option: mock the thing that stores the state permanantly, don't test it.
+    def test_store_get_memory(self):
+        self.assert_store_get_memory(True)
+        self.assert_store_get_memory(False)
+        self.assert_store_get_memory("a")
 
-# Option: put code to read the permanant state in the test.  Then invoke the real code to write it and assert it changed.
-#   - But that should be dedup'd with the live code that reads the state.  And at that point it could be changed to be non-permanant.
+    def test_in_memory_item_default_value(self):
+        self.assertEquals(None, storage.get_from_memory())
 
-# Option: Python has a reload() function.  It only works on modules.
+    def test_reload_state_reloads(self):
+        storage.store_in_memory(True)
+        self.reload_python_state()
+        self.assertEquals(None, storage.get_from_memory())
 
-# TODO: nose2 parameterized tests
+    # Now, we finally get to the fun persistence test.
+    def assert_store_get_persistent(self, value):
+        storage.store(value)
+        self.reload_python_state()
+        self.assertEquals(value, storage.get())
 
-
-def collect(appendable):
-    def level2(method):
-        def wrapper(*args, **kwargs):
-            return method(*args, **kwargs)
-        appendable.append(wrapper)
-        return wrapper
-    return level2
-
-state_methods = []
-class TestSomething(unittest2.TestCase):
-
-    @collect(state_methods)
-    def assert_set_get_state_single(self, state):
-        sb = statefulboolean.StatefulBoolean()
-        sb.set_state(state)
-        self.assertEquals(state, sb.get_state())
-
-    @collect(state_methods)
-    def assert_set_get_state(self, state):
-        sb1 = statefulboolean.StatefulBoolean()
-        sb1.set_state(state)
-        sb1 = None
-
-        sb2 = statefulboolean.StatefulBoolean()
-        self.assertEquals(state, sb2.get_state())
-
-    @collect(state_methods)
-    def assert_already_exists_get(self, state):
-        sb1 = statefulboolean.StatefulBoolean()
-        sb2 = statefulboolean.StatefulBoolean()
-
-        sb1.set_state(state)
-        self.assertEquals(state, sb2.get_state())
-
-    def assert_state_changer(self, state, method):
-        sb1 = statefulboolean.StatefulBoolean()
-        sb1.set_state(state)
-
-        method()
-
-        sb2 = statefulboolean.StatefulBoolean()
-        self.assertEquals(state, sb2.get_state())
-
-    @collect(state_methods)
-    def assert_state_changers(self, state):
-        changers = []
-
-        @collect(changers)
-        def rel():
-            reload(statefulboolean)
-
-        @collect(changers)
-        def chdir():
-            os.chdir("/")
-
-        for changer in changers:
-            self.assert_state_changer(state, changer)
-
-    def try_all(self, state):
-        for method in state_methods:
-            method(self, state)
-
-    def test_set_get(self):
-        data = [True, False, "a"]
-        for item in data:
-            self.try_all(item)
-
-
+    def test_store_get_persistent(self): # TODO: looks dup'd with test_store_get_memory
+        self.assert_store_get_persistent(True)
+        self.assert_store_get_persistent(False)
+        self.assert_store_get_persistent("a")
