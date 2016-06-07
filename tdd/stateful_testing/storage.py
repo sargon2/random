@@ -11,7 +11,7 @@ def store_in_memory(item):
 
 
 def store(item):
-    pickle.dump(item, open("state.p", "wb"))
+    pickle.dump(item, open("/tmp/state.p", "wb"))
 
 def get():
-    return pickle.load(open("state.p", "rb"))
+    return pickle.load(open("/tmp/state.p", "rb"))
