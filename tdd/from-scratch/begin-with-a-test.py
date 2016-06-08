@@ -27,13 +27,10 @@ def Test(a):
 
 class TestTestFramework(TestFramework):
 
-    def failing_test(self):
-        self.fail()
-
     @Test
     def test_test_can_fail(self):
         with self.assert_fails():
-            self.failing_test()
+            self.fail()
 
     @Test
     def test_assert_equals_pass(self):
