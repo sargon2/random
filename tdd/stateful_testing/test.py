@@ -7,6 +7,7 @@ import re
 import os
 
 # TODO: deletion
+# TODO: concurrency
 
 class TestStoreState(unittest2.TestCase):
     def reload_python_state(self):
