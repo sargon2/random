@@ -6,7 +6,7 @@ import sys
 import re
 import os
 
-# TODO: store 2 values, get both back
+# TODO: deletion
 
 class TestStoreState(unittest2.TestCase):
     def reload_python_state(self):
@@ -23,8 +23,9 @@ class TestStoreState(unittest2.TestCase):
                     r'^six',
                     r'^unittest',
                     r'^zipfile$',
-                    r'__main__',
-                    r'site'
+                    r'^__main__$',
+                    r'^site$',
+                    r'^nose'
                 ]
             for regex in do_not_reload_regexes:
                 if re.match(regex, module_name):
@@ -56,12 +57,17 @@ class TestStoreState(unittest2.TestCase):
 
     # Now, we finally get to the fun persistence test.
     def assert_store_get_persistent(self, value):
-        storage.store(value)
+        storage.store("key", value)
         self.reload_python_state()
-        self.assertEquals(value, storage.get())
+        self.assertEquals(value, storage.get("key"))
 
     def test_store_get_persistent(self):
         self.assert_store_get_persistent("a")
         self.assert_store_get_persistent([1, 2, 3])
         self.assert_store_get_persistent({'a': 3, 'b': 5})
 
+    def test_what(self):
+        storage.store("key", "a")
+        storage.store("key2", "b")
+        self.assertEquals("a", storage.get("key"))
+        self.assertEquals("b", storage.get("key2"))

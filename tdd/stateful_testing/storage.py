@@ -10,8 +10,13 @@ def store_in_memory(item):
     in_memory_item = item
 
 
-def store(item):
-    pickle.dump(item, open("/tmp/state.p", "wb"))
+data = {}
+def store(key, item):
+    global data
+    data[key] = item
+    pickle.dump(data, open("/tmp/state.p", "wb"))
 
-def get():
-    return pickle.load(open("/tmp/state.p", "rb"))
+def get(key):
+    global data
+    data = pickle.load(open("/tmp/state.p", "rb"))
+    return data[key]
