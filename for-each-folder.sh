@@ -1,6 +1,7 @@
 #!/bin/bash -e
 
 FAILED=()
+SUCCEEDED=()
 
 for FOLDER in *; do
     if [ ! -d "$FOLDER" ]; then
@@ -18,11 +19,16 @@ for FOLDER in *; do
         "$@" || ret=$?
         if [ $ret -ne 0 ]; then
             FAILED+=("$FOLDER")
+        else
+            SUCCEEDED+=("$FOLDER")
         fi
     popd >/dev/null
     echo
 done
 
+if [ -n "$SUCCEEDED" ]; then
+    echo "SUCCEEDED: ${SUCCEEDED[@]}"
+fi
 if [ -n "$FAILED" ]; then
     echo "FAILED: ${FAILED[@]}"
 fi
