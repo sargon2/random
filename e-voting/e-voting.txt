@@ -11,12 +11,9 @@ When they vote, a voter is assigned a random number in the range 1 - # of voters
 
 Then, when voting is complete, the voting system publishes a list of all those numbers with which way they voted.
 
-But knowing the # of voters is hard.  So let's assign the numbers in blocks of N.
-- Assign block 1 until it's full, then move on to block 2, etc.
+But knowing the # of voters is hard.  So let's assign the numbers incrementally (but still randomly).
 
-Maybe there's a better way than going in blocks.  Each voter is assigned a random not-yet-assigned number in the range 0 - total # of votes so far plus N?
-
-I don't like starting at small numbers and working towards large so much...
+Each voter is assigned a random not-yet-assigned number in the range 0 - total # of votes so far plus N.
 
 People with large numbers might not have a lot of neighbors, which would make their vote demonstratable.
  - They could tell someone else their number before the list is published, and then when it's on the list without any neighbors, it's clear it was correct.
@@ -29,10 +26,3 @@ When a voter looks at the list of votes, they can find their number, and verify 
 Anyone can download the entire list and count the votes to verify the totals.
 Each voter knows their number, but if they tell their number to someone else, that other person can't know for sure if they're telling the truth, since it's easy to make up valid numbers.
 
---
-
-https://en.wikipedia.org/wiki/Electronic_voting#Coercion_Evidence
-
-There's another possible requirement that voting systems be "coercion-evident".
-
-One possible solution is if voters could change their votes at any time up until the deadline.
