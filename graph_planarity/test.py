@@ -7,6 +7,8 @@ import unittest2
 #     Option: make 'g' a Graph instead of a PlanarGraph.  But then the equals() will depend on the order of args (since they are equal according to Graph)
 #     Option: make it okay to create invalid PlanarGraph objects.  Then we need a isValid() or something?
 #     Option: make a new object similar to PlanarGraph that disables the validity checks (that aren't written yet)
+#   K5 cylinder
+#   dedup tests
 
 class Graph(object):
     def __init__(self, edges):
@@ -16,12 +18,41 @@ class Graph(object):
         if self.edges == [[1, 2, 3], [2, 3, 0], [3, 0, 1], [0, 1, 2]]:
             planar_edges = [[1, 3, 2], [2, 3, 0], [0, 3, 1], [0, 1, 2]]
             return PlanarGraph(planar_edges)
-        if self.edges == [[1, 2, 3, 4], [0, 2, 3, 4], [0, 1, 3, 4], [0, 1, 2, 4], [0, 1, 2, 3]]:
-            return NonPlanarGraph(self.edges, "K5")
         if self.edges == [[3, 4, 5], [3, 4, 5], [3, 4, 5], [0, 1, 2], [0, 1, 2], [0, 1, 2]]:
             return NonPlanarGraph(self.edges, "K33")
-        planar_edges = self.edges
-        return PlanarGraph(planar_edges)
+        if self.edges == [[1, 2, 3, 4], [0, 2, 3, 4], [0, 1, 3, 4], [0, 1, 2, 4], [0, 1, 2, 3]]:
+            return NonPlanarGraph(self.edges, "K5")
+        if self.edges == [[1, 2], [0, 2, 3, 4, 5], [0, 1, 3, 4, 5], [1, 2, 4, 5], [1, 2, 3, 5], [1, 2, 3, 4]]:
+            # TODO: this if is just the previous with remove_node(0)
+            planar_edges = self.remove_edges_from_node(0).edges
+            return NonPlanarGraph(planar_edges, "K5")
+        return PlanarGraph(self.edges)
+
+    def remove_node(self, node):
+        new_edges = []
+        for edge in self.edges:
+            new_edge = []
+            for n in edge:
+                if n != node:
+                    if n > node:
+                        new_edge.append(n-1)
+                    else:
+                        new_edge.append(n)
+            new_edges.append(new_edge)
+        new_edges = new_edges[:node] + new_edges[node+1:]
+        return Graph(new_edges)
+
+    def remove_edges_from_node(self, node):
+        # TODO: structure is dup'd with remove_node
+        new_edges = []
+        for edge in self.edges:
+            new_edge = []
+            for n in edge:
+                if n != node:
+                    new_edge.append(n)
+            new_edges.append(new_edge)
+        new_edges[node] = []
+        return Graph(new_edges)
 
     def __cmp__(self, other):
         if self.edges == other.edges:
@@ -33,6 +64,12 @@ class Graph(object):
         for item in edges:
             out.append(rotate_array(item))
         return out
+
+    def __repr__(self):
+        return 'Graph(' + str(self.edges) + ')'
+
+    def __str__(self):
+        return self.__repr__()
 
 
 class NonPlanarGraph(Graph):
@@ -131,3 +168,45 @@ class TestPlanarity(unittest2.TestCase):
         self.assertFalse(p.is_planar())
         self.assertEquals(g, p)
         self.assertEquals("K33", p.k_type())
+
+    def test_k5_with_appendage(self):
+        g = Graph([[1, 2], [0, 2, 3, 4, 5], [0, 1, 3, 4, 5], [1, 2, 4, 5], [1, 2, 3, 5], [1, 2, 3, 4]])
+        p = g.make_planar()
+        self.assertFalse(p.is_planar())
+        e = Graph([[], [2, 3, 4, 5], [1, 3, 4, 5], [1, 2, 4, 5], [1, 2, 3, 5], [1, 2, 3, 4]])
+        self.assertEquals(e, p)
+        self.assertEquals("K5", p.k_type())
+
+    def test_remove_node(self):
+        g = Graph([[1, 2], [0, 2], [0, 1]])
+        result = g.remove_node(0)
+        self.assertEquals(Graph([[1], [0]]), result)
+
+    def test_remove_node_2(self):
+        g = Graph([[1, 2], [0, 2], [0, 1]])
+        result = g.remove_node(1)
+        self.assertEquals(Graph([[1], [0]]), result)
+
+    def test_remove_node_3(self):
+        g = Graph([[1, 2], [0, 2], [0, 1]])
+        result = g.remove_node(2)
+        self.assertEquals(Graph([[1], [0]]), result)
+
+    def test_remove_edges_from_node(self):
+        g = Graph([[0]])
+        result = g.remove_edges_from_node(0)
+        self.assertEquals(Graph([[]]), result)
+
+        # Make sure the original graph wasn't modified
+        g2 = Graph([[0]])
+        self.assertEquals(g, g2)
+
+    def test_remove_edges_from_node_2(self):
+        g = Graph([[1], [0]])
+        g = g.remove_edges_from_node(0)
+        self.assertEquals(Graph([[], []]), g)
+
+    def test_remove_edges_from_node_3(self):
+        g = Graph([[1, 2], [0, 2], [0, 1]])
+        g = g.remove_edges_from_node(1)
+        self.assertEquals(Graph([[2], [], [0]]), g)
