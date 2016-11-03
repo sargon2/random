@@ -2,7 +2,6 @@ import unittest2
 
 # TODO:
 #   make_planar
-#   test with some non-planar graphs
 #   test_four_node_without_make_planar
 #     It should be impossible to make a PlanarGraph with a non-planar embedding.  So how do we do this test?
 #     Option: make 'g' a Graph instead of a PlanarGraph.  But then the equals() will depend on the order of args (since they are equal according to Graph)
@@ -14,14 +13,20 @@ class Graph(object):
         self.edges = edges
 
     def make_planar(self):
-        planar_edges = self.edges
-        if planar_edges == [[1, 2, 3], [2, 3, 0], [3, 0, 1], [0, 1, 2]]:
+        if self.edges == [[1, 2, 3], [2, 3, 0], [3, 0, 1], [0, 1, 2]]:
             planar_edges = [[1, 3, 2], [2, 3, 0], [0, 3, 1], [0, 1, 2]]
+            return PlanarGraph(planar_edges)
+        if self.edges == [[1, 2, 3, 4], [0, 2, 3, 4], [0, 1, 3, 4], [0, 1, 2, 4], [0, 1, 2, 3]]:
+            return NonPlanarGraph(self.edges, "K5")
+        if self.edges == [[3, 4, 5], [3, 4, 5], [3, 4, 5], [0, 1, 2], [0, 1, 2], [0, 1, 2]]:
+            return NonPlanarGraph(self.edges, "K33")
+        planar_edges = self.edges
         return PlanarGraph(planar_edges)
 
-class PlanarGraph(object):
-    def __init__(self, edges):
-        self.edges = self.order_edges(edges)
+    def __cmp__(self, other):
+        if self.edges == other.edges:
+            return 0
+        return -1
 
     def order_edges(self, edges):
         out = []
@@ -29,13 +34,25 @@ class PlanarGraph(object):
             out.append(rotate_array(item))
         return out
 
+
+class NonPlanarGraph(Graph):
+    def __init__(self, edges, k_type):
+        self.edges = self.order_edges(edges)
+        self._k_type = k_type
+
+    def k_type(self):
+        return self._k_type
+
+    def is_planar(self):
+        return False
+
+class PlanarGraph(Graph):
+    def __init__(self, edges):
+        self.edges = self.order_edges(edges)
+
     def is_planar(self):
         return True
 
-    def __cmp__(self, other):
-        if self.edges == other.edges:
-            return 0
-        return -1
 
 def rotate_array(ary):
     # Rotate array so the smallest element is first.
@@ -100,3 +117,17 @@ class TestPlanarity(unittest2.TestCase):
         self.assertEquals(rotate_array([1, 2, 3]), [1, 2, 3])
         self.assertEquals(rotate_array([2, 3, 1]), [1, 2, 3])
         self.assertEquals(rotate_array([3, 2, 1]), [1, 3, 2])
+
+    def test_k5(self):
+        g = Graph([[1, 2, 3, 4], [0, 2, 3, 4], [0, 1, 3, 4], [0, 1, 2, 4], [0, 1, 2, 3]])
+        p = g.make_planar()
+        self.assertFalse(p.is_planar())
+        self.assertEquals(g, p)
+        self.assertEquals("K5", p.k_type())
+
+    def test_k33_1(self):
+        g = Graph([[3, 4, 5], [3, 4, 5], [3, 4, 5], [0, 1, 2], [0, 1, 2], [0, 1, 2]])
+        p = g.make_planar()
+        self.assertFalse(p.is_planar())
+        self.assertEquals(g, p)
+        self.assertEquals("K33", p.k_type())
