@@ -27,6 +27,7 @@ echo "Manually visit the link!!"
 
 # wait until done syncing
 # TODO: we're doing extra status calls here...
+# TODO: dup'd with wait-for-dropbox-sync.sh
 while ! ~/bin/dropbox status 2>&1 | grep -q "Up to date"; do sleep 5; ~/bin/dropbox status; sleep 5; done
 
 # Restart it so it's running via the python script instead of in this shell
