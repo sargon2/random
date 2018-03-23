@@ -1,5 +1,7 @@
 # https://www.reddit.com/r/personalfinance/comments/86bx1n/fair_way_to_split_rent_advice_needed/
 
+# Better solution here: http://www.spliddit.org/apps/rent
+
 from itertools import permutations
 
 # My idea for dividing up the house and assigning costs based on users' preferences...
