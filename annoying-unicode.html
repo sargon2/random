@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <center>
+            <input type="text" id="in"></input>
+            <button type="button" onclick="go()">go</button>
+            <p id="demo"></p>
+        </center>
+        <script>
+function go() {
+    str = document.getElementById('in').value;
+    outstr = "";
+    for (var i = 0; i < str.length; i++) {
+          outstr += str.charAt(i);
+          direction = Math.trunc(Math.random() * 5);
+          switch(direction) {
+              case 0:
+                  char = '\u0E47'; // left-ish
+                  break;
+              case 1:
+                  char = '\u0E49'; // right
+                  break;
+              case 2:
+                  char = '\u0E4A'; // up
+                  break;
+              case 3:
+                  char = '\u0E39'; // down
+                  break;
+              case 4:
+                  char = '\u0E3A'; // down-left-ish
+                  break;
+          }
+          num = Math.random() * 50 + 50;
+          for(var j = 0;j<num;j++) {
+              outstr += char;
+          }
+    }
+    document.getElementById("demo").innerHTML = outstr;
+}
+        </script>
+    </body>
+</html>
+
