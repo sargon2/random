@@ -1,4 +1,4 @@
-import unittest2
+import unittest
 import operator
 import random
 import sys
@@ -22,7 +22,7 @@ class Directions:
 class InvalidArgumentException(Exception):
     pass
 
-class MazeTest(unittest2.TestCase):
+class MazeTest(unittest.TestCase):
     def test_constructor(self):
         Maze(3, 3)
 
