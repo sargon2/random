@@ -16,3 +16,4 @@ choco upgrade -y audacity
 choco upgrade -y vlc
 choco upgrade -y minecraft
 choco upgrade -y spacesniffer
+choco upgrade -y veracrypt
