@@ -1,16 +1,21 @@
 #!/bin/bash
+DATE=date
 
-endTime=$(date -d "$@" +%s)
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    DATE=gdate
+fi
+
+endTime=$($DATE -d "$@" +%s)
 while true
 do
-    startTime=$(date +%s)
+    startTime=$($DATE +%s)
     timeToWait=$(($endTime- $startTime))
     if [ "$timeToWait" -le "0" ]
     then
         exit 0
     fi
     echo -n "Sleeping $timeToWait seconds until "
-    date -d "@$endTime"
+    $DATE -d "@$endTime"
     timeToWait=$((($timeToWait+9) / 10))
     if [ "$timeToWait" -lt "1" ]
     then
