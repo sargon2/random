@@ -1,0 +1,22 @@
+#!/bin/bash
+
+check-for-branch () {
+    if git rev-parse --git-dir >/dev/null 2> /dev/null; then
+        PROJ=$(basename `pwd`)
+        CURR_BRANCH=`git rev-parse --abbrev-ref HEAD`
+        if git show-ref --verify --quiet "refs/heads/$1"; then
+            printf "%-25s" "$PROJ: "
+            if [ "$CURR_BRANCH" = "$1" ]; then
+                echo -n "* "
+            else
+                echo -n "  "
+            fi
+            echo $1
+        fi
+    fi
+
+}
+
+export -f check-for-branch
+
+for-each-folder check-for-branch $1
