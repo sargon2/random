@@ -24,4 +24,4 @@ check-for-branch () {
 
 export -f check-for-branch
 
-for-each-folder check-for-branch $1
+for-each-folder -q check-for-branch $1
