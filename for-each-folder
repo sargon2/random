@@ -1,10 +1,16 @@
-#!/bin/bash
+#!/bin/bash -e
+
+failed=()
+succeeded=()
 
 quiet=false
+summary=false
 
-while getopts ":q" option; do
+while getopts ":qsh" option; do
   case $option in
     q) quiet=true ;;
+    s) summary=true ;;
+    h) echo "Usage: $0 [-q] [-s] command..." ;;
     ?) echo "error: no such option -$OPTARG"; exit ;;
   esac
 done
@@ -12,12 +18,37 @@ done
 # remove the options from the positional parameters
 shift $(( OPTIND - 1 ))
 
-for f in *; do
-    if [ -d "$f" ]; then
+for folder in *; do
+    if [ ! -d "$folder" ]; then
+        continue
+    fi
+    if [ "$folder" = "." ]; then
+        continue
+    fi
+    if [ "$folder" = ".." ]; then
+        continue
+    fi
+    if [ -d "$folder" ]; then
         ! $quiet && echo
-        ! $quiet && echo "$f:"
-        pushd "$f" >/dev/null
-        "$@"
+        ! $quiet && echo "$folder:"
+        pushd "$folder" >/dev/null
+            ret=0
+            "$@" || ret=$?
+            if [ $ret -ne 0 ]; then
+                failed+=("$folder")
+            else
+                succeeded+=("$folder")
+            fi
         popd >/dev/null
     fi
 done
+
+if [ "$summary" = true ]; then
+    echo
+    if [ -n "$succeeded" ]; then
+        echo "succeeded: ${succeeded[@]}"
+    fi
+    if [ -n "$failed" ]; then
+        echo "failed: ${failed[@]}"
+    fi
+fi
