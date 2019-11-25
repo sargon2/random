@@ -4,12 +4,10 @@ failed=()
 succeeded=()
 
 quiet=false
-summary=false
 
 while getopts ":qsh" option; do
   case $option in
     q) quiet=true ;;
-    s) summary=true ;;
     h) echo "Usage: $0 [-q] [-s] command..." ;;
     ?) echo "error: no such option -$OPTARG"; exit ;;
   esac
@@ -43,7 +41,7 @@ for folder in *; do
     fi
 done
 
-if [ "$summary" = true ]; then
+if [ ! "$quiet" = true ]; then
     echo
     if [ -n "$succeeded" ]; then
         echo "succeeded: ${succeeded[@]}"
