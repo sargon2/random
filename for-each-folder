@@ -46,6 +46,7 @@ if [ ! "$quiet" = true ]; then
     if [ -n "$succeeded" ]; then
         echo "succeeded: ${succeeded[@]}"
     fi
+    echo
     if [ -n "$failed" ]; then
         echo "failed: ${failed[@]}"
     fi
