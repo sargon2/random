@@ -5,18 +5,59 @@ succeeded=()
 
 quiet=false
 
-while getopts ":qsh" option; do
-  case $option in
-    q) quiet=true ;;
-    h) echo "Usage: $0 [-q] [-s] command..." ;;
-    ?) echo "error: no such option -$OPTARG"; exit ;;
-  esac
+all_folders=true
+
+PARAMS=""
+FOLDERS=""
+
+if [ -z "$1" ]; then
+    set -- "-h"
+fi
+
+while (( "$#" )); do
+    case "$1" in
+        -q|--quiet)
+            quiet=true
+            shift
+            ;;
+        -h|--help)
+            echo "Usage: $0 [-q] [-s] [-f folders...] [--] command..."
+            exit 0
+            ;;
+        -f|--folders)
+            all_folders=false
+            # We want to use up params until --.
+            # TODO if the user specifies -f without --, give a sensible error
+            while [[ "$1" != "--" ]]; do
+                FOLDERS="$FOLDERS $1"
+                shift
+            done
+            shift
+            PARAMS="$@"
+            break
+            ;;
+        --)
+            shift
+            PARAMS="$@"
+            break
+            ;;
+        -*|--*)
+            echo "error: no such option $1" >&2;
+            exit 1
+            ;;
+        *)
+            PARAMS="$PARAMS $1"
+            shift
+            ;;
+    esac
 done
 
 # remove the options from the positional parameters
-shift $(( OPTIND - 1 ))
+eval set -- "$PARAMS"
 
-for folder in *; do
+$all_folders && FOLDERS="*"
+
+for folder in $FOLDERS; do
     if [ ! -d "$folder" ]; then
         continue
     fi
