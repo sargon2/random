@@ -57,18 +57,45 @@ def get_segments(in_string):
         curr_pos = new_pos
     return (horizontal, vertical)
 
-def find_closest(point_list):
+def calc_distance(point, in_string):
+    # TODO we're reparsing input_str, we should only parse it once
+    curr_pos = (0, 0)
+    items = in_string.split(",")
+    tot_dist = 0
+    for item in items:
+        direction = item[0]
+        distance = int(item[1:])
+        if direction == "R":
+            new_pos = (curr_pos[0]+distance, curr_pos[1])
+            if point[1] == curr_pos[1] and curr_pos[0] <= point[0] and point[0] <= new_pos[0]:
+                return tot_dist + (point[0] - curr_pos[0])
+        elif direction == "L":
+            new_pos = (curr_pos[0]-distance, curr_pos[1])
+            if point[1] == curr_pos[1] and curr_pos[0] >= point[0] and point[0] >= new_pos[0]:
+                return tot_dist + (curr_pos[0] - point[0])
+        elif direction == "U":
+            new_pos = (curr_pos[0], curr_pos[1]+distance)
+            if point[0] == curr_pos[0] and curr_pos[1] <= point[1] and point[1] <= new_pos[1]:
+                return tot_dist + (point[1] - curr_pos[1])
+        elif direction == "D":
+            new_pos = (curr_pos[0], curr_pos[1]-distance)
+            if point[0] == curr_pos[0] and curr_pos[1] >= point[1] and point[1] >= new_pos[1]:
+                return tot_dist + (curr_pos[1] - point[1])
+        tot_dist += distance
+        curr_pos = new_pos
+
+
+def find_closest(point_list, input1, input2):
     closest = None
     closest_val = None
     for point in point_list:
-        if closest is None:
+        #val = abs(point[0]) + abs(point[1])
+        val1 = calc_distance(point, input1)
+        val2 = calc_distance(point, input2)
+        val = val1 + val2
+        if closest is None or val < closest_val:
             closest = point
-            closest_val = abs(point[0]) + abs(point[1])
-        else:
-            val = abs(point[0]) + abs(point[1])
-            if val < closest_val:
-                closest = point
-                closest_val = val
+            closest_val = val
     return closest, closest_val
 
 if __name__ == "__main__":
@@ -90,4 +117,4 @@ if __name__ == "__main__":
 
     intersections_1.extend(intersections_2)
 
-    print(find_closest(intersections_1))
+    print(find_closest(intersections_1, input1, input2))
