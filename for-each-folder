@@ -59,7 +59,6 @@ set -- "${PARAMS[@]}"
 $all_folders && FOLDERS=(*)
 
 for folder in "${FOLDERS[@]}"; do
-    echo "folder $folder"
     if [ ! -d "$folder" ]; then
         continue
     fi
