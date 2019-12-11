@@ -7,8 +7,8 @@ quiet=false
 
 all_folders=true
 
-PARAMS=""
-FOLDERS=""
+PARAMS=()
+FOLDERS=()
 
 if [ -z "$1" ]; then
     set -- "-h"
@@ -26,19 +26,20 @@ while (( "$#" )); do
             ;;
         -f|--folders)
             all_folders=false
+            shift
             # We want to use up params until --.
             # TODO if the user specifies -f without --, give a sensible error
             while [[ "$1" != "--" ]]; do
-                FOLDERS="$FOLDERS $1"
+                FOLDERS+=("$1")
                 shift
             done
             shift
-            PARAMS="$@"
+            PARAMS=("$@")
             break
             ;;
         --)
             shift
-            PARAMS="$@"
+            PARAMS=("$@")
             break
             ;;
         -*|--*)
@@ -46,18 +47,19 @@ while (( "$#" )); do
             exit 1
             ;;
         *)
-            PARAMS="$PARAMS $1"
+            PARAMS+=("$1")
             shift
             ;;
     esac
 done
 
 # remove the options from the positional parameters
-eval set -- "$PARAMS"
+set -- "${PARAMS[@]}"
 
-$all_folders && FOLDERS="*"
+$all_folders && FOLDERS=(*)
 
-for folder in $FOLDERS; do
+for folder in "${FOLDERS[@]}"; do
+    echo "folder $folder"
     if [ ! -d "$folder" ]; then
         continue
     fi
