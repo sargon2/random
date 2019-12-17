@@ -22,6 +22,7 @@ while (( "$#" )); do
             ;;
         -h|--help)
             echo "Usage: $0 [-q] [-s] [-f folders...] [--] command..."
+            echo 'The FOLDER variable will be set to the current folder.  Example: for-each-folder -- bash -c "echo \$FOLDER"'
             exit 0
             ;;
         -f|--folders)
@@ -58,26 +59,27 @@ set -- "${PARAMS[@]}"
 
 $all_folders && FOLDERS=(*)
 
-for folder in "${FOLDERS[@]}"; do
-    if [ ! -d "$folder" ]; then
+for FOLDER in "${FOLDERS[@]}"; do
+    export FOLDER
+    if [ ! -d "$FOLDER" ]; then
         continue
     fi
-    if [ "$folder" = "." ]; then
+    if [ "$FOLDER" = "." ]; then
         continue
     fi
-    if [ "$folder" = ".." ]; then
+    if [ "$FOLDER" = ".." ]; then
         continue
     fi
-    if [ -d "$folder" ]; then
+    if [ -d "$FOLDER" ]; then
         ! $quiet && echo
-        ! $quiet && echo "$folder:"
-        pushd "$folder" >/dev/null
+        ! $quiet && echo "$FOLDER:"
+        pushd "$FOLDER" >/dev/null
             ret=0
             "$@" || ret=$?
             if [ $ret -ne 0 ]; then
-                failed+=("$folder")
+                failed+=("$FOLDER")
             else
-                succeeded+=("$folder")
+                succeeded+=("$FOLDER")
             fi
         popd >/dev/null
     fi
