@@ -6,16 +6,28 @@ check-for-branch () {
         CURR_BRANCH=`git rev-parse --abbrev-ref HEAD`
         if [ "$1" == "" ]; then
             printf "%-25s" "$PROJ: "
-            echo " * $CURR_BRANCH"
+            if [[ -n $(git status -s) ]]; then
+                echo -n "* "
+            else
+                echo -n "  "
+            fi
+            echo " $CURR_BRANCH"
         else
             if git show-ref --verify --quiet "refs/heads/$1"; then
                 printf "%-25s" "$PROJ: "
-                if [ "$CURR_BRANCH" = "$1" ]; then
+                if [[ -n $(git status -s) ]]; then
                     echo -n "* "
                 else
                     echo -n "  "
                 fi
-                echo $1
+                echo -n $1
+
+                if [ "$CURR_BRANCH" = "$1" ]; then
+                    echo -n " (checked out)"
+                else
+                    echo -n "              "
+                fi
+                echo
             fi
         fi
     fi
