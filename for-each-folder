@@ -6,6 +6,7 @@ succeeded=()
 quiet=false
 
 all_folders=true
+on_branch=
 
 PARAMS=()
 FOLDERS=()
@@ -21,8 +22,11 @@ while (( "$#" )); do
             shift
             ;;
         -h|--help)
-            echo "Usage: $0 [-q] [-s] [-f folders...] [--] command..."
+            echo "Usage: $0 [-q] [-b <branch>] [-f folders...] [--] command..."
             echo 'The FOLDER variable will be set to the current folder.  Example: for-each-folder -- bash -c "echo \$FOLDER"'
+            echo '-q: Quiet.'
+            echo '-b: Only run command if folder is a git repository with the given branch checked out.'
+            echo '-f: Use the given list of folders.  Requires -- to mark the end of the folders.'
             exit 0
             ;;
         -f|--folders)
@@ -37,6 +41,11 @@ while (( "$#" )); do
             shift
             PARAMS=("$@")
             break
+            ;;
+        -b|--on-branch)
+            shift
+            on_branch="$1"
+            shift
             ;;
         --)
             shift
@@ -71,15 +80,31 @@ for FOLDER in "${FOLDERS[@]}"; do
         continue
     fi
     if [ -d "$FOLDER" ]; then
-        ! $quiet && echo
-        ! $quiet && echo "$FOLDER:"
         pushd "$FOLDER" >/dev/null
-            ret=0
-            "$@" || ret=$?
-            if [ $ret -ne 0 ]; then
-                failed+=("$FOLDER")
-            else
-                succeeded+=("$FOLDER")
+
+            SKIP=false
+
+            if [ -n "$on_branch" ]; then
+                if ! git rev-parse --git-dir >/dev/null 2> /dev/null; then
+                    # Not a git repo
+                    SKIP=true
+                else
+                    CURR_BRANCH=`git rev-parse --abbrev-ref HEAD`
+                    if [ ! "$CURR_BRANCH" == "$on_branch" ]; then
+                        SKIP=true
+                    fi
+                fi
+            fi
+            if ! $SKIP; then
+                ! $quiet && echo
+                ! $quiet && echo "$FOLDER:"
+                ret=0
+                "$@" || ret=$?
+                if [ $ret -ne 0 ]; then
+                    failed+=("$FOLDER")
+                else
+                    succeeded+=("$FOLDER")
+                fi
             fi
         popd >/dev/null
     fi
