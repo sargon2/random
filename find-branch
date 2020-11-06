@@ -5,7 +5,7 @@ check-for-branch () {
         PROJ=$(basename `pwd`)
         CURR_BRANCH=`git rev-parse --abbrev-ref HEAD`
         if [ "$1" == "" ]; then
-            printf "%-25s" "$PROJ: "
+            printf "%-35s" "$PROJ: "
             if [[ -n $(git status -s) ]]; then
                 echo -n "* "
             else
