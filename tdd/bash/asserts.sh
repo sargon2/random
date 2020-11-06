@@ -18,7 +18,7 @@ function assertNotEquals {
 }
 
 function assertFails {
-    RET=0
-    $@ > /dev/null || RET=$?
+    local RET=0
+    "$@" || RET=$?
     assertNotEquals $RET 0
 }
