@@ -61,6 +61,7 @@ for func in $functions; do
         # If we do $func || RET=$? here, it causes the tests to false negative.
         # That's super annoying and needs a fix, so we can output a reasonable
         # message on internal failure.
+        # See https://unix.stackexchange.com/a/318412
         $func
     fi
     if [[ $func = test_* ]]; then
