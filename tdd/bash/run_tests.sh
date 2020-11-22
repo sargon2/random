@@ -1,5 +1,7 @@
 #!/bin/bash -e
 
+# set -x; PS4='+ ${LINENO}: '
+
 function equals {
     if [ "$1" == "$2" ]; then
         return 0
@@ -18,7 +20,7 @@ function assertEquals {
 function assertNotEquals {
     if equals "$1" "$2"; then
         if [ -n "$3" ]; then
-            echo $3
+            echo "$3"
         else
             echo "expected '$1' to not equal '$2'"
         fi
@@ -42,6 +44,25 @@ function assertFailsMsg {
 
     MSG="${@: -1}"
     assertNotEquals $RET 0 "$MSG"
+}
+
+function assertFileNotExists {
+    if [ -f "$1" ]; then
+        if [ -n "$2" ]; then
+            echo "$2"
+        else
+            echo "expected '$1' to not exist"
+        fi
+        return 1
+    fi
+}
+
+function assertFileExists {
+    MSG=$2
+    if [ -z "$2" ]; then
+        MSG="expected '$1' to exist"
+    fi
+    assertFailsMsg assertFileNotExists "$1" "$MSG"
 }
 
 function internal_test_asserts {
@@ -73,48 +94,46 @@ function internal_test_asserts {
 
     assertNotEquals "asdf jkl" "asdf asdf"
     assertEquals "asdf jkl" "asdf jkl"
+
+    touch delme.txt # TODO hope this doesn't already exist...
+    assertFileExists delme.txt
+    rm -f delme.txt # TODO this doesn't get deleted if the assert fails
+    assertFails assertFileExists delme.txt
+
+    touch "del me.txt" # TODO same
+    assertFileExists "del me.txt"
+    rm -f "del me.txt"
+    assertFileNotExists "del me.txt"
 }
 
-function internal_test_not_equals_message {
-    set +e
-    msg=$(assertNotEquals "a" "a")
+function assertFailureMessage {
+    expected_msg="${@: -1}"
+    set +e ; actual_msg=$( ( set -e; "${@:1:$#-1}" ) ) ;
     set -e
-    assertEquals "expected 'a' to not equal 'a'" "$msg"
+
+    assertEquals "$expected_msg" "$actual_msg"
 }
 
-function internal_test_not_equals_custom_message {
-    set +e
-    msg=$(assertNotEquals "a" "a" "blah")
-    set -e
-    assertEquals "blah" "$msg"
+function assertCustomFailureMessage {
+    assertFailureMessage "$@" "blah msg" "blah msg"
 }
 
-function internal_test_equals_message {
-    set +e
-    msg=$(assertEquals "a" "b")
-    set -e
-    assertEquals "expected 'a' to equal 'b'" "$msg"
+function assertBothFailureMessages {
+    assertFailureMessage "$@"
+    assertCustomFailureMessage "${@:1:$#-1}"
 }
 
-function internal_test_equals_message_custom {
-    set +e
-    msg=$(assertEquals "a" "b" "blah")
-    set -e
-    assertEquals "blah" "$msg"
-}
+function internal_test_failure_messages {
+    assertBothFailureMessages assertNotEquals "a" "a" "expected 'a' to not equal 'a'"
+    assertBothFailureMessages assertEquals "a" "b" "expected 'a' to equal 'b'"
 
-function internal_test_fails_message {
-    set +e
-    msg=$(assertFails assertEquals "a" "a")
-    set -e
-    assertEquals "expected 'assertEquals a a' to fail" "$msg"
-}
+    assertFailureMessage assertFails assertEquals "a" "a" "expected 'assertEquals a a' to fail"
+    assertCustomFailureMessage assertFailsMsg assertEquals "a" "a"
 
-function internal_test_fails_message_custom {
-    set +e
-    msg=$(assertFailsMsg assertEquals "a" "a" "blah")
-    set -e
-    assertEquals "blah" "$msg"
+    touch "del me.txt" # TODO same
+    assertBothFailureMessages assertFileNotExists "del me.txt" "expected 'del me.txt' to not exist"
+    rm -f "del me.txt"
+    assertBothFailureMessages assertFileExists "del me.txt" "expected 'del me.txt' to exist"
 }
 
 functions=$(declare -F | cut -d" " -f3-)
