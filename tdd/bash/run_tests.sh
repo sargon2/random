@@ -10,20 +10,12 @@ function equals {
 }
 
 function assertEquals {
-    local MSG="$3"
-    if [ -z "$3" ]; then
-        MSG="expected '$1' to equal '$2'"
-    fi
-    assertFailsMsg assertNotEquals "$1" "$2" "$MSG"
+    assertFailsMsg assertNotEquals "$1" "$2" "$(default_msg "$3" "expected '$1' to equal '$2'")"
 }
 
 function assertNotEquals {
     if equals "$1" "$2"; then
-        if [ -n "$3" ]; then
-            echo "$3"
-        else
-            echo "expected '$1' to not equal '$2'"
-        fi
+        default_msg "$3" "expected '$1' to not equal '$2'"
         return 1
     fi
 }
@@ -48,21 +40,13 @@ function assertFailsMsg {
 
 function assertFileNotExists {
     if [ -f "$1" ]; then
-        if [ -n "$2" ]; then
-            echo "$2"
-        else
-            echo "expected '$1' to not exist"
-        fi
+        default_msg "$2" "expected '$1' to not exist"
         return 1
     fi
 }
 
 function assertFileExists {
-    MSG=$2
-    if [ -z "$2" ]; then
-        MSG="expected '$1' to exist"
-    fi
-    assertFailsMsg assertFileNotExists "$1" "$MSG"
+    assertFailsMsg assertFileNotExists "$1" "$(default_msg "$2" "expected '$1' to exist")"
 }
 
 function internal_test_asserts {
@@ -104,9 +88,17 @@ function internal_test_asserts {
     assertFails assertFileNotExists "del me.txt"
 }
 
+function default_msg {
+    if [ -n "$1" ]; then
+        echo "$1"
+    else
+        echo "$2"
+    fi
+}
+
 function assertFailureMessage {
-    expected_msg="${@: -1}"
-    set +e ; actual_msg=$( ( set -e; "${@:1:$#-1}" ) ) ;
+    local expected_msg="${@: -1}"
+    set +e ; local actual_msg=$( ( set -e; "${@:1:$#-1}" ) ) ;
     set -e
 
     assertEquals "$expected_msg" "$actual_msg"
@@ -132,6 +124,30 @@ function internal_test_failure_messages {
     touch "del me.txt"
     trap "rm -f \"del me.txt\"" EXIT RETURN
     assertBothFailureMessages assertFileNotExists "del me.txt" "expected 'del me.txt' to not exist"
+}
+
+function assertFileContentsNot {
+    local CONTENTS=$(cat "$2")
+    if [ "$1" == "$CONTENTS" ]; then
+        default_msg "$3" "expected '$2' to not contain '$1'"
+        return 1
+    fi
+}
+
+# TODO we're really doing a lot of this not pattern...
+function assertFileContents {
+    assertFailsMsg assertFileContentsNot "$@" "$(default_msg "$3" "expected '$2' to contain '$1'")"
+}
+
+function internal_test_file_contents {
+    echo "hi" > "del me.txt"
+    trap "rm -f \"del me.txt\"" EXIT RETURN
+    assertFileContents "hi" "del me.txt"
+    assertFails assertFileContentsNot "hi" "del me.txt"
+    assertFails assertFileContents "not hi" "del me.txt"
+    assertFileContentsNot "not hi" "del me.txt"
+    assertBothFailureMessages assertFileContents "not hi" "del me.txt" "expected 'del me.txt' to contain 'not hi'"
+    assertBothFailureMessages assertFileContentsNot "hi" "del me.txt" "expected 'del me.txt' to not contain 'hi'"
 }
 
 functions=$(declare -F | cut -d" " -f3-)
