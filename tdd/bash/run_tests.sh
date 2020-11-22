@@ -19,11 +19,14 @@ function assertNotEquals {
 
 function assertFails {
     local RET=0
-    "$@" || RET=$?
+    # https://stackoverflow.com/a/11092989
+    set +e ; ( set -e; "$@" ) ; RET=$?
+    set -e
     assertNotEquals $RET 0
 }
 
 function internal_test_asserts {
+    set -e
 
     assertEquals true true
     assertEquals false false
@@ -57,16 +60,18 @@ functions=$(declare -F | cut -d" " -f3-)
 overall_passed=true
 for func in $functions; do
     if [[ $func = internal_test_* ]]; then
-        # Silently run internal tests
-        # If we do $func || RET=$? here, it causes the tests to false negative.
-        # That's super annoying and needs a fix, so we can output a reasonable
-        # message on internal failure.
-        # See https://unix.stackexchange.com/a/318412
-        $func
+        set +e ; ( set -e; $func ) ; RET=$?
+        set -e
+
+        if [ "$RET" -ne "0" ]; then
+            echo "internal test" $func "FAIL"
+            exit 1
+        fi
     fi
     if [[ $func = test_* ]]; then
-        RET=0
-        $func || RET=$?
+        set +e ; ( set -e; $func ) ; RET=$?
+        set -e
+
         if [ "$RET" -eq "0" ]; then
             echo $func "PASS"
         else
