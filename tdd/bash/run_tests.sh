@@ -95,15 +95,13 @@ function internal_test_asserts {
     assertNotEquals "asdf jkl" "asdf asdf"
     assertEquals "asdf jkl" "asdf jkl"
 
-    touch delme.txt # TODO hope this doesn't already exist...
-    assertFileExists delme.txt
-    rm -f delme.txt # TODO this doesn't get deleted if the assert fails
-    assertFails assertFileExists delme.txt
-
-    touch "del me.txt" # TODO same
-    assertFileExists "del me.txt"
-    rm -f "del me.txt"
+    assertFails assertFileExists "del me.txt"
     assertFileNotExists "del me.txt"
+
+    touch "del me.txt"
+    trap "rm -f \"del me.txt\"" EXIT RETURN
+    assertFileExists "del me.txt"
+    assertFails assertFileNotExists "del me.txt"
 }
 
 function assertFailureMessage {
@@ -130,10 +128,10 @@ function internal_test_failure_messages {
     assertFailureMessage assertFails assertEquals "a" "a" "expected 'assertEquals a a' to fail"
     assertCustomFailureMessage assertFailsMsg assertEquals "a" "a"
 
-    touch "del me.txt" # TODO same
-    assertBothFailureMessages assertFileNotExists "del me.txt" "expected 'del me.txt' to not exist"
-    rm -f "del me.txt"
     assertBothFailureMessages assertFileExists "del me.txt" "expected 'del me.txt' to exist"
+    touch "del me.txt"
+    trap "rm -f \"del me.txt\"" EXIT RETURN
+    assertBothFailureMessages assertFileNotExists "del me.txt" "expected 'del me.txt' to not exist"
 }
 
 functions=$(declare -F | cut -d" " -f3-)
