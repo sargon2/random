@@ -26,8 +26,6 @@ function assertFails {
 }
 
 function internal_test_asserts {
-    set -e
-
     assertEquals true true
     assertEquals false false
 
