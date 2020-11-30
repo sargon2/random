@@ -164,6 +164,9 @@ for func in $functions; do
         fi
     fi
     if [[ $func = test_* ]]; then
+        if [[ $(type -t "setUpTest") == 'function' ]]; then
+            setUpTest
+        fi
         set +e ; MSG=$( ( set -e; $func ) ) ; RET=$?
         set -e
 
@@ -172,6 +175,10 @@ for func in $functions; do
         else
             echo "$func FAIL: $MSG"
             overall_passed=false
+        fi
+
+        if [[ $(type -t "tearDownTest") == 'function' ]]; then
+            tearDownTest
         fi
     fi
 done
