@@ -150,6 +150,30 @@ function internal_test_file_contents {
     assertBothFailureMessages assertFileContentsNot "hi" "del me.txt" "expected 'del me.txt' to not contain 'hi'"
 }
 
+function assertFolderExists {
+    assertFailsMsg assertNotFolder "$@" "$(default_msg "$3" "expected '$1' to be a folder")"
+}
+
+function assertNotFolder {
+    if [[ -d "$1" ]]; then
+        default_msg "$3" "expected '$1' to not be a folder"
+        return 1
+    fi
+}
+
+function internal_test_folder_exists {
+    assertFails assertFolderExists myfolder
+    assertNotFolder myfolder
+    mkdir myfolder
+    assertFails assertNotFolder myfolder
+    assertFolderExists myfolder
+    rmdir myfolder
+    touch myfolder
+    assertFails assertFolderExists myfolder
+    assertNotFolder myfolder
+    rm -f myfolder
+}
+
 functions=$(declare -F | cut -d" " -f3-)
 
 overall_passed=true
