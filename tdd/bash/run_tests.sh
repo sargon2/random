@@ -174,6 +174,37 @@ function internal_test_folder_exists {
     rm -f myfolder
 }
 
+function assertContains {
+    assertFailsMsg assertNotContains "$@" "$(default_msg "$3" "Expected \"$2\" to contain \"$1\"")"
+}
+
+function assertNotContains {
+    if [[ "$2" == *"$1"* ]]; then
+        default_msg "$3" "Expected \"$2\" to not contain \"$1\""
+        return 1
+    fi
+}
+
+function try_contains {
+    assertContains "$1" "$2"
+    assertBothFailureMessages assertNotContains "$1" "$2" "Expected \"$2\" to not contain \"$1\""
+}
+
+function try_not_contains {
+    assertNotContains "$1" "$2"
+    assertBothFailureMessages assertContains "$1" "$2" "Expected \"$2\" to contain \"$1\""
+}
+
+function internal_test_contains {
+    try_contains "asdf" "asdf"
+    try_contains "asdf" "jkl asdf jkl"
+    try_contains "asdf" "jkl asdf"
+    try_contains "asdf" "asdf jkl"
+
+    try_not_contains "asdf" "jkl"
+    try_not_contains "asdf" "asdj"
+}
+
 functions=$(declare -F | cut -d" " -f3-)
 
 overall_passed=true
