@@ -24,7 +24,7 @@ def align(str):
 
         x += 1
 
-    lines = ["".join(world[i]) for i in xrange(min_y, max_y+1)]
+    lines = ["".join(world[i]) for i in range(min_y, max_y+1)]
     ret = "\n".join(lines).rstrip()
     ret = re.sub(' +\n', '\n', ret)
     return ret
@@ -61,9 +61,9 @@ class TestAlign(unittest2.TestCase):
 def generate():
     chars = ['/', '_', '\\']
     ret = ""
-    for i in xrange(1, 80):
+    for i in range(1, 80):
         ret += random.sample(chars, 1)[0]
     return ret
 
 if __name__ == "__main__":
-    print align(generate())
+    print(align(generate()))
