@@ -205,6 +205,36 @@ function internal_test_contains {
     try_not_contains "asdf" "asdj"
 }
 
+function try_filemode {
+    assertFileMode "$1" "$2"
+    assertBothFailureMessages assertFileModeNot "$1" "$2" "Expected \"$2\" to not be mode \"$1\""
+}
+
+function try_filemode_not {
+    assertFileModeNot "$1" "$2"
+    assertBothFailureMessages assertFileMode "$1" "$2" "Expected \"$2\" to be mode \"$1\""
+}
+
+function assertFileModeNot {
+    local MODE=`stat -c "%a" "$2"`
+    if [ "$1" == "$MODE" ]; then
+        default_msg "$3" "Expected \"$2\" to not be mode \"$1\""
+        return 1
+    fi
+}
+
+function assertFileMode {
+    assertFailsMsg assertFileModeNot "$@" "$(default_msg "$3" "Expected \"$2\" to be mode \"$1\"")"
+}
+
+function internal_test_filemode {
+    touch "del me.txt"
+    trap "rm -f \"del me.txt\"" EXIT RETURN
+    chmod 644 "del me.txt"
+    try_filemode 644 "del me.txt"
+    try_filemode_not 645 "del me.txt"
+}
+
 functions=$(declare -F | cut -d" " -f3-)
 
 overall_passed=true
