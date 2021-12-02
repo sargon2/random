@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import random
 import time
@@ -14,5 +14,5 @@ while True:
             ary[r] = "A"
         else:
             ary[r] = "B"
-        print "".join(ary)
+        print("".join(ary))
         time.sleep(0.1)
