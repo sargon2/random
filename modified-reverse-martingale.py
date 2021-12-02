@@ -53,8 +53,41 @@ def modified_reverse_martingale(bank, win_streak, target):
             if win_streak < 0:
                 bank += win_streak
             win_streak = 0
+
+        num_bets += 1
+        if bank < min_bank:
+            min_bank = bank
+
+def just_target(bank, target):
+    # Bet the amount that, if won, would cancel all our debt and reach our target in one go.
+    print("just_target(" + str(bank) + ", " + str(target) + ")")
+    num_bets = 0
+    min_bank = bank
+    while True:
+        if bank >= target:
+            print("Made it! bank=" + str(bank) + ", target=" + str(target))
+            print("num_bets=" + str(num_bets) + ", min_bank=" + str(min_bank))
+            return
+
+        print("bank=" + str(bank) + ", target=" + str(target))
+
+        # Calculate bet amount
+        bet_amt = target - bank
+
+        # Do the bet
+        flip = get_flip()
+        if flip:
+            # Won
+            print("Bet " + str(bet_amt) + "; Win")
+            bank += bet_amt
+        else:
+            # Lost
+            print("Bet " + str(bet_amt) + "; Loss")
+            bank -= bet_amt
+
         num_bets += 1
         if bank < min_bank:
             min_bank = bank
 
 modified_reverse_martingale(1, 0, target)
+# just_target(1, target)
