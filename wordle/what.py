@@ -43,7 +43,7 @@ class TestGetMatches(unittest.TestCase):
 
 def file_lines(filename):
     with open(filename) as f:
-        return f.readlines()
+        return f.read().splitlines()
 
 def main():
     results = defaultdict(lambda: 0)
