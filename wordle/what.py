@@ -4,23 +4,23 @@ import unittest
 from collections import defaultdict
 
 def get_matches(word1, word2):
+    word1 = list(word1)
+    word2 = list(word2)
     yellow = 0
     green = 0
     for i in range(0, 5):
         if word1[i] == word2[i]:
             green += 1
+            word1[i] = None
+            word2[i] = None
     for letter in word1:
-        if letter in word2:
+        if letter is None:
+            continue
+        pos = word2.index(letter) if letter in word2 else -1
+        if pos > 0:
             yellow += 1
-    yellow -= green
+            word2[pos] = None
     return yellow, green
-
-def has_repeated_letters(word):
-    for letter in word:
-        if word.count(letter) > 1:
-            return True
-    return False
-
 
 class TestGetMatches(unittest.TestCase):
     def assertMatches(self, word1, word2, yellow, green):
@@ -34,11 +34,9 @@ class TestGetMatches(unittest.TestCase):
         self.assertMatches("abcde", "xaxxx", 1, 0)
         self.assertMatches("abcde", "axbxx", 1, 1)
         self.assertMatches("abcde", "abced", 2, 3)
-        # TODO There is some weirdness with repeated letters that I'm ignoring for now.
-
-    def test_has_repeated_letters(self):
-        self.assertEqual(False, has_repeated_letters("abcde"))
-        self.assertEqual(True, has_repeated_letters("aabcd"))
+        self.assertMatches("abcde", "aabcd", 3, 1)
+        self.assertMatches("abcde", "abcdd", 0, 4)
+        self.assertMatches("aabcd", "xxxxa", 1, 0)
 
 
 def file_lines(filename):
@@ -48,11 +46,7 @@ def file_lines(filename):
 def main():
     results = defaultdict(lambda: 0)
     for word1 in file_lines("wordle-answers-alphabetical.txt"):
-        if has_repeated_letters(word1):
-            continue
         for word2 in file_lines("wordle-answers-alphabetical.txt"):
-            if has_repeated_letters(word2):
-                continue
             if word1 == word2:
                 continue
             (yellow, green) = get_matches(word1, word2)
