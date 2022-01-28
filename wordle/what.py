@@ -13,13 +13,15 @@ def get_matches(word1, word2):
             green += 1
             word1[i] = None
             word2[i] = None
-    for letter in word1:
+    for i in range(0, 5):
+        letter = word1[i]
         if letter is None:
             continue
         pos = word2.index(letter) if letter in word2 else -1
-        if pos > 0:
+        if pos >= 0:
             yellow += 1
             word2[pos] = None
+            word1[i] = None
     return yellow, green
 
 class TestGetMatches(unittest.TestCase):
@@ -37,6 +39,13 @@ class TestGetMatches(unittest.TestCase):
         self.assertMatches("abcde", "aabcd", 3, 1)
         self.assertMatches("abcde", "abcdd", 0, 4)
         self.assertMatches("aabcd", "xxxxa", 1, 0)
+
+        # https://fivethirtyeight.com/features/can-you-design-the-perfect-wedding/
+        self.assertMatches("magic", "misos", 1, 1)
+        self.assertMatches("maims", "misos", 1, 2)
+        self.assertMatches("sumps", "misos", 2, 1)
+        self.assertMatches("mosso", "misos", 2, 2)
+        self.assertMatches("misos", "misos", 0, 5)
 
 
 def file_lines(filename):
