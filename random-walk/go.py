@@ -1,5 +1,5 @@
-#!/usr/bin/python
-import unittest2
+#!/usr/bin/env python3
+import unittest
 from collections import defaultdict
 import re
 import random
@@ -29,7 +29,7 @@ def align(str):
     ret = re.sub(' +\n', '\n', ret)
     return ret
 
-class TestAlign(unittest2.TestCase):
+class TestAlign(unittest.TestCase):
     def assertAlign(self, expected, input):
         self.assertEquals(expected, align(input))
 
@@ -61,7 +61,7 @@ class TestAlign(unittest2.TestCase):
 def generate():
     chars = ['/', '_', '\\']
     ret = ""
-    for i in range(1, 80):
+    for i in range(1, 160):
         ret += random.sample(chars, 1)[0]
     return ret
 
