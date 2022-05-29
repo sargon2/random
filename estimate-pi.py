@@ -1,6 +1,4 @@
-#!/usr/bin/python
-
-from __future__ import division
+#!/usr/bin/env python3
 
 import math
 import sys
@@ -16,7 +14,7 @@ def go():
         error = abs(math.pi - result)
         if error < best_error:
             best_error = error
-            print str(numerator) + " / " + str(denominator) + " = " + str(result) + ", error = " + str(error)
+            print(str(numerator) + " / " + str(denominator) + " = " + str(result) + ", error = " + str(error))
         if error < .00000000001:
             sys.exit(0)
         if result < math.pi :
