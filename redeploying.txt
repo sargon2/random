@@ -1,3 +1,38 @@
+New process, for WSL2:
+
+# install-windows-stuff.ps1 should install Ubuntu
+
+sudo apt-get update
+sudo apt-get install -y zsh zsh-doc git vim
+
+mkdir ~/.ssh
+ssh-keygen -t rsa -N "" -f ~/.ssh/id_rsa
+cat ~/.ssh/id_rsa.pub
+
+# MANUAL: Go to bitbucket.org, add public key to ssh keys
+
+mkdir bitbucket
+cd bitbucket
+git clone git@bitbucket.org:/dbesen/all_repos.git
+./all_repos/update-all.sh
+
+ln -s -f ~/bitbucket/settings/.irssi ~/
+ln -s -f ~/bitbucket/settings/.subversion ~/
+ln -s -f ~/bitbucket/settings/.vimrc ~/
+ln -s -f ~/bitbucket/settings/.zshrc ~/
+ln -s -f ~/bitbucket/settings/.zshenv ~/
+ln -s -f ~/bitbucket/settings/.ssh/config ~/.ssh/config
+ln -s -f ~/bitbucket/settings/.elinks ~/.elinks
+ln -s -f ~/bitbucket/settings/.gitconfig ~/.gitconfig
+
+chsh -s /bin/zsh # Asks for password
+exec zsh
+
+vim '+exit' # install vim plugins
+# MANUAL: set up ~/.zsh-colors
+
+---
+
 What I use hosting for:
  - Linux console (zsh etc.) - cloudshell or ec2 or cloud9 (done)
  - Static webhosting (e.g. weather.xem.us, davidbesen.com) - amplify (done)

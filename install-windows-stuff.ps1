@@ -20,3 +20,4 @@ choco upgrade -y minecraft-launcher
 choco upgrade -y discord
 
 wsl.exe --install
+wsl --install -d Ubuntu
