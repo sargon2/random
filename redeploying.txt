@@ -1,0 +1,54 @@
+What I use hosting for:
+ - Linux console (zsh etc.) - cloudshell or ec2 or cloud9 (done)
+ - Static webhosting (e.g. weather.xem.us, davidbesen.com) - amplify (done)
+ - Dynamic webhosting (really?) - ec2, lambda (don't need)
+ - Coding (python, etc.) - cloud9 (done)
+ - Project build & deployment pipelines - amplify? (don't need)
+ - Host gobot - lambda (done)
+ - Syncing linux console settings via dropbox - No need to sync
+ - IRCing? - slack/discord...
+ - SSH tunnels? - No use case
+ - DNS hosting - route53
+
+MANUAL: Deploy the new system
+
+sudo hostnamectl set-hostname tobu
+
+# MANUAL: edit /etc/hosts to set hostname
+
+sudo apt-get install -y openssh-server zsh zsh-doc git vim ruby ruby-dev make python-pip dos2unix curl nginx irssi inotify-tools sshpass libxcomposite1 libxxf86vm1 libxdamage1 libxfixes3 xcb
+
+mkdir ~/.ssh
+ssh-keygen -t rsa -N "" -f ~/.ssh/id_rsa
+
+# MANUAL: Go to bitbucket.org, add ~/.ssh/id_rsa.pub to ssh keys
+
+sudo pip install --upgrade pip
+sudo pip install requests
+
+mkdir bitbucket
+cd bitbucket
+git clone git@bitbucket.org:/dbesen/all_repos.git
+./all_repos/update-all.sh
+
+
+# Install dropbox
+~/bitbucket/random/reinstall-dropbox.sh # MANUAL: Visit link when it shows up
+
+ln -s -f ~/Dropbox/bitbucket/settings/.irssi ~/
+ln -s -f ~/Dropbox/bitbucket/settings/.subversion ~/
+ln -s -f ~/Dropbox/bitbucket/settings/.vimrc ~/
+ln -s -f ~/Dropbox/bitbucket/settings/.zshrc ~/
+ln -s -f ~/Dropbox/bitbucket/settings/.zshenv ~/
+ln -s -f ~/Dropbox/bitbucket/settings/.ssh/config ~/.ssh/config
+ln -s -f ~/Dropbox/bitbucket/settings/.elinks ~/.elinks
+
+chsh -s /bin/zsh
+exec zsh
+
+~/bitbucket/settings/git-config
+
+vim '+exit' # install vim plugins
+# MANUAL: set up ~/.zsh-colors
+
+# MANUAL: Set up nginx to serve websites davidbesen and xem (both in git)
