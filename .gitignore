@@ -9,3 +9,4 @@ a.out
 *.so
 tdd/compiler/compile
 delme.txt
+.tested
