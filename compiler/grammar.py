@@ -112,6 +112,7 @@ class Each(object):
                 return None
             results.append(parse_result)
             code = code[parse_result.matchlen:]
+            # print("Parsed", code[0:parse_result.matchlen])
 
         return ResultList(results)
 

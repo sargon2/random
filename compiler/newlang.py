@@ -272,9 +272,9 @@ class NewLanguage(object):
         return self.exec_python(python_code)
 
     def exec_python(self, code):
-        #print "code is:"
-        #print code
-        #print "end code"
+        #print("code is:")
+        #print(code)
+        #print("end code")
         # We have to execute in the global scope so that imports work.
         exec(code, globals())
         global exec_retval
