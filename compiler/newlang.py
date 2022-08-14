@@ -1,6 +1,7 @@
-
 import os
 from grammar import *
+
+import textwrap
 
 digit = RegexParser('\d+')
 string = RegexParser('"([^"]+)"')
@@ -212,34 +213,36 @@ class program_ob(object):
         return Each(statements, eof)
 
     def tocode(self, ast):
-        # TODO: lots of duplication here with 'ret +='
-        ret = "#!/usr/bin/env python3\n"
-        ret += "import sys\n"
-        ret += "import subprocess\n"
-        ret += "def read_file(filename):\n"
-        ret += "    with open(filename) as f:\n"
-        ret += "        return f.read()\n"
-        ret += "def write_file(filename, contents):\n"
-        ret += "    with open(filename, \"w\") as f:\n"
-        ret += "        f.write(contents)\n"
-        ret += "def invoke_process_with_stdin(command, stdin):\n"
-        ret += "    p = subprocess.Popen(command, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)\n"
-        ret += "    return p.communicate(input=stdin.encode(\"utf-8\"))[0].decode()\n"
-        ret += "def equals(a, b):\n"
-        ret += "    return a == b\n"
-        ret += "def if_m(cond, truthy=True, falsy=False):\n"
-        ret += "    if cond:\n"
-        ret += "        if hasattr(truthy, '__call__'):\n"
-        ret += "            return truthy()\n"
-        ret += "        return truthy\n"
-        ret += "    else:\n"
-        ret += "        if hasattr(falsy, '__call__'):\n"
-        ret += "            return falsy()\n"
-        ret += "        return falsy\n"
-        ret += "def outermost_function():\n"
-        ret += indent(ast[0].tocode()) # ignore leading whitespace and eof
-        ret += "exec_retval = outermost_function()\n"
-        return ret
+        ret = textwrap.dedent("""\
+            #!/usr/bin/env python3
+            import sys
+            import subprocess
+            def read_file(filename):
+                with open(filename) as f:
+                    return f.read()
+            def write_file(filename, contents):
+                with open(filename, "w") as f:
+                    f.write(contents)
+            def invoke_process_with_stdin(command, stdin):
+                p = subprocess.Popen(command, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
+                return p.communicate(input=stdin.encode("utf-8"))[0].decode()
+            def equals(a, b):
+                return a == b
+            def if_m(cond, truthy=True, falsy=False):
+                if cond:
+                    if hasattr(truthy, '__call__'):
+                        return truthy()
+                    return truthy
+                else:
+                    if hasattr(falsy, '__call__'):
+                        return falsy()
+                    return falsy
+            def outermost_function():
+            {code}
+            exec_retval = outermost_function()
+            """)
+
+        return ret.format(code=indent(ast[0].tocode())) # ignore leading whitespace and eof
 
 program = GrammarElement(program_ob)
 
