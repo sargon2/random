@@ -1,5 +1,3 @@
-
-import unittest2
 import re
 
 def indent(string):

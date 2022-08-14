@@ -100,7 +100,7 @@ class backticks_ob(object):
         if len(ast[4]):
             return "invoke_process_with_stdin(\"" + to_execute + "\", " + ast[4][0][2].tocode() + ")"
         else:
-            return "subprocess.check_output(\"" + to_execute + "\", shell=True)"
+            return "subprocess.check_output(\"" + to_execute + "\", shell=True).decode(\"utf-8\")"
 
 backticks = GrammarElement(backticks_ob)
 
@@ -213,7 +213,7 @@ class program_ob(object):
 
     def tocode(self, ast):
         # TODO: lots of duplication here with 'ret +='
-        ret = "#!/usr/bin/env python\n"
+        ret = "#!/usr/bin/env python3\n"
         ret += "import sys\n"
         ret += "import subprocess\n"
         ret += "def read_file(filename):\n"
@@ -224,7 +224,7 @@ class program_ob(object):
         ret += "        f.write(contents)\n"
         ret += "def invoke_process_with_stdin(command, stdin):\n"
         ret += "    p = subprocess.Popen(command, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)\n"
-        ret += "    return p.communicate(input=str(stdin))[0].decode()\n"
+        ret += "    return p.communicate(input=stdin.encode(\"utf-8\"))[0].decode()\n"
         ret += "def equals(a, b):\n"
         ret += "    return a == b\n"
         ret += "def if_m(cond, truthy=True, falsy=False):\n"
@@ -294,4 +294,4 @@ def compile_file(infile, outfile):
     with open(outfile, "w") as f:
         f.write(output)
 
-    os.chmod(outfile, 0755)
+    os.chmod(outfile, 0o755)

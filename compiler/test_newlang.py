@@ -1,9 +1,9 @@
 
-import unittest2
+import unittest
 import newlang
 import subprocess
 
-class TestNewLanguage(unittest2.TestCase):
+class TestNewLanguage(unittest.TestCase):
     def runNewLang(self, code):
         a = newlang.NewLanguage()
         return a.runNewLang(code)
@@ -17,7 +17,7 @@ class TestNewLanguage(unittest2.TestCase):
             self.assertIsParseError("return 1;")
 
     def assertResult(self, expected_result, code):
-        self.assertEquals(expected_result, self.runNewLang(code), msg="expected '{}' from '{}'".format(expected_result, code))
+        self.assertEqual(expected_result, self.runNewLang(code), msg="expected '{}' from '{}'".format(expected_result, code))
 
     def test_assertResult_fail(self):
         with self.assertRaises(AssertionError):
@@ -85,19 +85,19 @@ class TestNewLanguage(unittest2.TestCase):
         # TODO: prints
         # TODO: in compiler-source.newlang, print the output of gcc instead of eating it
 
-    @unittest2.skip("not passing yet")
+    @unittest.skip("not passing yet")
     def test_bootstrap(self):
         # Bootstrap compile:
         try:
-            print subprocess.check_output(["./bootstrap-compile", "-o", "compile", "compiler-source.newlang"])
+            print(subprocess.check_output(["./bootstrap-compile", "-o", "compile", "compiler-source.newlang"]))
         except Exception as e:
-            print "Output:"
-            print e.output
+            print("Output:")
+            print(e.output)
             raise
 
         # Get rid of all traces of the bootstrap compiler:
-        print subprocess.check_output(["./compile", "-o", "compile", "compiler-source.newlang"])
+        print(subprocess.check_output(["./compile", "-o", "compile", "compiler-source.newlang"]))
 
         # Verify:
-        print subprocess.check_output(["./compile", "-o", "verify", "compiler-source.newlang"])
-        print subprocess.check_output(["diff", "compile", "verify"])
+        print(subprocess.check_output(["./compile", "-o", "verify", "compiler-source.newlang"]))
+        print(subprocess.check_output(["diff", "compile", "verify"]))
