@@ -71,7 +71,6 @@ class newlang_code:
         return "return " + ast[2].tocode()
     
     def addition(self, ast):
-        # OneOrMore objects contain an each for remaining elements...
         ret = ast[2].tocode()
         for item in ast[3]:
             ret += " + " + item[3].tocode()
@@ -91,7 +90,7 @@ class newlang_code:
         # If we have an argument list...
         to_execute = ast[1].tocode()
         if len(ast[4]):
-            return "invoke_process_with_stdin(\"" + to_execute + "\", " + ast[4][0][2].tocode() + ")"
+            return "invoke_process_with_stdin(\"" + to_execute + "\", " + ast[4][0][2].tocode() + ")" # TODO this should be ast[4][2]
         else:
             return "subprocess.check_output(\"" + to_execute + "\", shell=True).decode(\"utf-8\")"
 
