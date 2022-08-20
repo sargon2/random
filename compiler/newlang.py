@@ -24,6 +24,7 @@ class newlang_grammar:
     anything_except_backtick_or_braces = Regex('[^`{}]+')
     eof = EOF()
 
+    # TODO I'm sure specifying optional_whitespace a lot
     return_stmt = ["return_word", "whitespace", "value", "optional_whitespace"]
     addition = ["open_paren", "optional_whitespace", "value", OneOrMore("optional_whitespace", "plus", "optional_whitespace", "value"), "optional_whitespace", "close_paren"]
     array_ref = ["word", "open_bracket", "digit", "close_bracket"]
