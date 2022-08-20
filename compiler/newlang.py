@@ -30,22 +30,22 @@ class newlang_grammar:
     array_ref = ["word", "open_bracket", "digit", "close_bracket"]
     brace_expansion = ["open_brace", "value", "close_brace"]
     backticks = ["backtick",
-                    OneOrMore(
-                        Or(
-                            "anything_except_backtick_or_braces",
-                            "brace_expansion"
-                        ),
-                        "optional_whitespace"
-                    ),
-                    "backtick",
-                    "optional_whitespace",
-                    ZeroOrOne(
-                        "open_paren",
-                        "optional_whitespace",
-                        "value",
-                        "optional_whitespace",
-                        "close_paren"
-                    )
+                 OneOrMore(
+                     Or(
+                         "anything_except_backtick_or_braces",
+                         "brace_expansion"
+                     ),
+                     "optional_whitespace"
+                 ),
+                 "backtick",
+                 "optional_whitespace",
+                 ZeroOrOne(
+                     "open_paren",
+                     "optional_whitespace",
+                     "value",
+                     "optional_whitespace",
+                     "close_paren"
+                 )
                 ]
     value = Or("function_invocation", "addition", "digit", "string", "array_ref", "word", "backticks")
     # TODO list_of, defined this way, means everything that uses it must come after it.  How do I remove that requirement?
