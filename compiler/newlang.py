@@ -49,7 +49,7 @@ class newlang_grammar:
                 ]
     value = Or("function_invocation", "addition", "digit", "string", "array_ref", "word", "backticks")
     # TODO list_of, defined this way, means everything that uses it must come after it.  How do I remove that requirement?
-    list_of = lambda x: [ZeroOrOne(x), ZeroOrMore("optional_whitespace", "comma", "optional_whitespace", x)] # TODO can the user specify only the 2nd part? That should be a parse error
+    list_of = lambda x: ZeroOrOne(x, ZeroOrMore("optional_whitespace", "comma", "optional_whitespace", x))
     function_invocation = ["word", "optional_whitespace", "open_paren", "optional_whitespace", list_of("value"), "optional_whitespace", "close_paren", "optional_whitespace"]
     assignment = ["word", "optional_whitespace", "equals_char", "optional_whitespace", "value"]
     statement = [Or("function_definition", "function_invocation", "return_stmt", "assignment"), "optional_whitespace", "semicolon", "optional_whitespace"]
