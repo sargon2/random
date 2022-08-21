@@ -91,7 +91,7 @@ class newlang_code:
         # If we have an argument list...
         to_execute = ast[1].tocode()
         if len(ast[4]):
-            return "invoke_process_with_stdin(\"" + to_execute + "\", " + ast[4][0][2].tocode() + ")" # TODO this should be ast[4][2]
+            return "invoke_process_with_stdin(\"" + to_execute + "\", " + ast[4][2].tocode() + ")"
         else:
             return "subprocess.check_output(\"" + to_execute + "\", shell=True).decode(\"utf-8\")"
 

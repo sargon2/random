@@ -117,7 +117,7 @@ class ZeroOrOne(object):
         if result is None:
             return ResultList([])
         # The each will make a ResultList, so we don't need to make another one.
-        return result
+        return result[0] # TODO why do we need the [0]?
 
 class Each(object):
     def __init__(self, *args):
