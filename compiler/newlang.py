@@ -66,8 +66,17 @@ class newlang_grammar:
                           ]
     program = ["statements", eof]
 
+    def get_grammar(self, name):
+        return getattr(self, name)
+
 
 class newlang_code:
+    def get_code(self, name, ast):
+        return getattr(self, name)(ast)
+
+    def has_code_for(self, name):
+        return hasattr(self, name)
+
     def return_stmt(self, ast):
         return "return " + ast[2].tocode()
     
@@ -171,7 +180,7 @@ class NewLanguage(object):
         for line in code.splitlines():
             newline = re.sub("#.*", "", line)
             newcode += newline + "\n"
-        result = GrammarElement("program").parse(newcode, newlang_grammar, newlang_code) # TODO one provider instead of 2?
+        result = GrammarElement("program").parse(newcode, newlang_grammar(), newlang_code()) # TODO one provider instead of 2?
         if result is None:
             return None # TODO: raise exception?
         return result.tocode()

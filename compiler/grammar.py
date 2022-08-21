@@ -146,18 +146,18 @@ class Each(object):
         return "Each(" + repr(self.items) + ")"
 
 def grammar_or_regex(name, grammar_provider, code_provider):
-    if hasattr(code_provider, name):
+    if code_provider.has_code_for(name):
         return GrammarElement(name)
     else:
         # It's a regex, use the one already defined
-        return getattr(grammar_provider, name)
+        return grammar_provider.get_grammar(name)
 
 class GrammarElement(object):
     def __init__(self, name):
         self.name = name
 
     def parse(self, code, grammar_provider, code_provider):
-        defn = getattr(grammar_provider, self.name) # TODO instead of getattr, call a regular getter (everywhere)
+        defn = grammar_provider.get_grammar(self.name)
         if type(defn) is list:
             defn = Each(*defn)
         result = defn.parse(code, grammar_provider, code_provider)
@@ -173,7 +173,7 @@ class GrammarElementResult(object):
         self.code_provider = code_provider
 
     def tocode(self):
-        return getattr(self.code_provider, self.name)(self, self.result)
+        return self.code_provider.get_code(self.name, self.result)
 
     def __repr__(self):
         return "GrammarElementResult(" + repr(self.name) + "," + repr(self.result) + ")"
