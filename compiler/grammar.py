@@ -81,7 +81,7 @@ class ResultList(object):
 
 class ZeroOrMore(object):
     def __init__(self, *args):
-        self.item = Each(args)
+        self.item = Each(*args)
 
     def parse(self, code, grammar_provider, code_provider):
         results = []
@@ -90,7 +90,7 @@ class ZeroOrMore(object):
             if result is None:
                 return ResultList(results)
             code = code[result.matchlen:]
-            results.extend(result) # TODO shouldn't this be append??
+            results.append(result)
 
 class OneOrMore(object):
     def __init__(self, *items):
