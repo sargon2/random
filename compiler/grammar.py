@@ -94,16 +94,16 @@ class ZeroOrMore(object):
 
 class OneOrMore(object):
     def __init__(self, *args):
-        self.item = Each(args)
+        self.item = Each(*args) # TODO I don't think this Each is necessary...
 
     def parse(self, code, grammar_provider, code_provider):
         result = Each(self.item, ZeroOrMore(self.item)).parse(code, grammar_provider, code_provider)
         if result is None:
             return None
         ret = []
-        ret.append(result[0][0]) # TODO why do we need the zeroes here?
+        ret.append(result[0]) # TODO why do we need the zeroes here?
         for item in result[1]:
-            ret.append(item[0][0]) # TODO why do we need the zeroes here?
+            ret.append(item[0]) # TODO why do we need the zeroes here?
         return ResultList(ret)
 
 class ZeroOrOne(object):
