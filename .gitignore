@@ -10,3 +10,4 @@ a.out
 tdd/compiler/compile
 delme.txt
 .tested
+.vscode

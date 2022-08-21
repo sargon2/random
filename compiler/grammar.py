@@ -108,7 +108,7 @@ class OneOrMore(object):
 
 class ZeroOrOne(object):
     def __init__(self, *args):
-        self.item = Each(args)
+        self.item = Each(*args)
 
     def parse(self, code, grammar_provider, code_provider):
         if type(self.item) is str:
@@ -117,7 +117,7 @@ class ZeroOrOne(object):
         if result is None:
             return ResultList([])
         # The each will make a ResultList, so we don't need to make another one.
-        return result[0] # TODO why do we need the [0]?
+        return result
 
 class Each(object):
     def __init__(self, *args):
