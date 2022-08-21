@@ -1,6 +1,6 @@
 import unittest
 
-from grammar import OneOrMore, Regex, ZeroOrMore, ZeroOrOne
+from grammar import Each, OneOrMore, Regex, ZeroOrMore, ZeroOrOne
 
 class TestGrammar(unittest.TestCase):
     def test_zeroorone_zero(self):
@@ -168,4 +168,36 @@ class TestGrammar(unittest.TestCase):
         self.assertEqual("a", result[1][0].literal_value)
         self.assertEqual("b", result[1][1].literal_value)
 
-    # TODO tests for Each
+    def test_each(self):
+        e = Each("a")
+        class grammar_provider:
+            a = Regex("a")
+        code_provider = None
+
+        result = e.parse("a", grammar_provider, code_provider)
+        self.assertEqual(1, len(result))
+        self.assertEqual("a", result[0].literal_value)
+
+    def test_each_two(self):
+        e = Each("a", "b")
+        class grammar_provider:
+            a = Regex("a")
+            b = Regex("b")
+        code_provider = None
+
+        result = e.parse("ab", grammar_provider, code_provider)
+        self.assertEqual(2, len(result))
+        self.assertEqual("a", result[0].literal_value)
+        self.assertEqual("b", result[1].literal_value)
+
+    def test_each_stops(self):
+        e = Each("a", "b")
+        class grammar_provider:
+            a = Regex("a")
+            b = Regex("b")
+        code_provider = None
+
+        result = e.parse("abab", grammar_provider, code_provider)
+        self.assertEqual(2, len(result))
+        self.assertEqual("a", result[0].literal_value)
+        self.assertEqual("b", result[1].literal_value)
