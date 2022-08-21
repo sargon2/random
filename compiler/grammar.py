@@ -23,7 +23,7 @@ class EOF(object):
     def __init__(self):
         self.matchlen = 0
 
-    def parse(self, code):
+    def parse(self, code, grammar_provider, code_provider):
         if code == '':
             return self
         return None
@@ -32,7 +32,7 @@ class Regex(object):
     def __init__(self, regex):
         self.regex = regex
 
-    def parse(self, code):
+    def parse(self, code, grammar_provider, code_provider):
         match = re.match(self.regex, code)
         if match:
             #print code
@@ -44,11 +44,11 @@ class Or(object):
     def __init__(self, *args):
         self.items = args
 
-    def parse(self, code):
+    def parse(self, code, grammar_provider, code_provider):
         for parser in self.items:
             if type(parser) is str: # TODO we should have less if type()
-                parser = grammar_or_regex(parser)
-            parse_result = parser.parse(code)
+                parser = grammar_or_regex(parser, grammar_provider, code_provider)
+            parse_result = parser.parse(code, grammar_provider, code_provider)
             if parse_result is not None:
                 return parse_result
 
@@ -83,10 +83,10 @@ class ZeroOrMore(object):
     def __init__(self, *args):
         self.item = Each(args)
 
-    def parse(self, code):
+    def parse(self, code, grammar_provider, code_provider):
         results = []
         while(True):
-            result = self.item.parse(code)
+            result = self.item.parse(code, grammar_provider, code_provider)
             if result is None:
                 return ResultList(results)
             code = code[result.matchlen:]
@@ -96,8 +96,8 @@ class OneOrMore(object):
     def __init__(self, *args):
         self.item = Each(args)
 
-    def parse(self, code):
-        result = Each(self.item, ZeroOrMore(self.item)).parse(code)
+    def parse(self, code, grammar_provider, code_provider):
+        result = Each(self.item, ZeroOrMore(self.item)).parse(code, grammar_provider, code_provider)
         if result is None:
             return None
         ret = []
@@ -110,10 +110,10 @@ class ZeroOrOne(object):
     def __init__(self, *args):
         self.item = Each(args)
 
-    def parse(self, code):
+    def parse(self, code, grammar_provider, code_provider):
         if type(self.item) is str:
-            self.item = grammar_or_regex(self.item)
-        result = self.item.parse(code)
+            self.item = grammar_or_regex(self.item, grammar_provider, code_provider)
+        result = self.item.parse(code, grammar_provider, code_provider)
         if result is None:
             return ResultList([])
         # The each will make a ResultList, so we don't need to make another one.
@@ -123,14 +123,14 @@ class Each(object):
     def __init__(self, *args):
         self.items = args
 
-    def parse(self, code):
+    def parse(self, code, grammar_provider, code_provider):
         results = []
         for item in self.items:
             if type(item) is str:
-                item = grammar_or_regex(item)
+                item = grammar_or_regex(item, grammar_provider, code_provider)
             if type(item) is list or type(item) is tuple:
                 item = Each(*item)
-            parse_result = item.parse(code)
+            parse_result = item.parse(code, grammar_provider, code_provider)
             if parse_result is None:
                 return None
             results.append(parse_result)
@@ -141,43 +141,35 @@ class Each(object):
     def __repr__(self):
         return "Each(" + repr(self.items) + ")"
 
-def grammar_or_regex(name):
-    from newlang import newlang_grammar, newlang_code # TODO grammar.py shouldn't depend on newlang anything
-    if hasattr(newlang_code, name):
+def grammar_or_regex(name, grammar_provider, code_provider):
+    if hasattr(code_provider, name):
         return GrammarElement(name)
     else:
         # It's a regex, use the one already defined
-        return getattr(newlang_grammar, name)
+        return getattr(grammar_provider, name)
 
 class GrammarElement(object):
     def __init__(self, name):
         self.name = name
 
-    def defn(self):
-        from newlang import newlang_grammar # TODO grammar.py shouldn't depend on newlang anything
-        return getattr(newlang_grammar, self.name)
-
-    def make_result(self, result):
-        return GrammarElementResult(self.name, result)
-
-    def parse(self, code):
-        defn = self.defn()
+    def parse(self, code, grammar_provider, code_provider):
+        defn = getattr(grammar_provider, self.name) # TODO instead of getattr, call a regular getter (everywhere)
         if type(defn) is list:
             defn = Each(*defn)
-        result = defn.parse(code)
+        result = defn.parse(code, grammar_provider, code_provider)
         if result is None:
             return None
-        return self.make_result(result)
+        return GrammarElementResult(self.name, result, code_provider)
 
 class GrammarElementResult(object):
-    def __init__(self, name, result):
+    def __init__(self, name, result, code_provider):
         self.name = name
         self.result = result
         self.matchlen = result.matchlen
+        self.code_provider = code_provider
 
     def tocode(self):
-        from newlang import newlang_code # TODO grammar.py shouldn't depend on newlang anything
-        return getattr(newlang_code, self.name)(self, self.result)
+        return getattr(self.code_provider, self.name)(self, self.result)
 
     def __repr__(self):
         return "GrammarElementResult(" + repr(self.name) + "," + repr(self.result) + ")"
