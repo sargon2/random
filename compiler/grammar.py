@@ -93,17 +93,21 @@ class ZeroOrMore(object):
             results.extend(result) # TODO shouldn't this be append??
 
 class OneOrMore(object):
-    def __init__(self, *args):
-        self.item = Each(*args) # TODO I don't think this Each is necessary...
+    def __init__(self, *items):
+        self.items = items
 
     def parse(self, code, grammar_provider, code_provider):
-        result = Each(self.item, ZeroOrMore(self.item)).parse(code, grammar_provider, code_provider)
+        result = Each(self.items, ZeroOrMore(self.items)).parse(code, grammar_provider, code_provider)
         if result is None:
             return None
         ret = []
-        ret.append(result[0]) # TODO why do we need the zeroes here?
+        # Zero is needed here because our outer Each always has its first iteration in the 0th position.
+        # It's specified above.
+        ret.append(result[0])
         for item in result[1]:
-            ret.append(item[0]) # TODO why do we need the zeroes here?
+            # Zero is needed here because ZeroOrMore always returns a list of groups. 
+            # Our group always has one item because there's only one specified above.
+            ret.append(item[0])
         return ResultList(ret)
 
 class ZeroOrOne(object):
