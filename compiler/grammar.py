@@ -23,7 +23,7 @@ class EOF(object):
     def __init__(self):
         self.matchlen = 0
 
-    def parse(self, code, grammar_provider, code_provider):
+    def parse(self, code, language_provider):
         if code == '':
             return self
         return None
@@ -32,7 +32,7 @@ class Regex(object):
     def __init__(self, regex):
         self.regex = regex
 
-    def parse(self, code, grammar_provider, code_provider):
+    def parse(self, code, language_provider):
         match = re.match(self.regex, code)
         if match:
             #print code
@@ -44,11 +44,11 @@ class Or(object):
     def __init__(self, *args):
         self.items = args
 
-    def parse(self, code, grammar_provider, code_provider):
+    def parse(self, code, language_provider):
         for parser in self.items:
             if type(parser) is str: # TODO we should have less if type()
-                parser = grammar_or_regex(parser, grammar_provider, code_provider)
-            parse_result = parser.parse(code, grammar_provider, code_provider)
+                parser = grammar_or_regex(parser, language_provider)
+            parse_result = parser.parse(code, language_provider)
             if parse_result is not None:
                 return parse_result
 
@@ -83,10 +83,10 @@ class ZeroOrMore(object):
     def __init__(self, *args):
         self.item = Each(*args)
 
-    def parse(self, code, grammar_provider, code_provider):
+    def parse(self, code, language_provider):
         results = []
         while(True):
-            result = self.item.parse(code, grammar_provider, code_provider)
+            result = self.item.parse(code, language_provider)
             if result is None:
                 return ResultList(results)
             code = code[result.matchlen:]
@@ -96,8 +96,8 @@ class OneOrMore(object):
     def __init__(self, *items):
         self.items = items
 
-    def parse(self, code, grammar_provider, code_provider):
-        result = Each(self.items, ZeroOrMore(self.items)).parse(code, grammar_provider, code_provider)
+    def parse(self, code, language_provider):
+        result = Each(self.items, ZeroOrMore(self.items)).parse(code, language_provider)
         if result is None:
             return None
         ret = []
@@ -114,10 +114,10 @@ class ZeroOrOne(object):
     def __init__(self, *args):
         self.item = Each(*args)
 
-    def parse(self, code, grammar_provider, code_provider):
+    def parse(self, code, language_provider):
         if type(self.item) is str:
-            self.item = grammar_or_regex(self.item, grammar_provider, code_provider)
-        result = self.item.parse(code, grammar_provider, code_provider)
+            self.item = grammar_or_regex(self.item, language_provider)
+        result = self.item.parse(code, language_provider)
         if result is None:
             return ResultList([])
         # The each will make a ResultList, so we don't need to make another one.
@@ -127,14 +127,14 @@ class Each(object):
     def __init__(self, *args):
         self.items = args
 
-    def parse(self, code, grammar_provider, code_provider):
+    def parse(self, code, language_provider):
         results = []
         for item in self.items:
             if type(item) is str:
-                item = grammar_or_regex(item, grammar_provider, code_provider)
+                item = grammar_or_regex(item, language_provider)
             if type(item) is list or type(item) is tuple:
                 item = Each(*item)
-            parse_result = item.parse(code, grammar_provider, code_provider)
+            parse_result = item.parse(code, language_provider)
             if parse_result is None:
                 return None
             results.append(parse_result)
@@ -145,25 +145,25 @@ class Each(object):
     def __repr__(self):
         return "Each(" + repr(self.items) + ")"
 
-def grammar_or_regex(name, grammar_provider, code_provider):
-    if code_provider.has_code_for(name):
+def grammar_or_regex(name, language_provider): # TODO should this move to the provider?
+    if language_provider.has_code_for(name):
         return GrammarElement(name)
     else:
         # It's a regex, use the one already defined
-        return grammar_provider.get_grammar(name)
+        return language_provider.get_grammar(name)
 
 class GrammarElement(object):
     def __init__(self, name):
         self.name = name
 
-    def parse(self, code, grammar_provider, code_provider):
-        defn = grammar_provider.get_grammar(self.name)
+    def parse(self, code, language_provider):
+        defn = language_provider.get_grammar(self.name)
         if type(defn) is list:
             defn = Each(*defn)
-        result = defn.parse(code, grammar_provider, code_provider)
+        result = defn.parse(code, language_provider)
         if result is None:
             return None
-        return GrammarElementResult(self.name, result, code_provider)
+        return GrammarElementResult(self.name, result, language_provider)
 
 class GrammarElementResult(object):
     def __init__(self, name, result, code_provider):

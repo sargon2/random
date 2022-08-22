@@ -3,74 +3,76 @@ from grammar import *
 
 import textwrap
 
-class newlang_grammar:
-    digit = Regex('\d+')
-    string = Regex('"([^"]+)"')
-    return_word = Regex('return')
-    whitespace = Regex('\s+')
-    optional_whitespace = Regex('\s*')
-    semicolon = Regex(';')
-    word = Regex('[a-z][_a-z0-9]*')
-    equals_char = Regex('=')
-    plus = Regex('\\+')
-    open_paren = Regex('\\(')
-    close_paren = Regex('\\)')
-    open_brace = Regex("{")
-    close_brace = Regex("}")
-    open_bracket = Regex("\\[")
-    close_bracket = Regex("\\]")
-    comma = Regex(",")
-    backtick = Regex('`')
-    anything_except_backtick_or_braces = Regex('[^`{}]+')
-    eof = EOF()
+class newlang_provider:
+    def __init__(self):
+        self.grammar = {}
+        # TODO read all this from an external grammar definition file
+        self.grammar['digit'] = Regex('\d+')
+        self.grammar['string'] = Regex('"([^"]+)"')
+        self.grammar['return_word'] = Regex('return')
+        self.grammar['whitespace'] = Regex('\s+')
+        self.grammar['optional_whitespace'] = Regex('\s*')
+        self.grammar['semicolon'] = Regex(';')
+        self.grammar['word'] = Regex('[a-z][_a-z0-9]*')
+        self.grammar['equals_char'] = Regex('=')
+        self.grammar['plus'] = Regex('\\+')
+        self.grammar['open_paren'] = Regex('\\(')
+        self.grammar['close_paren'] = Regex('\\)')
+        self.grammar['open_brace'] = Regex("{")
+        self.grammar['close_brace'] = Regex("}")
+        self.grammar['open_bracket'] = Regex("\\[")
+        self.grammar['close_bracket'] = Regex("\\]")
+        self.grammar['comma'] = Regex(",")
+        self.grammar['backtick'] = Regex('`')
+        self.grammar['anything_except_backtick_or_braces'] = Regex('[^`{}]+')
+        self.grammar['eof'] = EOF()
 
-    # TODO I'm sure specifying optional_whitespace a lot
-    return_stmt = ["return_word", "whitespace", "value", "optional_whitespace"]
-    addition = ["open_paren", "optional_whitespace", "value", OneOrMore("optional_whitespace", "plus", "optional_whitespace", "value"), "optional_whitespace", "close_paren"]
-    array_ref = ["word", "open_bracket", "digit", "close_bracket"]
-    brace_expansion = ["open_brace", "value", "close_brace"]
-    backticks = ["backtick",
-                 OneOrMore(
-                     Or(
-                         "anything_except_backtick_or_braces",
-                         "brace_expansion"
-                     ),
-                     "optional_whitespace"
-                 ),
-                 "backtick",
-                 "optional_whitespace",
-                 ZeroOrOne(
-                     "open_paren",
-                     "optional_whitespace",
-                     "value",
-                     "optional_whitespace",
-                     "close_paren"
-                 )
-                ]
-    value = Or("function_invocation", "addition", "digit", "string", "array_ref", "word", "backticks")
-    # TODO list_of, defined this way, means everything that uses it must come after it.  How do I remove that requirement?
-    list_of = lambda x: ZeroOrOne(x, ZeroOrMore("optional_whitespace", "comma", "optional_whitespace", x))
-    function_invocation = ["word", "optional_whitespace", "open_paren", "optional_whitespace", list_of("value"), "optional_whitespace", "close_paren", "optional_whitespace"]
-    assignment = ["word", "optional_whitespace", "equals_char", "optional_whitespace", "value"]
-    statement = [Or("function_definition", "function_invocation", "return_stmt", "assignment"), "optional_whitespace", "semicolon", "optional_whitespace"]
-    statements = ["optional_whitespace", OneOrMore("statement")]
+        # TODO I'm sure specifying optional_whitespace a lot
+        self.grammar['return_stmt'] = ["return_word", "whitespace", "value", "optional_whitespace"]
+        self.grammar['addition'] = ["open_paren", "optional_whitespace", "value", OneOrMore("optional_whitespace", "plus", "optional_whitespace", "value"), "optional_whitespace", "close_paren"]
+        self.grammar['array_ref'] = ["word", "open_bracket", "digit", "close_bracket"]
+        self.grammar['brace_expansion'] = ["open_brace", "value", "close_brace"]
+        self.grammar['backticks'] = ["backtick",
+                                    OneOrMore(
+                                        Or(
+                                            "anything_except_backtick_or_braces",
+                                            "brace_expansion"
+                                        ),
+                                        "optional_whitespace"
+                                    ),
+                                    "backtick",
+                                    "optional_whitespace",
+                                    ZeroOrOne(
+                                        "open_paren",
+                                        "optional_whitespace",
+                                        "value",
+                                        "optional_whitespace",
+                                        "close_paren"
+                                    )
+                                    ]
+        self.grammar['value'] = Or("function_invocation", "addition", "digit", "string", "array_ref", "word", "backticks")
+        # TODO list_of, defined this way, means everything that uses it must come after it.  How do I remove that requirement?
+        list_of = lambda x: ZeroOrOne(x, ZeroOrMore("optional_whitespace", "comma", "optional_whitespace", x))
+        self.grammar['function_invocation'] = ["word", "optional_whitespace", "open_paren", "optional_whitespace", list_of("value"), "optional_whitespace", "close_paren", "optional_whitespace"]
+        self.grammar['assignment'] = ["word", "optional_whitespace", "equals_char", "optional_whitespace", "value"]
+        self.grammar['statement'] = [Or("function_definition", "function_invocation", "return_stmt", "assignment"), "optional_whitespace", "semicolon", "optional_whitespace"]
+        self.grammar['statements'] = ["optional_whitespace", OneOrMore("statement")]
 
-    function_definition = ["word", "optional_whitespace",
-                           "equals_char", "optional_whitespace",
-                           "open_paren", "optional_whitespace",
-                           list_of(word), "optional_whitespace",
-                           "close_paren", "optional_whitespace",
-                           "open_brace", "optional_whitespace",
-                           "statements", "optional_whitespace",
-                           "close_brace", "optional_whitespace"
-                          ]
-    program = ["statements", eof]
+        self.grammar['function_definition'] = ["word", "optional_whitespace",
+                                            "equals_char", "optional_whitespace",
+                                            "open_paren", "optional_whitespace",
+                                            list_of("word"), "optional_whitespace",
+                                            "close_paren", "optional_whitespace",
+                                            "open_brace", "optional_whitespace",
+                                            "statements", "optional_whitespace",
+                                            "close_brace", "optional_whitespace"
+                                            ]
+        self.grammar['program'] = ["statements", "eof"]
 
     def get_grammar(self, name):
-        return getattr(self, name)
+        if name in self.grammar:
+            return self.grammar[name]
 
-
-class newlang_code:
     def get_code(self, name, ast):
         return getattr(self, name)(ast)
 
@@ -109,8 +111,9 @@ class newlang_code:
 
     def function_invocation(self, ast):
         fn_name = ast[0].tocode()
+        # If the user specifies an if, we want to call our own method for that instead of using the default Python if.
         if fn_name == "if":
-            fn_name = "if_m" # TODO why are we doing this?
+            fn_name = "if_m"
         ret = fn_name + "(" + ast[4].tocode() + ")"
         return ret
 
@@ -180,7 +183,7 @@ class NewLanguage(object):
         for line in code.splitlines():
             newline = re.sub("#.*", "", line)
             newcode += newline + "\n"
-        result = GrammarElement("program").parse(newcode, newlang_grammar(), newlang_code()) # TODO one provider instead of 2?
+        result = GrammarElement("program").parse(newcode, newlang_provider())
         if result is None:
             return None # TODO: raise exception?
         return result.tocode()
