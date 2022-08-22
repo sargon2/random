@@ -1,5 +1,8 @@
 import re
 
+class ParseError(Exception):
+    pass
+
 def indent(string):
     ret = ""
     lines = string.splitlines()
@@ -35,8 +38,7 @@ class Regex(object):
     def parse(self, code, language_provider):
         match = re.match(self.regex, code)
         if match:
-            #print code
-            #print "matched", self.regex
+            #print("regex matched", self.regex, "in", repr(code))
             literal_value = match.group(0)
             return ParseResult(literal_value, match)
 
@@ -48,6 +50,8 @@ class Or(object):
         for parser in self.items:
             if type(parser) is str: # TODO we should have less if type()
                 parser = grammar_or_regex(parser, language_provider)
+            if type(parser) is list or type(parser) is tuple:
+                parser = Each(*parser)
             parse_result = parser.parse(code, language_provider)
             if parse_result is not None:
                 return parse_result
@@ -162,7 +166,10 @@ class GrammarElement(object):
             defn = Each(*defn)
         result = defn.parse(code, language_provider)
         if result is None:
+            #print("Failed to parse", repr(code), "as", self.name)
             return None
+        #else:
+        #    print("Parsed", repr(code), "as", self.name)
         return GrammarElementResult(self.name, result, language_provider)
 
 class GrammarElementResult(object):

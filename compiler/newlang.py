@@ -1,4 +1,5 @@
 import os
+from re import S
 from grammar import *
 
 import textwrap
@@ -50,7 +51,7 @@ class newlang_provider:
                                         "close_paren"
                                     )
                                     ]
-        self.grammar['value'] = Or("function_invocation", "addition", "digit", "string", "array_ref", "word", "backticks")
+        self.grammar['value'] = Or("function_invocation", "addition", "digit", "string", "array_ref", "word", "backticks", "block")
         # TODO list_of, defined this way, means everything that uses it must come after it.  How do I remove that requirement?
         list_of = lambda x: ZeroOrOne(x, ZeroOrMore("optional_whitespace", "comma", "optional_whitespace", x))
         self.grammar['function_invocation'] = ["word", "optional_whitespace", "open_paren", "optional_whitespace", list_of("value"), "optional_whitespace", "close_paren", "optional_whitespace"]
@@ -58,15 +59,18 @@ class newlang_provider:
         self.grammar['statement'] = [Or("function_definition", "function_invocation", "return_stmt", "assignment"), "optional_whitespace", "semicolon", "optional_whitespace"]
         self.grammar['statements'] = ["optional_whitespace", OneOrMore("statement")]
 
+        self.grammar['block'] = ["open_brace", "optional_whitespace",
+                                 "statements", "optional_whitespace",
+                                 "close_brace", "optional_whitespace"
+                                ]
+
         self.grammar['function_definition'] = ["word", "optional_whitespace",
-                                            "equals_char", "optional_whitespace",
-                                            "open_paren", "optional_whitespace",
-                                            list_of("word"), "optional_whitespace",
-                                            "close_paren", "optional_whitespace",
-                                            "open_brace", "optional_whitespace",
-                                            "statements", "optional_whitespace",
-                                            "close_brace", "optional_whitespace"
-                                            ]
+                                               "equals_char", "optional_whitespace",
+                                               "open_paren", "optional_whitespace",
+                                               list_of("word"), "optional_whitespace",
+                                               "close_paren", "optional_whitespace",
+                                               "block", "optional_whitespace"
+                                              ]
         self.grammar['program'] = ["statements", "eof"]
 
     def get_grammar(self, name):
@@ -137,7 +141,7 @@ class newlang_provider:
         ret += "("
         ret += ast[6].tocode() # arg list
         ret += "):\n"
-        ret += indent(ast[12].tocode())
+        ret += indent(ast[10][2].tocode())
         return ret
 
     def statements(self, ast):
@@ -185,19 +189,11 @@ class NewLanguage(object):
             newcode += newline + "\n"
         result = GrammarElement("program").parse(newcode, newlang_provider())
         if result is None:
-            return None # TODO: raise exception?
+            raise ParseError("Failed to parse!")
         return result.tocode()
 
     def execute(self, code):
-        # TODO: these need to be dedup'd
-        if code == "if(equals(1, 2), { return 2; }); return 3;":
-            return 3
-        if code == "if(equals(1, 1), { return 2; }); return 3;":
-            return 2
-
         python_code = self.compile_string(code)
-        if python_code is None:
-            return None
         return self.exec_python(python_code)
 
     def exec_python(self, code):
