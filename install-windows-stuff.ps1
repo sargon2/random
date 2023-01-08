@@ -18,6 +18,7 @@ choco upgrade -y minecraft-launcher
 # choco upgrade -y spacesniffer
 # choco upgrade -y veracrypt
 choco upgrade -y discord
+choco upgrade -y microsoft-windows-terminal
 
 wsl.exe --install
 wsl --install -d Ubuntu
