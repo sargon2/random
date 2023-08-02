@@ -3,7 +3,9 @@ New process, for WSL2:
 # install-windows-stuff.ps1 should install Ubuntu
 
 sudo apt-get update
-sudo apt-get install -y zsh zsh-doc git vim
+sudo apt-get install -y zsh zsh-doc git vim python3-pip
+
+sudo pip3 install requests
 
 mkdir ~/.ssh
 ssh-keygen -t rsa -N "" -f ~/.ssh/id_rsa
