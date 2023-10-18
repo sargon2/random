@@ -1,0 +1,188 @@
+function myrand(min,max) {
+	var tmp = Math.random();
+	tmp *= Math.abs(max-min);
+	tmp += Math.min(min,max);
+	return tmp;
+}
+hsv2rgb = function(h, s, v)
+{
+//    trace("HSV2RGB()");
+	v *= 255;
+	if (s == 0)
+	{
+		// achromatic (gray)
+		return { r: v, g: v, b: v };
+	}
+	else
+	{
+		h /= 60;
+		var i = int(h); // implicit Math.floor(h)
+		var f = h - i;
+		var p = v * (1.0 - s);
+		var q = v * (1.0 - s * f);
+		var t = v * (1.0 - s * (1.0 - f));
+		if (i == 0)
+		{
+			return { r: v, g: t, b: p };
+		}
+		else if (i == 1)
+		{
+			return { r: q, g: v, b: p };
+		}
+		else if (i == 2)
+		{
+			return { r: p, g: v, b: t };
+		}
+		else if (i == 3)
+		{
+			return { r: p, g: q, b: v };
+		}
+		else if (i == 4)
+		{
+			return { r: t, g: p, b: v };
+		}
+		else if (i == 5)
+		{
+			return { r: v, g: p, b: q };
+		}
+		else
+		{
+			// if (i > 5)
+			//	 i = 5; // Prevent problem if hue is exactly 1
+			return { r: v, g: p, b: q };
+		}
+	}
+}
+
+createline = function(x, y) {
+	var tmp = this.createEmptyMovieClip("line" + _root.depth, _root.depth++);
+	c = hsv2rgb(myrand(0,50), myrand(.5,1), myrand(.5,1));
+	
+	var xo = -8;
+	
+//	tmp.lineStyle(1, myrand(0,0xffffff), 100);
+	tmp.lineStyle(3, c.r<<16|c.g<<8|c.b, 100);
+	tmp.moveTo(-4+xo,0);
+	tmp.curveTo(4/2+xo,4,4+xo,0);
+	tmp.curveTo(4/2+xo,-4,-4+xo,0);
+	tmp.lineStyle(.01, 0x333333, 100);
+	tmp.lineTo(8+xo,0);
+	
+	tmp._x = x;
+	tmp._y = y;
+	return tmp;
+}
+
+at = new Array();
+_root.depth = 0;
+
+numLines = 0;
+
+makesome = function() {
+	num = 50;
+	for(i=0;i<num;i++) {
+		r = myrand(0,2 * Math.PI);
+		t = myrand(0,100);
+		
+		x = t * Math.cos(r) + 150;
+		y = t * Math.sin(r) + 100;
+		curr = _root.depth;
+		at[curr] = createline(x,y);
+		numLines++;
+		at[curr]._rotation = 270 + myrand(-30,30);
+		at[curr].energy = 0;
+		if(myrand(0,1) > 0.5) at[curr].dir = 1;
+		else at[curr].dir = -1;
+		at[curr].onground = false;
+		at[curr].released = false;
+		at[curr].windVal = myrand(0.5,1.5);
+	}
+}
+
+makesome_old = function(x, y) {
+	num = myrand(50,100);
+	velMax = myrand(0.5,2);
+	for(i=0;i<num;i++) {
+		curr = _root.depth;
+		at[curr] = createline(x,y);
+		numLines++;
+		r = myrand(-velMax,velMax);
+		theta = myrand(0,Math.PI);
+		at[curr].dx = r*Math.sin(theta);
+		at[curr].dy = r*Math.cos(theta) - 0.5;
+		at[curr].dr = myrand(-10,10);
+	}
+}
+
+currTime = 0;
+
+//makesome(200,200);
+makesome();
+
+// windVal = 0.7; // made per leaf
+
+dropChance = 0;
+frameCount = 0;
+
+this.onEnterFrame = function() {
+	time = getTimer();
+	frameDelta = time - currTime;
+	currTime = time;
+	frameCount++;
+	
+	if(frameCount > 60)
+		dropChance += 0.00005;
+	
+//	if(Math.floor(myrand(0,100))==0) makesome(myrand(0,400),myrand(0,400));
+//	if(numLines < 200) makesome(myrand(0,550),myrand(0,400));
+	
+	elapsed = frameDelta / (1000/60); // we're at 60 fps
+	for(i in at) {
+		
+		if(myrand(0,1)<dropChance) at[i].released = true;
+
+		if(at[i].onground == true) continue;
+		
+		yval = at[i].dir * Math.sin((at[i]._rotation / 180) * Math.PI);
+		if(yval > 0) at[i].energy += 0.05;
+		else at[i].energy -= 0.05;
+		
+		xval = at[i].dir * Math.cos((at[i]._rotation / 180) * Math.PI);
+		
+
+		if(at[i].energy > 2) {
+			at[i].energy = 2;
+//			at[i]._rotation += myrand(-3,3);
+			at[i]._rotation += at[i].dir * 4;
+		}
+		
+//		if(at[i].energy < 0.1) at[i]._rotation += myrand(-10,10);
+		at[i]._rotation += at[i].dir;
+		
+		if(at[i].energy < 0) {
+			at[i].energy = 0;
+			if(myrand(0,1) < 0.1) at[i].dir = 0 - at[i].dir;
+			at[i]._rotation += at[i].dir * 4;
+		}
+		
+		if(at[i].released == false) {
+			continue;
+		}
+		at[i]._x += (at[i].energy * xval) + at[i].windVal;
+		at[i]._y += (at[i].energy * yval) + 0.8;
+//		at[i]._rotation += 1 * at[i].dir;
+		
+		if(at[i]._y < 0) {
+			at[i]._visible = false;
+		} else {
+			at[i]._visible = true;
+		}
+		if(at[i]._y > 580) {
+			at[i].onground = true;
+//			if(at[i]._rotation < 160 || at[i]._rotation > 200)
+//				at[i]._rotation = 180 + myrand(-20,20);
+		}
+	}
+}
+
+
