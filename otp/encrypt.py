@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import sys
 import os
@@ -6,7 +6,7 @@ import struct
 import math
 
 if len(sys.argv) == 1:
-    print "Usage:", sys.argv[0], "<file to encrypt> [number of output files (default 2)]"
+    print("Usage:", sys.argv[0], "<file to encrypt> [number of output files (default 2)]")
     sys.exit(1)
 
 infile = sys.argv[1]
@@ -19,8 +19,8 @@ size = os.stat(infile).st_size
 def readit(filename):
     with open(filename, "rb") as f:
         byte = f.read(1)
-        while byte != "":
-            yield byte
+        while byte:
+            yield byte[0]
             byte = f.read(1)
 
 def writeit(outfiles, generator):
@@ -28,17 +28,16 @@ def writeit(outfiles, generator):
     for outfile in outfiles:
         fds.append(open(outfile, "ab"))
     for byte in generator:
-        first = ord(byte)
+        first = byte
         for i in range(1, num_files):
-            r = ord(os.urandom(1))
-            fds[i].write(chr(r))
-            first ^= r
-        fds[0].write(chr(first))
-    # TODO: close fds
+            r = os.urandom(1)[0]
+            fds[i].write(bytes([r]))
+            first = first ^ r
+        fds[0].write(bytes([first]))
 
 def pad(num):
-    for i in xrange(0, num):
-        yield chr(0)
+    for i in range(0, num):
+        yield 0
 
 # http://stackoverflow.com/a/19164783
 def next_power_of_2(n):
@@ -64,7 +63,7 @@ for i in range(0, num_files):
 
 for outfile in outfiles:
     if(os.path.exists(outfile)):
-        print outfile + " exists"
+        print(outfile + " exists")
         sys.exit(1)
 
 size_bytes = struct.pack("I", size)
