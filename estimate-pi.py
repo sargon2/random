@@ -3,6 +3,9 @@
 import math
 import sys
 
+target = math.pi
+# target = (1 + math.sqrt(5)) / 2 # phi (the golden ratio)
+
 def go():
 
     numerator = 1
@@ -15,13 +18,13 @@ def go():
         result = numerator / denominator
         if prev_result == result:
             sys.exit(0)
-        error = abs(math.pi - result)
+        error = abs(target - result)
         if error < best_error:
             best_error = error
             print(str(numerator) + " / " + str(denominator) + " = " + str(result) + ", error = " + str(error))
-        if result < math.pi :
+        if result < target:
             numerator = numerator + 1
-        elif result > math.pi :
+        elif result > target:
             denominator = denominator + 1
 
 if __name__ == "__main__":
