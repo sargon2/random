@@ -29,9 +29,6 @@
 // How do we discover factory methods/providers?
 // - Hardcode a list of them
 
-// TODO see
-// https://medium.com/@aliaksei.radzevich/compile-time-dependency-injection-in-c-managing-dependencies-without-late-binding-4338e0afcc44
-
 #include <functional>
 #include <iostream>
 #include <typeindex>
@@ -51,6 +48,7 @@ template <typename T> class Singleton {
     Singleton() {}
 };
 
+// TODO support multiple objects of the same type
 class DIRegistry : public Singleton<DIRegistry> {
   public:
     // Register a factory function that creates an object of type T
@@ -58,14 +56,17 @@ class DIRegistry : public Singleton<DIRegistry> {
     // No need to specify template types, they are inferred from the function
     template <typename T, typename... Args>
     void registerFactory(T (*creator)(Args...)) {
-        creators[typeid(T)] = [this, creator]() {
+        creators[typeid(T)] = [this]() {
             return std::make_shared<T>(createDependency<Args>()...);
         };
     }
 
     // Given types as template arguments, create and register a factory.
-    // Usage: createFactory<TypeToProduce, TypeOfArg1, TypeOfArg2, ...>();
+    // Usage:
+    // createFactory<TypeToProduce, TypeOfCtorArg1, TypeOfCtorArg2, ...>();
     template <typename T, typename... Args> void createFactory() {
+        // We can't pass arguments like <T(A,B)> because that would require T to
+        // be a function, not a class.
         creators[typeid(T)] = [this]() {
             return std::make_shared<T>(T(createDependency<Args>()...));
         };
@@ -78,6 +79,8 @@ class DIRegistry : public Singleton<DIRegistry> {
             // functions to specify whether the same dep should be returned each
             // time or a new one created.  We should use soft pointers to allow
             // reference-counting GC to work.
+            // We can't create objects in the registerFactory/createFactory
+            // methods because the deps may not be registered yet.
             return std::static_pointer_cast<T>(it->second());
         }
         throw std::runtime_error("Dependency not found");
@@ -106,10 +109,9 @@ class C {
 };
 
 int try_dep_injection() {
-    // TODO can we pass args like <C(A, B)> instead of <C, A, B>?
-    DIRegistry::instance().createFactory<A>();
-    DIRegistry::instance().createFactory<B, A>();
     DIRegistry::instance().createFactory<C, A, B>();
+    DIRegistry::instance().createFactory<B, A>();
+    DIRegistry::instance().createFactory<A>();
 
     DIRegistry &registry = DIRegistry::instance();
 
