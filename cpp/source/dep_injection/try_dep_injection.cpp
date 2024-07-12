@@ -51,13 +51,27 @@ template <typename T> class Singleton {
     Singleton() {}
 };
 
+// TODO move this into DIRegistry (and inline it?)
+template <typename T, typename... Args> T instantiateObject(Args... args) {
+    return T(args...);
+}
+
 class DIRegistry : public Singleton<DIRegistry> {
   public:
+    // Register a factory function that creates an object of type T
+    // Usage: registerFactory(fn);
+    // No need to specify template types, they are inferred from the function
     template <typename T, typename... Args>
     void registerFactory(T (*creator)(Args...)) {
         creators[typeid(T)] = [this, creator]() {
             return std::make_shared<T>(createDependency<Args>()...);
         };
+    }
+
+    // Given types as template arguments, create and register a factory.
+    // Usage: createFactory<TypeToProduce, TypeOfArg1, TypeOfArg2, ...>();
+    template <typename T, typename... Args> void createFactory() {
+        registerFactory<T, Args...>(instantiateObject<T, Args...>);
     }
 
     template <typename T> std::shared_ptr<T> get() {
@@ -79,8 +93,6 @@ class DIRegistry : public Singleton<DIRegistry> {
     template <typename T> T createDependency() { return *get<T>(); }
 };
 
-#define DI_REGISTER_FACTORY DIRegistry::instance().registerFactory
-
 class A {
   public:
     A() { std::cout << "A constructor\n"; }
@@ -96,17 +108,11 @@ class C {
     C(A a, B b) { std::cout << "C constructor\n"; }
 };
 
-A createA() { return A(); }
-
-B createB(A a) { return B(a); }
-
-C createC(A a, B b) { return C(a, b); }
-
 int try_dep_injection() {
-    // TODO move these closer to the class definitions
-    DI_REGISTER_FACTORY(createA);
-    DI_REGISTER_FACTORY(createB);
-    DI_REGISTER_FACTORY(createC);
+    // TODO can we pass args like <C(A, B)> instead of <C, A, B>?
+    DIRegistry::instance().createFactory<A>();
+    DIRegistry::instance().createFactory<B, A>();
+    DIRegistry::instance().createFactory<C, A, B>();
 
     DIRegistry &registry = DIRegistry::instance();
 
