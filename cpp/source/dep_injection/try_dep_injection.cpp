@@ -37,29 +37,21 @@
 #include <typeindex>
 #include <unordered_map>
 
-class A {
+template <typename T> class Singleton {
   public:
-    A() { std::cout << "A constructor\n"; }
+    static T &instance() {
+        static T instance;
+        return instance;
+    };
+
+    Singleton(const Singleton &) = delete;
+    Singleton &operator=(const Singleton) = delete;
+
+  protected:
+    Singleton() {}
 };
 
-class B {
-  public:
-    B(A a) { std::cout << "B constructor\n"; }
-};
-
-class C {
-  public:
-    C(A a, B b) { std::cout << "C constructor\n"; }
-};
-
-A createA() { return A(); }
-
-B createB(A a) { return B(a); }
-
-C createC(A a, B b) { return C(a, b); }
-
-// TODO make singleton
-class DIRegistry {
+class DIRegistry : public Singleton<DIRegistry> {
   public:
     template <typename T, typename... Args>
     void registerFactory(T (*creator)(Args...)) {
@@ -87,13 +79,36 @@ class DIRegistry {
     template <typename T> T createDependency() { return *get<T>(); }
 };
 
-int try_dep_injection() {
-    DIRegistry registry;
+#define DI_REGISTER_FACTORY DIRegistry::instance().registerFactory
 
-    // TODO these should be moved to be near their class definitions
-    registry.registerFactory(createA);
-    registry.registerFactory(createB);
-    registry.registerFactory(createC);
+class A {
+  public:
+    A() { std::cout << "A constructor\n"; }
+};
+
+class B {
+  public:
+    B(A a) { std::cout << "B constructor\n"; }
+};
+
+class C {
+  public:
+    C(A a, B b) { std::cout << "C constructor\n"; }
+};
+
+A createA() { return A(); }
+
+B createB(A a) { return B(a); }
+
+C createC(A a, B b) { return C(a, b); }
+
+int try_dep_injection() {
+    // TODO move these closer to the class definitions
+    DI_REGISTER_FACTORY(createA);
+    DI_REGISTER_FACTORY(createB);
+    DI_REGISTER_FACTORY(createC);
+
+    DIRegistry &registry = DIRegistry::instance();
 
     std::shared_ptr<C> c = registry.get<C>();
     std::shared_ptr<B> b = registry.get<B>();
