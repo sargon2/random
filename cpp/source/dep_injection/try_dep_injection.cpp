@@ -51,11 +51,6 @@ template <typename T> class Singleton {
     Singleton() {}
 };
 
-// TODO move this into DIRegistry (and inline it?)
-template <typename T, typename... Args> T instantiateObject(Args... args) {
-    return T(args...);
-}
-
 class DIRegistry : public Singleton<DIRegistry> {
   public:
     // Register a factory function that creates an object of type T
@@ -71,7 +66,9 @@ class DIRegistry : public Singleton<DIRegistry> {
     // Given types as template arguments, create and register a factory.
     // Usage: createFactory<TypeToProduce, TypeOfArg1, TypeOfArg2, ...>();
     template <typename T, typename... Args> void createFactory() {
-        registerFactory<T, Args...>(instantiateObject<T, Args...>);
+        creators[typeid(T)] = [this]() {
+            return std::make_shared<T>(T(createDependency<Args>()...));
+        };
     }
 
     template <typename T> std::shared_ptr<T> get() {
