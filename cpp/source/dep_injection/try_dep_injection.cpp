@@ -29,6 +29,9 @@
 // How do we discover factory methods/providers?
 // - Hardcode a list of them
 
+// TODO see
+// https://medium.com/@aliaksei.radzevich/compile-time-dependency-injection-in-c-managing-dependencies-without-late-binding-4338e0afcc44
+
 #include "try_dep_injection.h"
 #include <iostream>
 #include <map>
@@ -80,6 +83,7 @@ class ProviderRegistry : public Singleton<ProviderRegistry> {
     std::map<std::type_index, std::shared_ptr<IProvider>> providers;
 };
 
+// TODO make providers functions instead of classes
 class int_provider : public Provider<int> {
   public:
     int_provider() { std::cout << "int_provider constructor" << std::endl; }
@@ -105,6 +109,8 @@ class int_consumer {
 int try_dep_injection() {
     ProviderRegistry &registry = ProviderRegistry::instance();
     registry.registerProvider<int>(std::make_shared<int_provider>());
+    // TODO construct the consumer without manually passing in the constructor
+    // arguments
     int *a = registry.getProvider<int>();
 
     int_consumer *c = new int_consumer(a);
