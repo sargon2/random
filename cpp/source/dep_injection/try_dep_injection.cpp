@@ -46,8 +46,21 @@ template <typename T> class Provider : public IProvider {
     virtual T *get() = 0;
 };
 
-// TODO make singleton
-class ProviderRegistry {
+template <typename T> class Singleton {
+  public:
+    static T &instance() {
+        static T instance;
+        return instance;
+    };
+
+    Singleton(const Singleton &) = delete;
+    Singleton &operator=(const Singleton) = delete;
+
+  protected:
+    Singleton() {}
+};
+
+class ProviderRegistry : public Singleton<ProviderRegistry> {
   public:
     template <typename T>
     void registerProvider(std::shared_ptr<Provider<T>> provider) {
@@ -90,7 +103,7 @@ class int_consumer {
 };
 
 int try_dep_injection() {
-    ProviderRegistry registry;
+    ProviderRegistry &registry = ProviderRegistry::instance();
     registry.registerProvider<int>(std::make_shared<int_provider>());
     int *a = registry.getProvider<int>();
 
