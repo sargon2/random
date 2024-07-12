@@ -32,89 +32,66 @@
 // TODO see
 // https://medium.com/@aliaksei.radzevich/compile-time-dependency-injection-in-c-managing-dependencies-without-late-binding-4338e0afcc44
 
-#include "try_dep_injection.h"
+#include <functional>
 #include <iostream>
-#include <map>
-#include <memory>
-#include <stdexcept>
 #include <typeindex>
+#include <unordered_map>
 
-class IProvider {
+class A {
   public:
-    virtual ~IProvider() = default;
+    A() { std::cout << "A constructor\n"; }
 };
 
-template <typename T> class Provider : public IProvider {
+class B {
   public:
-    virtual T *get() = 0;
+    B(A a) { std::cout << "B constructor\n"; }
 };
 
-template <typename T> class Singleton {
+class C {
   public:
-    static T &instance() {
-        static T instance;
-        return instance;
-    };
-
-    Singleton(const Singleton &) = delete;
-    Singleton &operator=(const Singleton) = delete;
-
-  protected:
-    Singleton() {}
+    C(A a, B b) { std::cout << "C constructor\n"; }
 };
 
-class ProviderRegistry : public Singleton<ProviderRegistry> {
+A createA() { return A(); }
+
+B createB(A a) { return B(a); }
+
+C createC(A a, B b) { return C(a, b); }
+
+class DIContainer {
   public:
-    template <typename T>
-    void registerProvider(std::shared_ptr<Provider<T>> provider) {
-        providers[typeid(T)] = std::static_pointer_cast<IProvider>(provider);
+    template <typename T, typename... Args>
+    void registerDep(T (*creator)(Args...)) {
+        creators[typeid(T)] = [this, creator]() {
+            return std::make_shared<T>(createDependency<Args>()...);
+        };
     }
 
-    template <typename T> T *getProvider() {
-        auto it = providers.find(typeid(T));
-        if (it == providers.end()) {
-            throw std::runtime_error(
-                "Provider not found for the requested type");
+    template <typename T> std::shared_ptr<T> getDep() {
+        auto it = creators.find(typeid(T));
+        if (it != creators.end()) {
+            return std::static_pointer_cast<T>(it->second());
         }
-        return static_cast<Provider<T> *>(it->second.get())->get();
+        throw std::runtime_error("Dependency not found");
     }
 
   private:
-    std::map<std::type_index, std::shared_ptr<IProvider>> providers;
-};
+    std::unordered_map<std::type_index, std::function<std::shared_ptr<void>()>>
+        creators;
 
-// TODO make providers functions instead of classes
-class int_provider : public Provider<int> {
-  public:
-    int_provider() { std::cout << "int_provider constructor" << std::endl; }
-    int *get() {
-        static int value = 3;
-        return &value;
-    }
-};
-
-class int_consumer {
-  public:
-    int_consumer(int *a) {
-        std::cout << "int_consumer constructor: " << a << std::endl;
-        this->a = *a;
-    }
-
-    void echo() { std::cout << "a: " << a << std::endl; }
-
-  private:
-    int a;
+    template <typename T> T createDependency() { return *getDep<T>(); }
 };
 
 int try_dep_injection() {
-    ProviderRegistry &registry = ProviderRegistry::instance();
-    registry.registerProvider<int>(std::make_shared<int_provider>());
-    // TODO construct the consumer without manually passing in the constructor
-    // arguments
-    int *a = registry.getProvider<int>();
+    DIContainer container;
 
-    int_consumer *c = new int_consumer(a);
+    container.registerDep(createA);
+    container.registerDep(createB);
+    container.registerDep(createC);
 
-    c->echo();
+    auto c = container.getDep<C>();
+    auto b = container.getDep<B>();
+    auto a = container.getDep<A>();
+
     return 0;
 }
