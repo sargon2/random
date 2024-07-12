@@ -58,18 +58,23 @@ B createB(A a) { return B(a); }
 
 C createC(A a, B b) { return C(a, b); }
 
-class DIContainer {
+// TODO make singleton
+class DIRegistry {
   public:
     template <typename T, typename... Args>
-    void registerDep(T (*creator)(Args...)) {
+    void registerFactory(T (*creator)(Args...)) {
         creators[typeid(T)] = [this, creator]() {
             return std::make_shared<T>(createDependency<Args>()...);
         };
     }
 
-    template <typename T> std::shared_ptr<T> getDep() {
+    template <typename T> std::shared_ptr<T> get() {
         auto it = creators.find(typeid(T));
         if (it != creators.end()) {
+            // TODO keep a registry of created objects and allow creator
+            // functions to specify whether the same dep should be returned each
+            // time or a new one created.  We should use soft pointers to allow
+            // reference-counting GC to work.
             return std::static_pointer_cast<T>(it->second());
         }
         throw std::runtime_error("Dependency not found");
@@ -79,19 +84,20 @@ class DIContainer {
     std::unordered_map<std::type_index, std::function<std::shared_ptr<void>()>>
         creators;
 
-    template <typename T> T createDependency() { return *getDep<T>(); }
+    template <typename T> T createDependency() { return *get<T>(); }
 };
 
 int try_dep_injection() {
-    DIContainer container;
+    DIRegistry registry;
 
-    container.registerDep(createA);
-    container.registerDep(createB);
-    container.registerDep(createC);
+    // TODO these should be moved to be near their class definitions
+    registry.registerFactory(createA);
+    registry.registerFactory(createB);
+    registry.registerFactory(createC);
 
-    auto c = container.getDep<C>();
-    auto b = container.getDep<B>();
-    auto a = container.getDep<A>();
+    std::shared_ptr<C> c = registry.get<C>();
+    std::shared_ptr<B> b = registry.get<B>();
+    std::shared_ptr<A> a = registry.get<A>();
 
     return 0;
 }
