@@ -73,15 +73,23 @@ class DIRegistry : public Singleton<DIRegistry> {
     }
 
     template <typename T> std::shared_ptr<T> get() {
+        // Have we created one?
+        auto whatever = created.find(typeid(T));
+        if (whatever != created.end()) {
+            return std::static_pointer_cast<T>(whatever->second);
+        }
+        // We haven't created one yet, create it
         auto it = creators.find(typeid(T));
         if (it != creators.end()) {
-            // TODO keep a registry of created objects and allow creator
-            // functions to specify whether the same dep should be returned each
-            // time or a new one created.  We should use soft pointers to allow
-            // reference-counting GC to work.
-            // We can't create objects in the registerFactory/createFactory
-            // methods because the deps may not be registered yet.
-            return std::static_pointer_cast<T>(it->second());
+            // TODO allow creator functions to specify whether the same dep
+            // should be returned each time or a new one created.
+            // TODO We should use soft pointers to allow reference-counting GC
+            // to work. Note we can't create objects in the
+            // registerFactory/createFactory methods because the deps may not be
+            // registered yet.
+            auto ob = it->second();
+            created[typeid(T)] = ob;
+            return std::static_pointer_cast<T>(ob);
         }
         throw std::runtime_error("Dependency not found");
     }
@@ -89,6 +97,7 @@ class DIRegistry : public Singleton<DIRegistry> {
   private:
     std::unordered_map<std::type_index, std::function<std::shared_ptr<void>()>>
         creators;
+    std::unordered_map<std::type_index, std::shared_ptr<void>> created;
 
     template <typename T> T createDependency() { return *get<T>(); }
 };
