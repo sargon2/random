@@ -68,7 +68,7 @@ class DIRegistry : public Singleton<DIRegistry> {
         // We can't pass arguments like <T(A,B)> because that would require T to
         // be a function, not a class.
         creators[typeid(T)] = [this]() {
-            return std::make_shared<T>(T(createDependency<Args>()...));
+            return std::make_shared<T>(createDependency<Args>()...);
         };
     }
 
