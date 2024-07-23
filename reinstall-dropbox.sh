@@ -32,6 +32,7 @@ while ! ~/bin/dropbox status 2>&1 | grep -q "Up to date"; do sleep 5; ~/bin/drop
 
 # Restart it so it's running via the python script instead of in this shell
 ~/bin/dropbox stop
+sleep 5
 ~/bin/dropbox start
 
 ~/bin/dropbox lansync n # apparently makes it use less network bandwidth
