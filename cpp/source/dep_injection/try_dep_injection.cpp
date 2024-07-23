@@ -117,10 +117,13 @@ class C {
     C(A a, B b) { std::cout << "C constructor\n"; }
 };
 
+A *createA() { return new A(); }
+
 int try_dep_injection() {
     DIRegistry::instance().createFactory<C, A, B>();
     DIRegistry::instance().createFactory<B, A>();
-    DIRegistry::instance().createFactory<A>();
+    // DIRegistry::instance().createFactory<A>();
+    DIRegistry::instance().registerFactory(createA);
 
     DIRegistry &registry = DIRegistry::instance();
 
