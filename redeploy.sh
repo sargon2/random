@@ -17,7 +17,7 @@ wait_for_keypress () {
 
 sudo chsh -s $(which zsh) $(whoami)
 sudo apt-get update
-sudo apt-get install -y zsh zsh-doc git vim make python-pip dos2unix curl inotify-tools
+sudo apt-get install -y zsh zsh-doc git vim make python-pip dos2unix curl inotify-tools gnupg
 sudo pip3 install requests
 
 mkdir ~/.ssh
@@ -51,5 +51,14 @@ cd ~/bitbucket/random
 ./reinstall-dropbox.sh
 
 cp -R ~/Dropbox/aws/.aws ~
+
+# GPG
+gpg --batch --import ~/Dropbox/gpg/private_key.txt
+
+# Extract the key ID of the imported key
+KEY_ID=$(gpg --list-keys --with-colons --fingerprint | awk -F: '/^fpr:/ {print $10; exit}')
+
+# Set the trust level to ultimate for the imported key
+echo "$KEY_ID:6:" | gpg --batch --import-ownertrust
 
 exec zsh
