@@ -41,4 +41,15 @@ cd ~/bitbucket/settings
 
 vim '+exit' # install vim plugins
 
+clear
+echo
+echo MANUAL: Visit the link to log in to dropbox after it appears.
+echo
+wait_for_keypress
+
+cd ~/bitbucket/random
+./reinstall-dropbox.sh
+
+cp -R ~/Dropbox/aws/.aws ~
+
 exec zsh
