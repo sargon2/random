@@ -7,7 +7,7 @@
 # wsl --install Ubuntu
 
 # Run with:
-# wget -O- https://bitbucket.org/dbesen/random/raw/master/redeploy.sh | bash
+# bash -ex <(wget -o /dev/null -O- https://bitbucket.org/dbesen/random/raw/master/redeploy.sh)
 
 wait_for_keypress () {
     read -n 1 -s -r -p "Press any key to continue";echo
@@ -15,10 +15,11 @@ wait_for_keypress () {
 
 # The first sudo will ask for password.
 
-sudo chsh -s $(which zsh) $(whoami)
 sudo apt-get update
 sudo apt-get install -y zsh zsh-doc git vim make python-pip dos2unix curl inotify-tools gnupg
 sudo pip3 install requests
+
+sudo chsh -s $(which zsh) $(whoami)
 
 mkdir ~/.ssh
 ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -N ''
