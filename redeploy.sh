@@ -27,7 +27,7 @@ clear
 echo
 echo MANUAL: Go to bitbucket.org, add public key to ssh keys:
 echo
-cat ~/.ssh/id_rsa.pub
+cat ~/.ssh/id_ed25519.pub
 echo
 wait_for_keypress
 
