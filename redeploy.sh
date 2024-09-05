@@ -3,8 +3,8 @@
 # install-windows-stuff.ps1 should install Ubuntu
 
 # Redeploying Ubuntu on WSL2:
-# wsl2 --unregister Ubuntu
-# wsl2 --install Ubuntu
+# wsl --unregister Ubuntu
+# wsl --install Ubuntu
 
 # Run with:
 # wget -O- https://bitbucket.org/dbesen/random/raw/master/redeploy.sh | bash
