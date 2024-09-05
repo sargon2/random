@@ -16,8 +16,7 @@ wait_for_keypress () {
 # The first sudo will ask for password.
 
 sudo apt-get update
-sudo apt-get install -y zsh zsh-doc git vim make python3-pip dos2unix curl inotify-tools gnupg
-sudo pip3 install requests
+sudo apt-get install -y zsh zsh-doc git vim make dos2unix curl inotify-tools gnupg
 
 sudo chsh -s $(which zsh) $(whoami)
 
