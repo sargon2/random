@@ -1,0 +1,13 @@
+[Unit]
+Description=Dropbox Daemon
+After=network.target
+
+[Service]
+ExecStart=%h/.dropbox-dist/dropboxd
+Restart=always
+Environment=DISPLAY=:0
+Environment=XDG_RUNTIME_DIR=/run/user/%U
+
+[Install]
+WantedBy=default.target
+
