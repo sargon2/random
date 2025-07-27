@@ -6,7 +6,7 @@ pkg install -y zsh git vim make dos2unix curl inotify-tools gnupg gh wget
 
 chsh -s zsh
 
-mkdir ~/.ssh
+mkdir -p ~/.ssh
 ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -N ''
 
 gh auth login -p ssh -w --skip-ssh-key
