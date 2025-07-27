@@ -16,13 +16,21 @@ gh ssh-key add ~/.ssh/id_ed25519.pub
 
 mkdir -p ~/github
 mkdir -p ~/github/sargon2
+
 cd ~/github/sargon2
 git clone git@github.com:sargon2/all_repos
 cd ..
+
 ./sargon2/all_repos/update-all.sh
 
-cd sargon2/settings
+pushd sargon2/random
+# This script was probably cloned over https, so reset the remote to use ssh
+git remote set-url origin git@github.com:sargon2/random
+popd
+
+pushd sargon2/settings
 ./install.sh
+popd
 
 vim '+exit' # install vim plugins
 
