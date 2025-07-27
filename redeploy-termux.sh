@@ -17,10 +17,11 @@ gh ssh-key add ~/.ssh/id_ed25519.pub
 mkdir -p ~/github
 mkdir -p ~/github/sargon2
 cd ~/github/sargon2
-git clone git@github.com:sargon/all_repos
-./all_repos/update-all.sh
+git clone git@github.com:sargon2/all_repos
+cd ..
+./sargon2/all_repos/update-all.sh
 
-cd settings
+cd sargon2/settings
 ./install.sh
 
 vim '+exit' # install vim plugins
