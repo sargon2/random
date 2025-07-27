@@ -6,7 +6,7 @@ pkg install -y zsh git vim make dos2unix curl inotify-tools gnupg gh wget
 
 chsh -s zsh
 
-if [ ! -f "~/.ssh/id_ed25519" ]; then
+if [ ! -f ~/.ssh/id_ed25519 ]; then
     mkdir -p ~/.ssh
     ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -N ''
 fi
