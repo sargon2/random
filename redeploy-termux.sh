@@ -15,7 +15,7 @@ gh ssh-key add ~/.ssh/id_ed25519.pub
 mkdir -p ~/github
 mkdir -p ~/github/sargon2
 cd ~/github/sargon2
-git clone github.com/sargon/all_repos
+git clone git@github.com:sargon/all_repos
 ./all_repos/update-all.sh
 
 cd settings
