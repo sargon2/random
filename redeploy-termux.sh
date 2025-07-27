@@ -9,7 +9,7 @@ chsh -s zsh
 mkdir -p ~/.ssh
 ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -N ''
 
-gh auth login -p ssh -w --skip-ssh-key
+gh auth login -p ssh -w --skip-ssh-key -s admin:public_key
 gh ssh-key add ~/.ssh/id_ed25519.pub
 
 mkdir -p ~/github
