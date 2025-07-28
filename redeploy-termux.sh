@@ -2,7 +2,7 @@
 
 # This one is for termux only.  It sets up git but not Dropbox.
 
-pkg install -y zsh git vim make dos2unix curl inotify-tools gnupg gh wget
+pkg install -y zsh git vim make dos2unix curl inotify-tools gnupg gh wget man less
 
 chsh -s zsh
 
