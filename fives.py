@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 results = {}
-MAX_DEPTH = 6
+MAX_DEPTH = 5
 TARGET_NUMBER="5"
 
 def is_whole(n):
@@ -13,7 +13,7 @@ def num_fives(s):
 def doit(string_so_far, num_parens=0, depth=0):
     if num_parens < 0:
         return
-    if num_parens == 0:
+    elif num_parens == 0:
         try:
             result = eval(string_so_far)
         except:
@@ -44,7 +44,10 @@ def doit(string_so_far, num_parens=0, depth=0):
     doit(string_so_far + ")-(" + TARGET_NUMBER, num_parens, depth+1)
     doit(string_so_far + ")/(" + TARGET_NUMBER, num_parens, depth+1)
 
+    doit(string_so_far + ")" + TARGET_NUMBER, num_parens-1, depth+1)
+
 doit(TARGET_NUMBER)
+doit("(" + TARGET_NUMBER, 1)
 
 kc = 1
 for k in sorted(results):
