@@ -43,5 +43,6 @@ kc = 1
 for k in sorted(results):
     if k != kc:
         print("BREAK!!!")
+        kc = k
     kc = kc + 1
     print(k, results[k])
