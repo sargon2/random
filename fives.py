@@ -44,7 +44,7 @@ def doit(string_so_far, num_parens=0, depth=0):
     doit(string_so_far + ")-(" + TARGET_NUMBER, num_parens, depth+1)
     doit(string_so_far + ")/(" + TARGET_NUMBER, num_parens, depth+1)
 
-    doit(string_so_far + ")" + TARGET_NUMBER, num_parens-1, depth+1)
+    doit(string_so_far + ")", num_parens-1, depth+1)
 
 doit(TARGET_NUMBER)
 doit("(" + TARGET_NUMBER, 1)
