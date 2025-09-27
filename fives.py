@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 
 results = {}
+MAX_DEPTH = 6
+TARGET_NUMBER="5"
 
 def is_whole(n):
     return n == int(n)
 
 def num_fives(s):
-    return s.count("5")
+    return s.count(TARGET_NUMBER)
 
-def doit(string_so_far, num_parens=0):
+def doit(string_so_far, num_parens=0, depth=0):
     if num_parens < 0:
         return
     if num_parens == 0:
@@ -20,24 +22,24 @@ def doit(string_so_far, num_parens=0):
             result = int(result)
             if not result in results or num_fives(string_so_far) < num_fives(results[result]):
                 results[result] = string_so_far
-    if len(string_so_far) > 15:
+    if depth > MAX_DEPTH:
         return
-    doit(string_so_far + "*5", num_parens)
-    doit(string_so_far + "+5", num_parens)
-    doit(string_so_far + "-5", num_parens)
-    doit(string_so_far + "/5", num_parens)
+    doit(string_so_far + "*" + TARGET_NUMBER, num_parens, depth+1)
+    doit(string_so_far + "+" + TARGET_NUMBER, num_parens, depth+1)
+    doit(string_so_far + "-" + TARGET_NUMBER, num_parens, depth+1)
+    doit(string_so_far + "/" + TARGET_NUMBER, num_parens, depth+1)
 
-    doit(string_so_far + ")*5", num_parens-1)
-    doit(string_so_far + ")+5", num_parens-1)
-    doit(string_so_far + ")-5", num_parens-1)
-    doit(string_so_far + ")/5", num_parens-1)
+    doit(string_so_far + ")*" + TARGET_NUMBER, num_parens-1, depth+1)
+    doit(string_so_far + ")+" + TARGET_NUMBER, num_parens-1, depth+1)
+    doit(string_so_far + ")-" + TARGET_NUMBER, num_parens-1, depth+1)
+    doit(string_so_far + ")/" + TARGET_NUMBER, num_parens-1, depth+1)
 
-    doit(string_so_far + "*(5", num_parens+1)
-    doit(string_so_far + "+(5", num_parens+1)
-    doit(string_so_far + "-(5", num_parens+1)
-    doit(string_so_far + "/(5", num_parens+1)
+    doit(string_so_far + "*(" + TARGET_NUMBER, num_parens+1, depth+1)
+    doit(string_so_far + "+(" + TARGET_NUMBER, num_parens+1, depth+1)
+    doit(string_so_far + "-(" + TARGET_NUMBER, num_parens+1, depth+1)
+    doit(string_so_far + "/(" + TARGET_NUMBER, num_parens+1, depth+1)
 
-doit("5")
+doit(TARGET_NUMBER)
 
 kc = 1
 for k in sorted(results):
