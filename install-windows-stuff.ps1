@@ -11,7 +11,6 @@ choco upgrade -y notepadplusplus
 choco upgrade -y steam
 # choco upgrade -y launchy
 # choco upgrade -y anki
-choco upgrade -y paint.net
 choco upgrade -y audacity
 # choco upgrade -y vlc
 choco upgrade -y minecraft-launcher
@@ -19,6 +18,8 @@ choco upgrade -y minecraft-launcher
 # choco upgrade -y veracrypt
 choco upgrade -y discord
 choco upgrade -y microsoft-windows-terminal
+
+winget install --id dotPDN.PaintDotNet -e
 
 wsl.exe --install
 wsl --install -d Ubuntu
