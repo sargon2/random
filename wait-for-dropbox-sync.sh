@@ -11,7 +11,11 @@ $DROPBOX lansync n # apparently makes it use less network bandwidth
 
 # wait until done syncing
 # TODO: dup'd with reinstall-dropbox.sh
-while ! $DROPBOX status 2>&1 | grep -q "Up to date"; do
+while true; do
+    status="$($DROPBOX status 2>&1)"
+    echo "$status"
+    if echo "$status" | grep -q "Up to date"; then
+        break
+    fi
     sleep 5
 done
-
