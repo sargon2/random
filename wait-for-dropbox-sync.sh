@@ -8,6 +8,7 @@ DROPBOX=/bin/dropbox-cli # arch
 # DROPBOX=~/bin/dropbox
 
 $DROPBOX lansync n # apparently makes it use less network bandwidth
+$DROPBOX start
 
 # wait until done syncing
 # TODO: dup'd with reinstall-dropbox.sh
