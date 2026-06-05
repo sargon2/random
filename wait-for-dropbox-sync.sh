@@ -4,8 +4,11 @@ set -e
 
 unset DISPLAY # otherwise dropbox tries to use X
 
-DROPBOX=/bin/dropbox-cli # arch
-# DROPBOX=~/bin/dropbox
+if [ -x /bin/dropbox-cli ]; then
+  DROPBOX=/bin/dropbox-cli # arch
+else
+  DROPBOX="$HOME/bin/dropbox"
+fi
 
 $DROPBOX lansync n # apparently makes it use less network bandwidth
 $DROPBOX start
