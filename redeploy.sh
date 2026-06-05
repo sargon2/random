@@ -1,4 +1,4 @@
-#!/bin/bash -ex
+g!/bin/bash -ex
 
 # install-windows-stuff.ps1 should install Ubuntu
 
@@ -23,42 +23,41 @@ sudo chsh -s $(which zsh) $(whoami)
 mkdir ~/.ssh
 ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -N ''
 
-clear
-echo
-echo MANUAL: Go to bitbucket.org, add public key to ssh keys:
-echo
-cat ~/.ssh/id_ed25519.pub
-echo
-wait_for_keypress
+# gh auth login should have been run.
 
-mkdir bitbucket
-cd bitbucket
-git clone git@bitbucket.org:/dbesen/all_repos.git
-./all_repos/update-all.sh
+mkdir -p ~/github/sargon2
+cd ~/github/sargon2
+gh repo clone all_repos
+cd all_repos
+./update_all.sh
 
-cd ~/bitbucket/settings
+cd ~/github/sargon2/settings
 ./install.sh
 
 vim '+exit' # install vim plugins
 
-clear
-echo
-echo MANUAL: Visit the link to log in to dropbox after it appears.
-echo
-wait_for_keypress
+echo "Manually install dropbox, copy AWS creds, copy GPG creds."
 
-cd ~/bitbucket/random
-./reinstall-dropbox.sh
+# Dropbox stuff disabled for now, because Arch can install it via AUR and this is weird.
+# clear
+# echo
+# echo MANUAL: Visit the link to log in to dropbox after it appears.
+# echo
+# wait_for_keypress
+#
+# cd ~/bitbucket/random
+# ./reinstall-dropbox.sh
 
-cp -R ~/Dropbox/aws/.aws ~
+# Copy in AWS config
+# cp -R ~/Dropbox/aws/.aws ~
 
-# GPG
-gpg --batch --import ~/Dropbox/gpg/private_key.txt
-
-# Extract the key ID of the imported key
-KEY_ID=$(gpg --list-keys --with-colons --fingerprint | awk -F: '/^fpr:/ {print $10; exit}')
-
-# Set the trust level to ultimate for the imported key
-echo "$KEY_ID:6:" | gpg --batch --import-ownertrust
+# # GPG
+# gpg --batch --import ~/Dropbox/gpg/private_key.txt
+#
+# # Extract the key ID of the imported key
+# KEY_ID=$(gpg --list-keys --with-colons --fingerprint | awk -F: '/^fpr:/ {print $10; exit}')
+#
+# # Set the trust level to ultimate for the imported key
+# echo "$KEY_ID:6:" | gpg --batch --import-ownertrust
 
 exec zsh
