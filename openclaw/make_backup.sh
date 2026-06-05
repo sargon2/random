@@ -14,6 +14,8 @@ ssh "$HOST" "
   set -euo pipefail
   tar -czf '$REMOTE_TAR' \
     --exclude='*/node_modules' \
+    --exclude='*/npm' \
+    --exclude='*/npm/**' \
     --exclude='*/.git' \
     --exclude='*/.cache' \
     --exclude='*/cache' \
@@ -26,9 +28,7 @@ ssh "$HOST" "
     --exclude='*/.venv' \
     --exclude='*/venv' \
     -C "\$HOME" \
-    .openclaw/workspace \
-    .openclaw/skills \
-    .openclaw/plugin-skills 2>/tmp/openclaw-backup-warnings-$STAMP.log || true
+    .openclaw 2>/tmp/openclaw-backup-warnings-$STAMP.log || true
 
   if [ ! -s '$REMOTE_TAR' ]; then
     echo 'Backup tarball was not created or is empty' >&2
