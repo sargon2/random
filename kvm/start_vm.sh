@@ -4,15 +4,23 @@ DISK_SIZE="100G"
 MEMORY="8192"
 VCPUS="2"
 
-PUBLIC_KEY="$HOME/.ssh/id_ed25519.pub"
+# Arch
 VM_NAME="arch1"
+file="Arch-Linux-x86_64-cloudimg.qcow2"
+url="https://fastly.mirror.pkgbuild.com/images/latest/$file"
+OSINFO="archlinux"
+
+# Ubuntu 24.04
+# VM_NAME="openclaw"
+# file="noble-server-cloudimg-amd64.img"
+# url="https://cloud-images.ubuntu.com/noble/current/$file"
+# OSINFO="ubuntu24.04"
+
+PUBLIC_KEY="$HOME/.ssh/id_ed25519.pub"
 INSTANCE_ID="${VM_NAME}-$(date +%Y%m%d%H%M%S)-$(uuidgen | cut -d- -f1)"
 LOCAL_HOSTNAME="$VM_NAME"
 TIMEOUT=180 # Seconds to wait for it to come up & get a dhcp address
 SSH_TIMEOUT=180 # Seconds to wait retrying SSH
-
-file="Arch-Linux-x86_64-cloudimg.qcow2"
-url="https://fastly.mirror.pkgbuild.com/images/latest/$file"
 
 # Ensure we have the public ssh key ready to go
 ls $PUBLIC_KEY
@@ -29,12 +37,19 @@ temp_dir=$(mktemp -d)
 echo "Temporary directory: $temp_dir"
 cd $temp_dir
 
-# Get the arch image
+# Get the image
 if [ ! -f "$file" ]; then
   wget "$url"
 fi
 
-# Resize the arch image and copy it into place
+# Convert the image
+if [[ "$file" != *.qcow2 ]]; then
+    newfile="${file%.*}.qcow2"
+    qemu-img convert -O qcow2 "$file" "$newfile"
+    file="$newfile"
+fi
+
+# Resize the image and copy it into place
 qemu-img resize $file $DISK_SIZE
 sudo mv $file /var/lib/libvirt/images/
 sudo chown libvirt-qemu:kvm /var/lib/libvirt/images/$file
@@ -70,7 +85,7 @@ virt-install \
   --name $LOCAL_HOSTNAME \
   --memory $MEMORY \
   --vcpus $VCPUS \
-  --osinfo archlinux \
+  --osinfo $OSINFO \
   --import \
   --disk path=/var/lib/libvirt/images/$file,format=qcow2,bus=virtio \
   --network network=default,model=virtio \
