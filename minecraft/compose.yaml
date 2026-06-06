@@ -16,8 +16,7 @@ services:
         sargon2
       MODRINTH_PROJECTS: |
         fabric-api
-        # Not sure if this is needed for distant horizons to work
-        # view-distance-fix:fabric-1.0.2+26.1.2
+        view-distance-fix:fabric-1.0.2+26.1.2
     ports:
       - "25565:25565"
     volumes:
