@@ -20,9 +20,16 @@ services:
         lithium
         ferrite-core
         view-distance-fix:fabric-1.0.2+26.1.2
+        geyser:2.10.0-b1162
+        floodgate
       VIEW_DISTANCE: 16
     ports:
-      - "25565:25565"
+      - "25565:25565/tcp"
+      - "25565:25565/udp"
+      - "19132:19132/tcp"
+      - "19132:19132/udp"
+      - "19133:19133/tcp"
+      - "19133:19133/udp"
     volumes:
       - ./minecraft_data:/data
     stdin_open: true
