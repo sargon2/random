@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-HOST="sargon-openclaw.exe.xyz"
+USER="openclaw"
+HOST="openclaw"
 REMOTE_ROOT="~/.openclaw"
 LOCAL_BACKUP_DIR="$HOME/Dropbox/openclaw/backups"
 STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
@@ -10,7 +11,7 @@ LOCAL_TAR="$LOCAL_BACKUP_DIR/openclaw-backup-$STAMP.tar.gz"
 
 mkdir -p "$LOCAL_BACKUP_DIR"
 
-ssh "$HOST" "
+ssh "$USER@$HOST" "
   set -euo pipefail
   tar -czf '$REMOTE_TAR' \
     --exclude='*/node_modules' \
@@ -36,8 +37,8 @@ ssh "$HOST" "
   fi
 "
 
-scp "$HOST:$REMOTE_TAR" "$LOCAL_TAR"
-ssh "$HOST" "rm -f '$REMOTE_TAR' /tmp/openclaw-backup-warnings-$STAMP.log"
+scp "$USER@$HOST:$REMOTE_TAR" "$LOCAL_TAR"
+ssh "$USER@$HOST" "rm -f '$REMOTE_TAR' /tmp/openclaw-backup-warnings-$STAMP.log"
 
 sha256sum "$LOCAL_TAR" > "$LOCAL_TAR.sha256"
 ls -lh "$LOCAL_TAR" "$LOCAL_TAR.sha256"
