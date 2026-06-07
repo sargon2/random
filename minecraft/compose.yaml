@@ -26,10 +26,11 @@ services:
       VIEW_DISTANCE: 16
       USE_MEOWICE_FLAGS: true
       MOTD: |
-        §cFirelight Systems§r §aMINECRAFT§r
+        §cFirelight Systems§r §aMinecraft§r
         §7Unwind and enjoy!§r
       DIFFICULTY: hard
       ICON: https://www.firelightsystems.com/logo/logo_512x512.png
+      VANILLATWEAKS_SHARECODE: kvflFT
     ports:
       - "25565:25565/tcp"
       - "25565:25565/udp"
