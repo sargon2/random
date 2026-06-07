@@ -1,5 +1,5 @@
 services:
-  mc:
+  minecraft:
     image: itzg/minecraft-server
     environment:
       EULA: true
@@ -25,6 +25,11 @@ services:
         viafabric:0.4.21+164-26.x
       VIEW_DISTANCE: 16
       USE_MEOWICE_FLAGS: true
+      MOTD: |
+        §cFirelight Systems§r §aMINECRAFT§r
+        §7Unwind and enjoy!§r
+      DIFFICULTY: hard
+      ICON: https://www.firelightsystems.com/logo/logo_512x512.png
     ports:
       - "25565:25565/tcp"
       - "25565:25565/udp"
