@@ -5,9 +5,9 @@ services:
       EULA: true
       MEMORY: 8G
       TYPE: FABRIC
+      VERSION: 26.1.2
       FABRIC_LAUNCHER_VERSION: 1.1.1
       FABRIC_LOADER_VERSION: 0.19.3
-      VERSION: 26.1.2
       UID: "${MINECRAFT_UID:?missing MINECRAFT_UID}"
       GID: "${MINECRAFT_GID:?missing MINECRAFT_GID}"
       SEED: 6378
@@ -23,6 +23,8 @@ services:
         geyser:2.10.0-b1162
         floodgate
         viafabric:0.4.21+164-26.x
+        datapack:cheaper-recovery-compass
+        trade-picker
       VIEW_DISTANCE: 16
       USE_MEOWICE_FLAGS: true
       MOTD: |
