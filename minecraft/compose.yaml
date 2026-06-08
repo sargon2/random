@@ -13,6 +13,14 @@ services:
       SEED: 6378
       WHITELIST: |
         sargon2
+        zerowidth
+        ieyasu
+        BadManJose
+        pZilla486
+        guantastic
+        VioletCrime
+        Ro_0s
+        OceanLettuce7
       OPS: |
         sargon2
       MODRINTH_PROJECTS: |
