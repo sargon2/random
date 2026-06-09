@@ -13,6 +13,9 @@ fi
 $DROPBOX lansync n # apparently makes it use less network bandwidth
 $DROPBOX start
 
+# Sometimes Dropbox doesn't notice the FS is updated for a bit.
+sleep 2
+
 # wait until done syncing
 # TODO: dup'd with reinstall-dropbox.sh
 while true; do
