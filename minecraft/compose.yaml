@@ -51,7 +51,7 @@ services:
       - "19132:19132/udp"
       - "19133:19133/tcp"
       - "19133:19133/udp"
-      - "8100:8100/tcp"
+      - "127.0.0.1:8100:8100/tcp"
     volumes:
       - type: bind
         source: ${MINECRAFT_DATA_LOCATION:?missing MINECRAFT_DATA_LOCATION}
