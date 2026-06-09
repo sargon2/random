@@ -35,6 +35,7 @@ services:
         datapack:cheaper-recovery-compass
         trade-picker
         ledger
+        bluemap
       VIEW_DISTANCE: 16
       USE_MEOWICE_FLAGS: true
       MOTD: |
@@ -50,6 +51,7 @@ services:
       - "19132:19132/udp"
       - "19133:19133/tcp"
       - "19133:19133/udp"
+      - "8100:8100/tcp"
     volumes:
       - type: bind
         source: ${MINECRAFT_DATA_LOCATION:?missing MINECRAFT_DATA_LOCATION}
