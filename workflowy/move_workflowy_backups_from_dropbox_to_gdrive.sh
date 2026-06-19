@@ -5,7 +5,7 @@ SRC_REMOTE="Dropbox"
 DST_REMOTE="Google Drive"
 
 SRC_PATH="/Apps/WorkFlowy"
-DST_BASE_PATH="/Workflowy backups"
+DST_BASE_PATH="/backups/Workflowy"
 
 TIMESTAMP="$(date '+%Y-%m-%d_%H-%M-%S')"
 BACKUP_NAME="WorkFlowy_${TIMESTAMP}"
