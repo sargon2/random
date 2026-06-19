@@ -4,7 +4,7 @@ set -euo pipefail
 USER="openclaw"
 HOST="openclaw"
 REMOTE_ROOT="~/.openclaw"
-LOCAL_BACKUP_DIR="$HOME/Dropbox/openclaw/backups"
+LOCAL_BACKUP_DIR="$HOME/Google Drive/backups/openclaw"
 STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
 REMOTE_TAR="/tmp/openclaw-backup-$STAMP.tar.gz"
 LOCAL_TAR="$LOCAL_BACKUP_DIR/openclaw-backup-$STAMP.tar.gz"
