@@ -31,7 +31,7 @@ services:
         view-distance-fix:fabric-1.0.2+26.1.2
         geyser:2.10.0-b1162
         floodgate
-        viafabric:0.4.21+164-26.x
+        viafabric:0.4.21+172-26.x
         datapack:cheaper-recovery-compass
         trade-picker
         ledger
