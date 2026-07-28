@@ -41,6 +41,9 @@ scp "$USER@$HOST:$REMOTE_TAR" "$LOCAL_TAR"
 ssh "$USER@$HOST" "rm -f '$REMOTE_TAR' /tmp/openclaw-backup-warnings-$STAMP.log"
 
 sha256sum "$LOCAL_TAR" > "$LOCAL_TAR.sha256"
+
+wait-rclone-vfs.sh
+
 ls -lh "$LOCAL_TAR" "$LOCAL_TAR.sha256"
 
 echo "$LOCAL_TAR"
